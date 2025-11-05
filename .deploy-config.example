@@ -1,0 +1,22 @@
+# Deployment Configuration Example
+# Copy this to .deploy-config and fill in your server details
+# DO NOT commit .deploy-config to Git (it's in .gitignore)
+
+# Deployment method: ftp, sftp, ssh, or git
+DEPLOY_METHOD="ssh"
+
+# Server connection details
+SERVER_HOST="your-server.com"
+SERVER_USER="your-username"
+SERVER_PASS="your-password"  # Only needed for FTP
+SERVER_PORT="22"  # 21 for FTP, 22 for SSH/SFTP
+
+# WordPress theme path on server
+SERVER_PATH="/var/www/html/wp-content/themes/clarkes-terraclean/"
+
+# SSH key path (if using SSH/SFTP)
+SSH_KEY="$HOME/.ssh/id_rsa"
+
+# Git remote name (if using Git deployment)
+GIT_REMOTE="production"
+

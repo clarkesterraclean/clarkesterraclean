@@ -1,72 +1,60 @@
-# Clarke's TerraClean Theme - Deployment Guide
+# Deployment Setup for WordPress Server
 
-## Pre-Deployment Checklist
+## Overview
 
-### Required Information
-- [ ] Web hosting provider name
-- [ ] FTP/SFTP credentials (host, username, password, port)
-- [ ] WordPress installation path (usually `/public_html/` or `/wp-content/`)
-- [ ] WordPress admin access (to activate theme)
-- [ ] Domain name (e.g., clarkesterraclean.co.uk)
+This theme is developed in Cursor and needs to be deployed to your WordPress server's theme folder.
 
-### Files to Upload
+## Server Information Needed
 
-**Essential Theme Files** (must upload):
-- `style.css` - WordPress theme header
-- `functions.php` - Core functionality
-- `header.php` - Header template
-- `footer.php` - Footer template
-- `index.php` - Main template
-- `front-page.php` - Homepage template
-- `page.php` - Page template
-- `404.php` - Error page
-- `screenshot.png` - Theme preview (1200×900)
-- `page-about.php` - About page template
-- `page-services.php` - Services page template
-- `page-case-studies.php` - Case Studies template
-- `page-testimonials.php` - Testimonials template
-- `page-contact-us.php` - Contact page template
-- `dist/style.css` - Compiled Tailwind CSS (CRITICAL)
-- `js/theme.js` - Theme JavaScript
+Please provide the following details about your WordPress server:
 
-**Development Files** (optional - can skip):
-- `src/style.css` - Tailwind source (not needed on server)
-- `tailwind.config.js` - Tailwind config (not needed)
-- `package.json` - NPM config (not needed)
-- `node_modules/` - Dependencies (not needed)
-- `screenshot.svg` - SVG source (optional)
+1. **Server Type**: 
+   - [ ] FTP/SFTP
+   - [ ] SSH/SCP
+   - [ ] Git-based deployment
+   - [ ] Other (specify)
 
-### Deployment Steps
+2. **Server Details** (if FTP/SFTP):
+   - Host: `________________`
+   - Username: `________________`
+   - Password: `________________`
+   - Port: `21` (FTP) or `22` (SFTP)
+   - WordPress theme path: `/wp-content/themes/clarkes-terraclean/`
 
-1. **Prepare Files**
-   - Ensure `dist/style.css` is built and up-to-date
-   - Verify all PHP files are present
+3. **Server Details** (if SSH):
+   - Host: `________________`
+   - Username: `________________`
+   - SSH key path: `________________`
+   - WordPress theme path: `/wp-content/themes/clarkes-terraclean/`
 
-2. **Upload to Server**
-   - Upload entire `clarkes-terraclean` folder to `/wp-content/themes/`
-   - Final path should be: `/wp-content/themes/clarkes-terraclean/`
+4. **Server Details** (if Git):
+   - Repository URL: `________________`
+   - Branch: `main` or `master`
+   - Deployment hook/script: `________________`
 
-3. **Activate Theme**
-   - Log into WordPress Admin
-   - Go to Appearance → Themes
-   - Find "Clarke's TerraClean" theme
-   - Click "Activate"
+## Current Setup
 
-4. **Configure WordPress**
-   - Go to Appearance → Menus
-   - Create a menu and assign to "Primary Menu"
-   - Set up pages (they should auto-create on activation)
+- **Local Development**: `/Users/napwoodconstruction/Desktop/ClarkesTerraClean/clarkes-terraclean`
+- **Git Repository**: `https://github.com/clarkesterraclean/clarkesterraclean.git`
+- **Auto-commit**: Enabled
+- **Auto-push to GitHub**: Enabled
 
-5. **Test**
-   - Visit homepage
-   - Test contact form
-   - Check mobile menu
-   - Verify all pages load correctly
+## Deployment Options
 
-## Important Notes
+### Option 1: Automated Deployment Script (Recommended)
 
-- **Tailwind CSS**: The `dist/style.css` file MUST be uploaded - this contains all compiled styles
-- **No Build Process Needed**: The theme uses pre-compiled CSS, no npm/node required on server
-- **PHP Version**: Requires PHP 7.4 or higher
-- **WordPress Version**: Requires WordPress 6.0 or higher
+A script will sync the theme files to your server after each commit.
 
+### Option 2: Manual Deployment
+
+Run a deployment command when ready to push changes.
+
+### Option 3: Git-based Deployment
+
+If your server supports Git, we can set up a deployment hook.
+
+## Next Steps
+
+1. Provide your server details above
+2. I'll create the deployment script
+3. Configure it to run automatically after commits

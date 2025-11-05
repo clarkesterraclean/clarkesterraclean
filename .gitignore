@@ -10,8 +10,9 @@ yarn-error.log
 package-lock.json
 yarn.lock
 
-# Build files
-dist/
+# Build files (but keep dist/style.css - needed for deployment)
+dist/*
+!dist/style.css
 *.min.css
 *.min.js
 
@@ -35,6 +36,9 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Deployment config (contains sensitive server credentials)
+.deploy-config
 
 # Logs
 *.log
