@@ -1,0 +1,22 @@
+/*
+Theme Name: Clarke's DPF & Engine Specialists
+Theme URI: https://clarkesterraclean.co.uk
+Author: Clarke's DPF & Engine Specialists
+Author URI: https://clarkesterraclean.co.uk
+Description: Custom WordPress theme for Clarke's DPF & Engine Specialists - professional engine decarbonisation, DPF cleaning and EGR cleaning services in Kent.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.4
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: clarkes-terraclean
+Tags: custom-theme, automotive, technical, eco-friendly
+*/
+
+/* 
+ * This theme uses Tailwind CSS for styling.
+ * The compiled CSS file is generated from src/style.css
+ * Run: npm run build-css (or pnpm build-css) to compile Tailwind
+ */
+

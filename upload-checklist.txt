@@ -1,0 +1,35 @@
+CLARKES TERRACLEAN THEME - UPLOAD CHECKLIST
+==========================================
+
+FILES TO UPLOAD (all in clarkes-terraclean folder):
+✓ style.css
+✓ functions.php
+✓ header.php
+✓ footer.php
+✓ index.php
+✓ front-page.php
+✓ page.php
+✓ 404.php
+✓ page-about.php
+✓ page-services.php
+✓ page-case-studies.php
+✓ page-testimonials.php
+✓ page-contact-us.php
+✓ screenshot.png
+✓ dist/style.css (CRITICAL - contains all styles)
+✓ js/theme.js
+
+DO NOT UPLOAD:
+✗ node_modules/ (not needed)
+✗ src/ (source files, not needed)
+✗ package.json (not needed)
+✗ tailwind.config.js (not needed)
+
+UPLOAD LOCATION:
+/wp-content/themes/clarkes-terraclean/
+
+AFTER UPLOAD:
+1. Go to WordPress Admin → Appearance → Themes
+2. Activate "Clarke's TerraClean"
+3. Go to Appearance → Menus → Create menu → Assign to "Primary Menu"
+4. Test the site!
