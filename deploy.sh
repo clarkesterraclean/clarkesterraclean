@@ -79,9 +79,21 @@ deploy_via_sftp() {
         exit 1
     fi
     
-    rsync -avz --exclude-from="$EXCLUDE_FILE" \
-        -e "ssh -p $SERVER_PORT ${SSH_KEY:+-i $SSH_KEY}" \
-        "$THEME_DIR/" "${SERVER_USER}@${SERVER_HOST}:${SERVER_PATH}"
+    # Use sshpass if password is provided, otherwise use SSH key
+    if [ -n "$SERVER_PASS" ] && command -v sshpass &> /dev/null; then
+        rsync -avz --exclude-from="$EXCLUDE_FILE" \
+            -e "sshpass -p '$SERVER_PASS' ssh -p $SERVER_PORT -o StrictHostKeyChecking=no" \
+            "$THEME_DIR/" "${SERVER_USER}@${SERVER_HOST}:${SERVER_PATH}"
+    elif [ -n "$SSH_KEY" ]; then
+        rsync -avz --exclude-from="$EXCLUDE_FILE" \
+            -e "ssh -p $SERVER_PORT -i $SSH_KEY -o StrictHostKeyChecking=no" \
+            "$THEME_DIR/" "${SERVER_USER}@${SERVER_HOST}:${SERVER_PATH}"
+    else
+        # Try interactive password prompt
+        rsync -avz --exclude-from="$EXCLUDE_FILE" \
+            -e "ssh -p $SERVER_PORT -o StrictHostKeyChecking=no" \
+            "$THEME_DIR/" "${SERVER_USER}@${SERVER_HOST}:${SERVER_PATH}"
+    fi
 }
 
 deploy_via_ssh() {
