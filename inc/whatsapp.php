@@ -13,6 +13,11 @@ if (!defined('ABSPATH')) {
  * Register WhatsApp Customizer Settings
  */
 function clarkes_register_whatsapp_settings($wp_customize) {
+    // Check if panel exists first
+    if (!$wp_customize->get_panel('clarkes_theme_options')) {
+        return; // Panel not registered yet, skip
+    }
+    
     // Add section to existing panel
     $wp_customize->add_section('clarkes_whatsapp', array(
         'title'    => esc_html__('Contact & WhatsApp', 'clarkes-terraclean'),

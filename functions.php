@@ -142,6 +142,20 @@ add_filter('script_loader_tag', function($tag, $handle) {
 }, 10, 2);
 
 /**
+ * Error handler to catch fatal errors during theme activation
+ */
+if (!function_exists('clarkes_error_handler')) {
+    function clarkes_error_handler($errno, $errstr, $errfile, $errline) {
+        // Only log errors, don't break the site
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Clarke's Theme Error: $errstr in $errfile on line $errline");
+        }
+        return false; // Let WordPress handle it
+    }
+    set_error_handler('clarkes_error_handler', E_WARNING | E_NOTICE);
+}
+
+/**
  * Create Default Pages on Theme Activation
  */
 function clarkes_terraclean_create_pages() {
