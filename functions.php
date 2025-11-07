@@ -432,26 +432,47 @@ add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
 
 /**
  * Include Customizer settings
+ * Wrapped in try-catch to prevent fatal errors
  */
 $customizer_file = get_template_directory() . '/inc/customizer.php';
 if (file_exists($customizer_file)) {
-    require_once $customizer_file;
+    try {
+        require_once $customizer_file;
+    } catch (Throwable $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Clarke Theme: Error loading customizer.php - ' . $e->getMessage());
+        }
+    }
 }
 
 /**
  * Include Reviews system
+ * Wrapped in try-catch to prevent fatal errors
  */
 $reviews_file = get_template_directory() . '/inc/reviews.php';
 if (file_exists($reviews_file)) {
-    require_once $reviews_file;
+    try {
+        require_once $reviews_file;
+    } catch (Throwable $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Clarke Theme: Error loading reviews.php - ' . $e->getMessage());
+        }
+    }
 }
 
 /**
  * Include WhatsApp FAB system
+ * Wrapped in try-catch to prevent fatal errors
  */
 $whatsapp_file = get_template_directory() . '/inc/whatsapp.php';
 if (file_exists($whatsapp_file)) {
-    require_once $whatsapp_file;
+    try {
+        require_once $whatsapp_file;
+    } catch (Throwable $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Clarke Theme: Error loading whatsapp.php - ' . $e->getMessage());
+        }
+    }
 }
 
 /**
