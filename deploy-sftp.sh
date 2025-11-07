@@ -39,10 +39,11 @@ echo ""
 RSYNC_EXCLUDES="--exclude=.git --exclude=.gitignore --exclude=node_modules --exclude='*.log' --exclude=.DS_Store --exclude=.env --exclude='*.md' --exclude=README* --exclude=.git-credentials-store.sh --exclude=commit-and-push.sh --exclude=.auto-commit.sh --exclude=deploy.sh --exclude=deploy-sftp.sh --exclude=.deploy-config.example --exclude=.deploy-config --exclude=functions-minimal.php --exclude=verify-files.php --exclude=check-theme.php"
 
 # Use expect script for password authentication
+# Use --delete to ensure server matches local exactly
 if command -v expect &> /dev/null; then
     expect <<EOF
-set timeout 60
-spawn rsync -avz $RSYNC_EXCLUDES -e "ssh -p $SERVER_PORT -o StrictHostKeyChecking=no" "$THEME_DIR/" "${SERVER_USER}@${SERVER_HOST}:${SERVER_PATH}"
+set timeout 120
+spawn rsync -avz --delete $RSYNC_EXCLUDES -e "ssh -p $SERVER_PORT -o StrictHostKeyChecking=no" "$THEME_DIR/" "${SERVER_USER}@${SERVER_HOST}:${SERVER_PATH}"
 expect {
     "password:" {
         send "$SERVER_PASS\r"
