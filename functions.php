@@ -419,17 +419,26 @@ add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
 /**
  * Include Customizer settings
  */
-require get_template_directory() . '/inc/customizer.php';
+$customizer_file = get_template_directory() . '/inc/customizer.php';
+if (file_exists($customizer_file)) {
+    require $customizer_file;
+}
 
 /**
  * Include Reviews system
  */
-require get_template_directory() . '/inc/reviews.php';
+$reviews_file = get_template_directory() . '/inc/reviews.php';
+if (file_exists($reviews_file)) {
+    require $reviews_file;
+}
 
 /**
  * Include WhatsApp FAB system
  */
-require get_template_directory() . '/inc/whatsapp.php';
+$whatsapp_file = get_template_directory() . '/inc/whatsapp.php';
+if (file_exists($whatsapp_file)) {
+    require $whatsapp_file;
+}
 
 /**
  * Helper function to get color from theme mod with fallback
