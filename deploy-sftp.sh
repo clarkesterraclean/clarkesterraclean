@@ -35,7 +35,8 @@ echo "Path: $SERVER_PATH"
 echo ""
 
 # Build rsync exclude pattern
-RSYNC_EXCLUDES="--exclude=.git --exclude=.gitignore --exclude=node_modules --exclude='*.log' --exclude=.DS_Store --exclude=.env --exclude='*.md' --exclude=README* --exclude=.git-credentials-store.sh --exclude=commit-and-push.sh --exclude=.auto-commit.sh --exclude=deploy.sh --exclude=deploy-sftp.sh --exclude=.deploy-config.example --exclude=.deploy-config"
+# IMPORTANT: Only exclude development files, NOT theme files (inc/, dist/, js/, *.php, etc.)
+RSYNC_EXCLUDES="--exclude=.git --exclude=.gitignore --exclude=node_modules --exclude='*.log' --exclude=.DS_Store --exclude=.env --exclude='*.md' --exclude=README* --exclude=.git-credentials-store.sh --exclude=commit-and-push.sh --exclude=.auto-commit.sh --exclude=deploy.sh --exclude=deploy-sftp.sh --exclude=.deploy-config.example --exclude=.deploy-config --exclude=functions-minimal.php --exclude=verify-files.php --exclude=check-theme.php"
 
 # Use expect script for password authentication
 if command -v expect &> /dev/null; then
