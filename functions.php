@@ -142,18 +142,9 @@ add_filter('script_loader_tag', function($tag, $handle) {
 }, 10, 2);
 
 /**
- * Error handler to catch fatal errors during theme activation
+ * Error handler removed - was causing issues
+ * WordPress handles errors natively
  */
-if (!function_exists('clarkes_error_handler')) {
-    function clarkes_error_handler($errno, $errstr, $errfile, $errline) {
-        // Only log errors, don't break the site
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Clarke's Theme Error: $errstr in $errfile on line $errline");
-        }
-        return false; // Let WordPress handle it
-    }
-    set_error_handler('clarkes_error_handler', E_WARNING | E_NOTICE);
-}
 
 /**
  * Create Default Pages on Theme Activation
@@ -432,47 +423,26 @@ add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
 
 /**
  * Include Customizer settings
- * Wrapped in try-catch to prevent fatal errors
  */
 $customizer_file = get_template_directory() . '/inc/customizer.php';
 if (file_exists($customizer_file)) {
-    try {
-        require_once $customizer_file;
-    } catch (Throwable $e) {
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Clarke Theme: Error loading customizer.php - ' . $e->getMessage());
-        }
-    }
+    require_once $customizer_file;
 }
 
 /**
  * Include Reviews system
- * Wrapped in try-catch to prevent fatal errors
  */
 $reviews_file = get_template_directory() . '/inc/reviews.php';
 if (file_exists($reviews_file)) {
-    try {
-        require_once $reviews_file;
-    } catch (Throwable $e) {
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Clarke Theme: Error loading reviews.php - ' . $e->getMessage());
-        }
-    }
+    require_once $reviews_file;
 }
 
 /**
  * Include WhatsApp FAB system
- * Wrapped in try-catch to prevent fatal errors
  */
 $whatsapp_file = get_template_directory() . '/inc/whatsapp.php';
 if (file_exists($whatsapp_file)) {
-    try {
-        require_once $whatsapp_file;
-    } catch (Throwable $e) {
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Clarke Theme: Error loading whatsapp.php - ' . $e->getMessage());
-        }
-    }
+    require_once $whatsapp_file;
 }
 
 /**
