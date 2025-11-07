@@ -10,6 +10,15 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Sanitize Integer (must be defined before use in settings)
+ */
+if (!function_exists('clarkes_sanitize_int')) {
+    function clarkes_sanitize_int($input) {
+        return absint($input);
+    }
+}
+
+/**
  * Register WhatsApp Customizer Settings
  */
 function clarkes_register_whatsapp_settings($wp_customize) {
@@ -173,13 +182,6 @@ function clarkes_register_whatsapp_settings($wp_customize) {
     ));
 }
 add_action('customize_register', 'clarkes_register_whatsapp_settings');
-
-/**
- * Sanitize Integer
- */
-function clarkes_sanitize_int($input) {
-    return absint($input);
-}
 
 /**
  * Render WhatsApp FAB

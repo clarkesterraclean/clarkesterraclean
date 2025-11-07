@@ -435,7 +435,7 @@ add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
  */
 $customizer_file = get_template_directory() . '/inc/customizer.php';
 if (file_exists($customizer_file)) {
-    require $customizer_file;
+    require_once $customizer_file;
 }
 
 /**
@@ -443,7 +443,7 @@ if (file_exists($customizer_file)) {
  */
 $reviews_file = get_template_directory() . '/inc/reviews.php';
 if (file_exists($reviews_file)) {
-    require $reviews_file;
+    require_once $reviews_file;
 }
 
 /**
@@ -451,7 +451,7 @@ if (file_exists($reviews_file)) {
  */
 $whatsapp_file = get_template_directory() . '/inc/whatsapp.php';
 if (file_exists($whatsapp_file)) {
-    require $whatsapp_file;
+    require_once $whatsapp_file;
 }
 
 /**
