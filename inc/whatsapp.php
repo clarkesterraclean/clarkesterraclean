@@ -304,9 +304,9 @@ function clarkes_render_whatsapp_fab() {
     </script>
     <?php
 }
+}
 add_action('wp_footer', 'clarkes_render_whatsapp_fab', 99);
 
-}
 /**
  * Enqueue Customizer Preview Script
  */
