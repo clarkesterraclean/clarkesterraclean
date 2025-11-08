@@ -481,6 +481,7 @@ add_action('customize_register', 'clarkes_customize_register');
 /**
  * Enqueue Customizer preview script
  */
+if (!function_exists('clarkes_customize_preview_init')) {
 function clarkes_customize_preview_init() {
     wp_enqueue_script(
         'clarkes-customizer-preview',
@@ -489,6 +490,7 @@ function clarkes_customize_preview_init() {
         wp_get_theme()->get('Version'),
         true
     );
+}
 }
 add_action('customize_preview_init', 'clarkes_customize_preview_init');
 

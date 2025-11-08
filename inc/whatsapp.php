@@ -185,9 +185,11 @@ function clarkes_register_whatsapp_settings($wp_customize) {
 }
 add_action('customize_register', 'clarkes_register_whatsapp_settings');
 
+}
 /**
  * Render WhatsApp FAB
  */
+if (!function_exists('clarkes_render_whatsapp_fab')) {
 function clarkes_render_whatsapp_fab() {
     // Check if enabled
     if (!get_theme_mod('enable_whatsapp_fab', 1)) {
@@ -305,9 +307,11 @@ function clarkes_render_whatsapp_fab() {
 }
 add_action('wp_footer', 'clarkes_render_whatsapp_fab', 99);
 
+}
 /**
  * Enqueue Customizer Preview Script
  */
+if (!function_exists('clarkes_whatsapp_preview_init')) {
 function clarkes_whatsapp_preview_init() {
     wp_enqueue_script(
         'clarkes-whatsapp-preview',
@@ -316,6 +320,7 @@ function clarkes_whatsapp_preview_init() {
         wp_get_theme()->get('Version'),
         true
     );
+}
 }
 add_action('customize_preview_init', 'clarkes_whatsapp_preview_init');
 
