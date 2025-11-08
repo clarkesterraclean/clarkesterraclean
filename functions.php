@@ -481,13 +481,16 @@ if (!function_exists('clarkes_register_whatsapp_settings')) {
 
 /**
  * Helper function to get color from theme mod with fallback
+ * Note: This function may not be available if clarkes_sanitize_hex_color doesn't exist yet
  */
 if (!function_exists('clarkes_color')) {
 function clarkes_color($key, $default = '') {
+    if (!function_exists('clarkes_sanitize_hex_color')) {
+        return $default;
+    }
     $color = get_theme_mod($key, $default);
     return clarkes_sanitize_hex_color($color) ?: $default;
 }
-
 }
 /**
  * Sanitize hex color
@@ -534,11 +537,21 @@ function clarkes_sanitize_select($input, $setting) {
  */
 if (!function_exists('clarkes_output_dynamic_css')) {
 function clarkes_output_dynamic_css() {
-    $accent = clarkes_color('color_accent', '#4ade80');
-    $carbon_dark = clarkes_color('color_dark', '#0f0f0f');
-    $carbon_light = clarkes_color('color_light', '#f5f5f5');
-    $text_body = clarkes_color('color_text_body', '#d4d4d4');
-    $text_dark = clarkes_color('color_text_dark', '#1a1a1a');
+    // Use get_theme_mod directly with fallbacks
+    $accent = get_theme_mod('color_accent', '#4ade80');
+    $carbon_dark = get_theme_mod('color_dark', '#0f0f0f');
+    $carbon_light = get_theme_mod('color_light', '#f5f5f5');
+    $text_body = get_theme_mod('color_text_body', '#d4d4d4');
+    $text_dark = get_theme_mod('color_text_dark', '#1a1a1a');
+    
+    // Sanitize colors if function exists, otherwise use defaults
+    if (function_exists('clarkes_sanitize_hex_color')) {
+        $accent = clarkes_sanitize_hex_color($accent) ?: '#4ade80';
+        $carbon_dark = clarkes_sanitize_hex_color($carbon_dark) ?: '#0f0f0f';
+        $carbon_light = clarkes_sanitize_hex_color($carbon_light) ?: '#f5f5f5';
+        $text_body = clarkes_sanitize_hex_color($text_body) ?: '#d4d4d4';
+        $text_dark = clarkes_sanitize_hex_color($text_dark) ?: '#1a1a1a';
+    }
     
     // Container max width
     $container_max = get_theme_mod('container_max', '7xl');
