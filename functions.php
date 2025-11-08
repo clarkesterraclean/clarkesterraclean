@@ -209,11 +209,13 @@ add_action('after_switch_theme', 'clarkes_terraclean_create_pages');
 /**
  * Add Custom Body Classes
  */
+if (!function_exists('clarkes_terraclean_body_classes')) {
 function clarkes_terraclean_body_classes($classes) {
     if (is_front_page()) {
         $classes[] = 'is-front-page';
     }
     return $classes;
+}
 }
 add_filter('body_class', 'clarkes_terraclean_body_classes');
 
