@@ -430,6 +430,7 @@ function clarkes_handle_contact_form() {
         wp_send_json_error(array('errors' => array('form' => 'Unable to send message. Please try calling us directly.')));
     }
 }
+}
 add_action('wp_ajax_clarkes_contact', 'clarkes_handle_contact_form');
 add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
 
@@ -486,25 +487,31 @@ function clarkes_sanitize_hex_color($color) {
     
     return '';
 }
+}
 
 /**
  * Sanitize checkbox
  */
+if (!function_exists('clarkes_sanitize_checkbox')) {
 function clarkes_sanitize_checkbox($input) {
     return (isset($input) && true === $input) ? 1 : 0;
+}
 }
 
 /**
  * Sanitize select
  */
+if (!function_exists('clarkes_sanitize_select')) {
 function clarkes_sanitize_select($input, $setting) {
     $choices = $setting->manager->get_control($setting->id)->choices;
     return (array_key_exists($input, $choices) ? $input : $setting->default);
+}
 }
 
 /**
  * Output dynamic CSS variables
  */
+if (!function_exists('clarkes_output_dynamic_css')) {
 function clarkes_output_dynamic_css() {
     $accent = clarkes_color('color_accent', '#4ade80');
     $carbon_dark = clarkes_color('color_dark', '#0f0f0f');
