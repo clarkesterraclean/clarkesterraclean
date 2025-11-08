@@ -561,6 +561,7 @@ function clarkes_output_dynamic_css() {
     </style>
     <?php
 }
+}
 add_action('wp_head', 'clarkes_output_dynamic_css', 15);
 
 }
@@ -678,5 +679,6 @@ function clarkes_nav_menu_link_attributes($atts, $item, $args) {
         }
     }
     return $atts;
+}
 }
 add_filter('nav_menu_link_attributes', 'clarkes_nav_menu_link_attributes', 10, 3);
