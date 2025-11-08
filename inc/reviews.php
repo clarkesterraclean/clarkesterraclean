@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 /**
  * Register Review Custom Post Type
  */
+if (!function_exists('clarkes_register_review_post_type')) {
 function clarkes_register_review_post_type() {
     $labels = array(
         'name'                  => _x('Reviews', 'Post type general name', 'clarkes-terraclean'),
@@ -48,6 +49,7 @@ function clarkes_register_review_post_type() {
     );
 
     register_post_type('review', $args);
+}
 }
 add_action('init', 'clarkes_register_review_post_type');
 

@@ -21,6 +21,7 @@ if (!function_exists('clarkes_sanitize_int')) {
 /**
  * Register WhatsApp Customizer Settings
  */
+if (!function_exists('clarkes_register_whatsapp_settings')) {
 function clarkes_register_whatsapp_settings($wp_customize) {
     // Check if panel exists first
     if (!$wp_customize->get_panel('clarkes_theme_options')) {
@@ -180,6 +181,7 @@ function clarkes_register_whatsapp_settings($wp_customize) {
             'pages_only' => 'Static Pages Only',
         ),
     ));
+}
 }
 add_action('customize_register', 'clarkes_register_whatsapp_settings');
 

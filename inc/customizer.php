@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 /**
  * Add Customizer settings and controls
  */
+if (!function_exists('clarkes_customize_register')) {
 function clarkes_customize_register($wp_customize) {
     
     // Create main panel
@@ -473,6 +474,7 @@ function clarkes_customize_register($wp_customize) {
             '2xl' => '2X Large',
         ),
     ));
+}
 }
 add_action('customize_register', 'clarkes_customize_register');
 
