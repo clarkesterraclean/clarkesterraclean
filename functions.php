@@ -153,6 +153,7 @@ add_filter('script_loader_tag', function($tag, $handle) {
 /**
  * Create Default Pages on Theme Activation
  */
+if (!function_exists('clarkes_terraclean_create_pages')) {
 function clarkes_terraclean_create_pages() {
     $pages = array(
         'Home' => array(
@@ -202,6 +203,7 @@ function clarkes_terraclean_create_pages() {
         }
     }
 }
+}
 add_action('after_switch_theme', 'clarkes_terraclean_create_pages');
 
 /**
@@ -233,11 +235,13 @@ function clarkes_terraclean_meta_description() {
         echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
     }
 }
+}
 add_action('wp_head', 'clarkes_terraclean_meta_description', 1);
 
 /**
  * Rewrite menu links to anchors on front page
  */
+if (!function_exists('clarkes_terraclean_menu_link_anchors')) {
 function clarkes_terraclean_menu_link_anchors($atts, $item, $args) {
     // Only process on front page
     if (!is_front_page()) {
@@ -270,11 +274,13 @@ function clarkes_terraclean_menu_link_anchors($atts, $item, $args) {
     
     return $atts;
 }
+}
 add_filter('nav_menu_link_attributes', 'clarkes_terraclean_menu_link_anchors', 10, 3);
 
 /**
  * Default menu fallback if no menu is assigned
  */
+if (!function_exists('clarkes_terraclean_default_menu')) {
 function clarkes_terraclean_default_menu() {
     // Build menu items - use anchors on front page, URLs on other pages
     if (is_front_page()) {
@@ -316,10 +322,12 @@ function clarkes_terraclean_default_menu() {
     }
     echo '</ul>';
 }
+}
 
 /**
  * Contact Form AJAX Handler
  */
+if (!function_exists('clarkes_handle_contact_form')) {
 function clarkes_handle_contact_form() {
     // Verify nonce
     check_ajax_referer('clarkes_contact_nonce', 'nonce');
@@ -452,14 +460,17 @@ if (file_exists($whatsapp_file)) {
 /**
  * Helper function to get color from theme mod with fallback
  */
+if (!function_exists('clarkes_color')) {
 function clarkes_color($key, $default = '') {
     $color = get_theme_mod($key, $default);
     return clarkes_sanitize_hex_color($color) ?: $default;
 }
 
+}
 /**
  * Sanitize hex color
  */
+if (!function_exists('clarkes_sanitize_hex_color')) {
 function clarkes_sanitize_hex_color($color) {
     if (empty($color)) {
         return '';
@@ -545,9 +556,11 @@ function clarkes_output_dynamic_css() {
 }
 add_action('wp_head', 'clarkes_output_dynamic_css', 15);
 
+}
 /**
  * Check if URL is external
  */
+if (!function_exists('clarkes_is_external_url')) {
 function clarkes_is_external_url($url) {
     // Treat empty, mailto, tel, and anchor-only as internal
     if (empty($url) || strpos($url, 'mailto:') === 0 || strpos($url, 'tel:') === 0 || strpos($url, '#') === 0) {
