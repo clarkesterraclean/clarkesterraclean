@@ -440,35 +440,44 @@ add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
 /**
  * Include Customizer settings
  * Only include if not already loaded (prevents redeclaration)
+ * Temporarily disabled for debugging - uncomment to enable
  */
+/*
 if (!function_exists('clarkes_customize_register')) {
     $customizer_file = get_template_directory() . '/inc/customizer.php';
     if (file_exists($customizer_file)) {
         require_once $customizer_file;
     }
 }
+*/
 
 /**
  * Include Reviews system
  * Only include if not already loaded (prevents redeclaration)
+ * Temporarily disabled for debugging - uncomment to enable
  */
+/*
 if (!function_exists('clarkes_register_review_post_type')) {
     $reviews_file = get_template_directory() . '/inc/reviews.php';
     if (file_exists($reviews_file)) {
         require_once $reviews_file;
     }
 }
+*/
 
 /**
  * Include WhatsApp FAB system
  * Only include if not already loaded (prevents redeclaration)
+ * Temporarily disabled for debugging - uncomment to enable
  */
+/*
 if (!function_exists('clarkes_register_whatsapp_settings')) {
     $whatsapp_file = get_template_directory() . '/inc/whatsapp.php';
     if (file_exists($whatsapp_file)) {
         require_once $whatsapp_file;
     }
 }
+*/
 
 /**
  * Helper function to get color from theme mod with fallback
