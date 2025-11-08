@@ -22,7 +22,7 @@
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
-<?php wp_body_open(); ?>
+<?php if (function_exists('wp_body_open')) { wp_body_open(); } ?>
 
 <header class="<?php echo get_theme_mod('header_sticky', 1) ? 'fixed' : 'relative'; ?> top-0 left-0 right-0 z-50 bg-carbon-dark text-text-body border-b border-eco-green/30" role="banner">
     <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
