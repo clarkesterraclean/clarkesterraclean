@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 /**
  * Theme Setup
  */
+if (!function_exists('clarkes_terraclean_setup')) {
 function clarkes_terraclean_setup() {
     // Add theme support for title tag
     add_theme_support('title-tag');
@@ -94,11 +95,13 @@ function clarkes_terraclean_setup() {
         $content_width = 1200;
     }
 }
+}
 add_action('after_setup_theme', 'clarkes_terraclean_setup');
 
 /**
  * Enqueue Styles and Scripts
  */
+if (!function_exists('clarkes_terraclean_scripts')) {
 function clarkes_terraclean_scripts() {
     // Cache-busting versioning using filemtime
     $css_file = get_stylesheet_directory() . '/dist/style.css';
@@ -128,6 +131,7 @@ function clarkes_terraclean_scripts() {
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce'    => wp_create_nonce('clarkes_contact_nonce'),
     ));
+}
 }
 add_action('wp_enqueue_scripts', 'clarkes_terraclean_scripts');
 
