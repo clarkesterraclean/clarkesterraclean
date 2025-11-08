@@ -222,6 +222,7 @@ add_filter('body_class', 'clarkes_terraclean_body_classes');
 /**
  * Add meta description tag
  */
+if (!function_exists('clarkes_terraclean_meta_description')) {
 function clarkes_terraclean_meta_description() {
     // Only output if no SEO plugin is active
     if (function_exists('yoast_breadcrumb') || 
