@@ -564,7 +564,6 @@ function clarkes_output_dynamic_css() {
 }
 add_action('wp_head', 'clarkes_output_dynamic_css', 15);
 
-}
 /**
  * Check if URL is external
  */
@@ -612,10 +611,12 @@ function clarkes_link_attrs($url, $extra_classes = '') {
     
     return implode(' ', $attrs);
 }
+}
 
 /**
  * Filter post content to add external link attributes
  */
+if (!function_exists('clarkes_filter_content_links')) {
 function clarkes_filter_content_links($content) {
     if (empty($content)) {
         return $content;
@@ -665,11 +666,13 @@ function clarkes_filter_content_links($content) {
     
     return $modified;
 }
+}
 add_filter('the_content', 'clarkes_filter_content_links', 12);
 
 /**
  * Filter nav menu link attributes to add external link attributes
  */
+if (!function_exists('clarkes_nav_menu_link_attributes')) {
 function clarkes_nav_menu_link_attributes($atts, $item, $args) {
     // Only apply to social menu
     if (isset($args->theme_location) && $args->theme_location === 'social_menu') {
