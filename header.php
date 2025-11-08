@@ -124,11 +124,9 @@
                     $anchor_class = (is_front_page() && strpos($item_url, '#') === 0) ? ' js-anchor' : '';
                     echo '<a href="' . esc_url($item_url) . '" class="block py-3 px-4 border-b border-eco-green/10 text-text-body hover:bg-carbon-dark/60 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green' . esc_attr($anchor_class) . '">' . esc_html($item->title) . '</a>';
                 }
-                <?php 
                 $phone = get_theme_mod('business_phone', '07706 230867');
                 $phone_clean = preg_replace('/[^0-9]/', '', $phone);
-                ?>
-                <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="block py-3 px-4 border-b border-eco-green/10 text-eco-green hover:bg-carbon-dark/60 transition-colors font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Call <?php echo esc_html($phone); ?></a>
+                echo '<a href="tel:' . esc_attr($phone_clean) . '" aria-label="Call Clarke\'s DPF & Engine Specialists" class="block py-3 px-4 border-b border-eco-green/10 text-eco-green hover:bg-carbon-dark/60 transition-colors font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Call ' . esc_html($phone) . '</a>';
                 echo '</div>';
             } else {
                 // Fallback if menu items retrieval fails
@@ -137,11 +135,9 @@
                     $anchor_class = (is_front_page() && strpos($url, '#') === 0) ? ' js-anchor' : '';
                     echo '<a href="' . esc_url($url) . '" class="block py-3 px-4 border-b border-eco-green/10 text-text-body hover:bg-carbon-dark/60 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green' . esc_attr($anchor_class) . '">' . esc_html($title) . '</a>';
                 }
-                <?php 
                 $phone = get_theme_mod('business_phone', '07706 230867');
                 $phone_clean = preg_replace('/[^0-9]/', '', $phone);
-                ?>
-                <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="block py-3 px-4 border-b border-eco-green/10 text-eco-green hover:bg-carbon-dark/60 transition-colors font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Call <?php echo esc_html($phone); ?></a>
+                echo '<a href="tel:' . esc_attr($phone_clean) . '" aria-label="Call Clarke\'s DPF & Engine Specialists" class="block py-3 px-4 border-b border-eco-green/10 text-eco-green hover:bg-carbon-dark/60 transition-colors font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Call ' . esc_html($phone) . '</a>';
                 echo '</div>';
             }
         } else {
