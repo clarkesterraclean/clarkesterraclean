@@ -185,7 +185,6 @@ function clarkes_register_whatsapp_settings($wp_customize) {
 }
 add_action('customize_register', 'clarkes_register_whatsapp_settings');
 
-}
 /**
  * Render WhatsApp FAB
  */
