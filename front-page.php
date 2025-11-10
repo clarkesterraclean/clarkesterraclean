@@ -74,18 +74,40 @@ if (!empty($hero_bg_image)) {
 <?php if (get_theme_mod('show_about', 1)) : ?>
 <section id="about" class="py-16 md:py-24 bg-carbon-light text-text-dark">
     <div class="max-w-7xl mx-auto px-4">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-semibold mb-8">Why Choose Us?</h2>
-            <div class="prose prose-lg max-w-none space-y-6">
-                <p>
-                    Clarke's DPF & Engine Specialists are Kent-based specialists using professional engine decarbonisation service using specialist equipment and detergents to remove carbon build-up from engines, fuel and emissions systems.
-                </p>
-                <p>
-                    Modern short journeys cause soot build-up that clogs DPFs, EGR valves and fuel injectors. Many garages just clear the warning codes – but that doesn't fix the underlying problem. We treat the root cause by thoroughly cleaning your engine's critical components using professional decarbonisation equipment and detergents.
-                </p>
-                <p>
-                    Whether you're experiencing reduced MPG, warning lights, limp mode or sluggish performance, our engine decarbonisation service restores your engine to optimal condition – without the cost of replacement parts.
-                </p>
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <!-- Image Column -->
+            <div class="order-2 md:order-1">
+                <?php 
+                $about_image_id = get_theme_mod('about_section_image', '');
+                if ($about_image_id) {
+                    $about_image = wp_get_attachment_image($about_image_id, 'large', false, array('class' => 'rounded-lg shadow-lg w-full h-auto object-cover'));
+                    echo $about_image;
+                } else {
+                    // Placeholder for when image is uploaded
+                    echo '<div class="bg-carbon-dark/10 rounded-lg shadow-lg aspect-[4/3] flex items-center justify-center text-text-dark/40">';
+                    echo '<p class="text-center">Image placeholder<br><span class="text-sm">Upload image via Customizer</span></p>';
+                    echo '</div>';
+                }
+                ?>
+            </div>
+            
+            <!-- Content Column -->
+            <div class="order-1 md:order-2">
+                <h2 class="text-3xl md:text-4xl font-semibold mb-6">Why Choose Clarke's?</h2>
+                <div class="prose prose-lg max-w-none space-y-6">
+                    <p class="text-lg leading-relaxed">
+                        <strong class="text-eco-green">Kent's trusted engine decarbonisation specialists.</strong> We use professional-grade equipment and specialist detergents to remove carbon build-up from engines, fuel systems, and emissions components – restoring performance without costly replacements.
+                    </p>
+                    <p class="leading-relaxed">
+                        Modern driving patterns, especially short journeys and city driving, cause soot and carbon deposits to accumulate in critical components like DPFs, EGR valves, and fuel injectors. Many garages simply clear warning codes, but that's just a temporary fix. <strong>We treat the root cause</strong> by thoroughly cleaning your engine's critical components using professional decarbonisation equipment.
+                    </p>
+                    <div class="bg-white rounded-lg p-6 border-l-4 border-eco-green shadow-sm">
+                        <p class="font-semibold text-text-dark mb-2">The Result?</p>
+                        <p class="text-text-dark">
+                            Whether you're experiencing reduced MPG, warning lights, limp mode, or sluggish performance, our engine decarbonisation service restores your engine to optimal condition – saving you thousands compared to replacement parts.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -100,67 +122,107 @@ if (!empty($hero_bg_image)) {
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Service 1: Engine Carbon Cleaning -->
-            <div class="bg-carbon-light rounded-lg p-6 border border-gray-200 hover:border-eco-green transition-colors">
-                <div class="mb-4">
-                    <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
-                        <span class="text-2xl">⚙️</span>
+            <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
+                <?php 
+                $service1_image_id = get_theme_mod('service_1_image', '');
+                if ($service1_image_id) {
+                    echo '<div class="h-48 overflow-hidden">';
+                    echo wp_get_attachment_image($service1_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">⚙️</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Engine Carbon Cleaning</h3>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3">Engine Carbon Cleaning</h3>
+                    <p class="text-text-dark mb-4 leading-relaxed">
+                        Professional decarbonisation of intake and combustion areas using specialist equipment. Removes carbon deposits that restrict airflow and reduce power.
+                    </p>
+                    <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center group">
+                        Learn more <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
                 </div>
-                <p class="text-text-dark mb-4">
-                    Professional decarbonisation of intake/combustion areas to restore smooth running and performance.
-                </p>
-                <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Learn more →
-                </a>
             </div>
             
             <!-- Service 2: DPF Cleaning -->
-            <div class="bg-carbon-light rounded-lg p-6 border border-gray-200 hover:border-eco-green transition-colors">
-                <div class="mb-4">
-                    <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
-                        <span class="text-2xl">🔧</span>
+            <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
+                <?php 
+                $service2_image_id = get_theme_mod('service_2_image', '');
+                if ($service2_image_id) {
+                    echo '<div class="h-48 overflow-hidden">';
+                    echo wp_get_attachment_image($service2_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">🔧</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">DPF Cleaning</h3>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3">DPF Cleaning</h3>
+                    <p class="text-text-dark mb-4 leading-relaxed">
+                        Restore blocked Diesel Particulate Filters and prevent costly replacements. Our cleaning service removes soot build-up that triggers warning lights and limp mode.
+                    </p>
+                    <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center group">
+                        Learn more <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
                 </div>
-                <p class="text-text-dark mb-4">
-                    We restore blocked Diesel Particulate Filters to prevent costly replacements.
-                </p>
-                <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Learn more →
-                </a>
             </div>
             
             <!-- Service 3: EGR Valve Cleaning -->
-            <div class="bg-carbon-light rounded-lg p-6 border border-gray-200 hover:border-eco-green transition-colors">
-                <div class="mb-4">
-                    <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
-                        <span class="text-2xl">🌬️</span>
+            <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
+                <?php 
+                $service3_image_id = get_theme_mod('service_3_image', '');
+                if ($service3_image_id) {
+                    echo '<div class="h-48 overflow-hidden">';
+                    echo wp_get_attachment_image($service3_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">🌬️</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">EGR Valve Cleaning</h3>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3">EGR Valve Cleaning</h3>
+                    <p class="text-text-dark mb-4 leading-relaxed">
+                        Clean sticking and sooted EGR valves to improve airflow, reduce emissions, and restore proper engine operation. Prevents rough idle and stalling.
+                    </p>
+                    <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center group">
+                        Learn more <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
                 </div>
-                <p class="text-text-dark mb-4">
-                    We clean sticking/sooted EGR valves to improve airflow and reduce emissions.
-                </p>
-                <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Learn more →
-                </a>
             </div>
             
             <!-- Service 4: Injector Cleaning & Diagnostics -->
-            <div class="bg-carbon-light rounded-lg p-6 border border-gray-200 hover:border-eco-green transition-colors">
-                <div class="mb-4">
-                    <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
-                        <span class="text-2xl">💉</span>
+            <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
+                <?php 
+                $service4_image_id = get_theme_mod('service_4_image', '');
+                if ($service4_image_id) {
+                    echo '<div class="h-48 overflow-hidden">';
+                    echo wp_get_attachment_image($service4_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <div class="w-12 h-12 bg-eco-green/20 rounded-lg flex items-center justify-center mb-4">
+                            <span class="text-2xl">💉</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Injector Cleaning & Diagnostics</h3>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3">Injector Cleaning & Diagnostics</h3>
+                    <p class="text-text-dark mb-4 leading-relaxed">
+                        Diagnose and correct rough idle, poor spray patterns, and performance loss. Our cleaning service restores proper fuel delivery and combustion efficiency.
+                    </p>
+                    <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center group">
+                        Learn more <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
                 </div>
-                <p class="text-text-dark mb-4">
-                    We diagnose and correct rough idle, poor spray patterns and performance loss.
-                </p>
-                <a href="<?php echo esc_url(home_url('/services/')); ?>" class="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Learn more →
-                </a>
             </div>
         </div>
     </div>
@@ -175,21 +237,41 @@ if (!empty($hero_bg_image)) {
         
         <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-8">
             <!-- Case Study 1: Audi A4 TDI -->
-            <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-                <h3 class="text-xl font-semibold mb-3 text-eco-green">Audi A4 TDI</h3>
-                <p class="text-sm text-gray-600 mb-4 font-medium">Blocked DPF / Limp Mode</p>
-                <p class="text-text-dark">
-                    Dealer recommended a new DPF. We performed our DPF cleaning service and restored flow – no replacement needed.
-                </p>
+            <div class="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <?php 
+                $case1_image_id = get_theme_mod('case_study_1_image', '');
+                if ($case1_image_id) {
+                    echo '<div class="h-48 overflow-hidden">';
+                    echo wp_get_attachment_image($case1_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3 text-eco-green">Audi A4 TDI</h3>
+                    <p class="text-sm text-gray-600 mb-4 font-medium">Blocked DPF / Limp Mode</p>
+                    <p class="text-text-dark leading-relaxed">
+                        Dealer recommended a new DPF at over £1,500. We performed our professional DPF cleaning service and restored exhaust flow – warning light cleared, full performance restored, no replacement needed.
+                    </p>
+                </div>
             </div>
             
             <!-- Case Study 2: Ford Transit -->
-            <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-                <h3 class="text-xl font-semibold mb-3 text-eco-green">Ford Transit</h3>
-                <p class="text-sm text-gray-600 mb-4 font-medium">Poor MPG / Sluggish</p>
-                <p class="text-text-dark">
-                    Full engine decarbonisation service improved economy by 10-15% and restored throttle response.
-                </p>
+            <div class="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <?php 
+                $case2_image_id = get_theme_mod('case_study_2_image', '');
+                if ($case2_image_id) {
+                    echo '<div class="h-48 overflow-hidden">';
+                    echo wp_get_attachment_image($case2_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3 text-eco-green">Ford Transit</h3>
+                    <p class="text-sm text-gray-600 mb-4 font-medium">Poor MPG / Sluggish Performance</p>
+                    <p class="text-text-dark leading-relaxed">
+                        Full engine decarbonisation service including carbon cleaning, EGR valve cleaning, and injector cleaning. Result: MPG improved by 10-15%, throttle response fully restored, vehicle performing as expected.
+                    </p>
+                </div>
             </div>
         </div>
         

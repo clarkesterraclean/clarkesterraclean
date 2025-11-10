@@ -23,43 +23,71 @@ get_header();
             </p>
 
             <!-- Case Study 1: Audi A4 TDI -->
-            <section class="mb-8 bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-                <h2 class="text-2xl font-semibold mb-4 text-eco-green">Audi A4 TDI</h2>
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Problem</h3>
-                        <p>Warning light and limp mode activation. Vehicle losing power and entering restricted performance mode.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Dealer Said</h3>
-                        <p>"New DPF needed" – replacement cost estimated at over £1,500.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">What We Did</h3>
-                        <p>DPF cleaning service to remove carbon deposits and restore exhaust flow through the blocked filter.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Result</h3>
-                        <p>Warning light cleared, full performance restored. Vehicle no longer entering limp mode. Customer avoided costly DPF replacement.</p>
+            <section class="mb-12 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <?php 
+                $case1_image_id = get_theme_mod('case_study_1_image', '');
+                if ($case1_image_id) {
+                    echo '<div class="h-64 overflow-hidden">';
+                    echo wp_get_attachment_image($case1_image_id, 'large', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-6 text-eco-green">Audi A4 TDI</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-text-dark">Problem</h3>
+                                <p class="leading-relaxed">Warning light and limp mode activation. Vehicle losing power and entering restricted performance mode.</p>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-text-dark">Dealer Said</h3>
+                                <p class="leading-relaxed">"New DPF needed" – replacement cost estimated at over £1,500.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-eco-green">What We Did</h3>
+                                <p class="leading-relaxed">DPF cleaning service to remove carbon deposits and restore exhaust flow through the blocked filter.</p>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-eco-green">Result</h3>
+                                <p class="leading-relaxed">Warning light cleared, full performance restored. Vehicle no longer entering limp mode. Customer avoided costly DPF replacement.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Case Study 2: Ford Transit -->
-            <section class="mb-8 bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-                <h2 class="text-2xl font-semibold mb-4 text-eco-green">Ford Transit</h2>
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Problem</h3>
-                        <p>Low MPG and sluggish throttle response. Vehicle felt underpowered, especially when loaded.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">What We Did</h3>
-                        <p>Full engine decarbonisation service covering engine carbon cleaning, EGR valve cleaning, and injector cleaning.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Result</h3>
-                        <p>MPG improved by approximately 10–15% (typical improvement range). Throttle response restored to normal operation. Vehicle performing as expected.</p>
+            <section class="mb-12 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <?php 
+                $case2_image_id = get_theme_mod('case_study_2_image', '');
+                if ($case2_image_id) {
+                    echo '<div class="h-64 overflow-hidden">';
+                    echo wp_get_attachment_image($case2_image_id, 'large', false, array('class' => 'w-full h-full object-cover'));
+                    echo '</div>';
+                }
+                ?>
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold mb-6 text-eco-green">Ford Transit</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-text-dark">Problem</h3>
+                                <p class="leading-relaxed">Low MPG and sluggish throttle response. Vehicle felt underpowered, especially when loaded.</p>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-eco-green">What We Did</h3>
+                                <p class="leading-relaxed">Full engine decarbonisation service covering engine carbon cleaning, EGR valve cleaning, and injector cleaning.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2 text-eco-green">Result</h3>
+                                <p class="leading-relaxed">MPG improved by approximately 10–15% (typical improvement range). Throttle response restored to normal operation. Vehicle performing as expected.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
