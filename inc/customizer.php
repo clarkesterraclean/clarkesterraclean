@@ -179,6 +179,29 @@ function clarkes_customize_register($wp_customize) {
         'priority' => 30,
     ));
     
+    // Header Layout Settings
+    $wp_customize->add_setting('header_layout', array(
+        'default'           => 'default',
+        'sanitize_callback' => function($input) {
+            $choices = array('default', 'centered', 'split', 'minimal');
+            return in_array($input, $choices) ? $input : 'default';
+        },
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('header_layout', array(
+        'label'       => esc_html__('Header Layout', 'clarkes-terraclean'),
+        'description' => esc_html__('Choose the header layout style', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'select',
+        'choices'     => array(
+            'default'  => 'Default (Logo Left, Nav Right)',
+            'centered' => 'Centered (Logo Center, Nav Below)',
+            'split'    => 'Split (Logo Left, Nav Right, CTA Right)',
+            'minimal'  => 'Minimal (Logo Only)',
+        ),
+    ));
+    
     // Header sticky
     $wp_customize->add_setting('header_sticky', array(
         'default'           => 1,
@@ -191,6 +214,220 @@ function clarkes_customize_register($wp_customize) {
         'description' => esc_html__('Keep header fixed at top when scrolling', 'clarkes-terraclean'),
         'section'     => 'clarkes_header',
         'type'        => 'checkbox',
+    ));
+    
+    // Header Height
+    $wp_customize->add_setting('header_height', array(
+        'default'           => '64',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_height', array(
+        'label'       => esc_html__('Header Height (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Set the header height in pixels (default: 64px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 40,
+            'max'  => 120,
+            'step' => 4,
+        ),
+    ));
+    
+    // Header Background Color
+    $wp_customize->add_setting('header_bg_color', array(
+        'default'           => '#0f0f0f',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'header_bg_color', array(
+        'label'   => esc_html__('Header Background Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+    )));
+    
+    // Header Background Image
+    $wp_customize->add_setting('header_bg_image', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'header_bg_image', array(
+        'label'       => esc_html__('Header Background Image (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a background image for the header', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'mime_type'   => 'image',
+    )));
+    
+    // Header Text Color
+    $wp_customize->add_setting('header_text_color', array(
+        'default'           => '#d4d4d4',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'header_text_color', array(
+        'label'   => esc_html__('Header Text Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+    )));
+    
+    // Header Link Color
+    $wp_customize->add_setting('header_link_color', array(
+        'default'           => '#d4d4d4',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'header_link_color', array(
+        'label'   => esc_html__('Header Link Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+    )));
+    
+    // Header Link Hover Color
+    $wp_customize->add_setting('header_link_hover_color', array(
+        'default'           => '#4ade80',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'header_link_hover_color', array(
+        'label'   => esc_html__('Header Link Hover Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+    )));
+    
+    // Header Border Color
+    $wp_customize->add_setting('header_border_color', array(
+        'default'           => '#4ade804d',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'header_border_color', array(
+        'label'   => esc_html__('Header Border Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+    )));
+    
+    // Header Padding Top/Bottom
+    $wp_customize->add_setting('header_padding_vertical', array(
+        'default'           => '0',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_padding_vertical', array(
+        'label'       => esc_html__('Header Vertical Padding (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Top and bottom padding for header content', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 40,
+            'step' => 2,
+        ),
+    ));
+    
+    // Header Padding Horizontal
+    $wp_customize->add_setting('header_padding_horizontal', array(
+        'default'           => '16',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_padding_horizontal', array(
+        'label'       => esc_html__('Header Horizontal Padding (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Left and right padding for header content', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 80,
+            'step' => 4,
+        ),
+    ));
+    
+    // Logo Size
+    $wp_customize->add_setting('header_logo_size', array(
+        'default'           => 'medium',
+        'sanitize_callback' => function($input) {
+            $choices = array('small', 'medium', 'large', 'xlarge');
+            return in_array($input, $choices) ? $input : 'medium';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_logo_size', array(
+        'label'   => esc_html__('Logo Size', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+        'type'    => 'select',
+        'choices' => array(
+            'small'  => 'Small',
+            'medium' => 'Medium',
+            'large'  => 'Large',
+            'xlarge' => 'Extra Large',
+        ),
+    ));
+    
+    // Navigation Font Size
+    $wp_customize->add_setting('header_nav_font_size', array(
+        'default'           => '14',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_nav_font_size', array(
+        'label'       => esc_html__('Navigation Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 10,
+            'max'  => 20,
+            'step' => 1,
+        ),
+    ));
+    
+    // Navigation Font Weight
+    $wp_customize->add_setting('header_nav_font_weight', array(
+        'default'           => '500',
+        'sanitize_callback' => function($input) {
+            $choices = array('300', '400', '500', '600', '700');
+            return in_array($input, $choices) ? $input : '500';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_nav_font_weight', array(
+        'label'   => esc_html__('Navigation Font Weight', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+        'type'    => 'select',
+        'choices' => array(
+            '300' => 'Light (300)',
+            '400' => 'Normal (400)',
+            '500' => 'Medium (500)',
+            '600' => 'Semi-Bold (600)',
+            '700' => 'Bold (700)',
+        ),
+    ));
+    
+    // Navigation Letter Spacing
+    $wp_customize->add_setting('header_nav_letter_spacing', array(
+        'default'           => '0',
+        'sanitize_callback' => function($input) {
+            return is_numeric($input) ? floatval($input) : 0;
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('header_nav_letter_spacing', array(
+        'label'       => esc_html__('Navigation Letter Spacing (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => -2,
+            'max'  => 5,
+            'step' => 0.1,
+        ),
     ));
     
     // Show phone in header
@@ -206,6 +443,61 @@ function clarkes_customize_register($wp_customize) {
         'section'     => 'clarkes_header',
         'type'        => 'checkbox',
     ));
+    
+    // Phone Button Style
+    $wp_customize->add_setting('header_phone_button_style', array(
+        'default'           => 'outline',
+        'sanitize_callback' => function($input) {
+            $choices = array('outline', 'solid', 'text');
+            return in_array($input, $choices) ? $input : 'outline';
+        },
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('header_phone_button_style', array(
+        'label'   => esc_html__('Phone Button Style', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+        'type'    => 'select',
+        'choices' => array(
+            'outline' => 'Outline',
+            'solid'   => 'Solid',
+            'text'    => 'Text Only',
+        ),
+    ));
+    
+    // Mobile Menu Settings
+    $wp_customize->add_setting('mobile_menu_style', array(
+        'default'           => 'slide',
+        'sanitize_callback' => function($input) {
+            $choices = array('slide', 'dropdown', 'fullscreen');
+            return in_array($input, $choices) ? $input : 'slide';
+        },
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('mobile_menu_style', array(
+        'label'       => esc_html__('Mobile Menu Style', 'clarkes-terraclean'),
+        'description' => esc_html__('Choose how the mobile menu appears', 'clarkes-terraclean'),
+        'section'     => 'clarkes_header',
+        'type'        => 'select',
+        'choices'     => array(
+            'slide'     => 'Slide Down',
+            'dropdown'  => 'Dropdown',
+            'fullscreen' => 'Full Screen Overlay',
+        ),
+    ));
+    
+    // Mobile Menu Background Color
+    $wp_customize->add_setting('mobile_menu_bg_color', array(
+        'default'           => '#0f0f0f',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'mobile_menu_bg_color', array(
+        'label'   => esc_html__('Mobile Menu Background Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_header',
+    )));
     
     // ========================================
     // SECTION D: Hero (Home)
@@ -461,7 +753,7 @@ function clarkes_customize_register($wp_customize) {
         'priority' => 60,
     ));
     
-    // Footer layout
+    // Footer Layout
     $wp_customize->add_setting('footer_layout', array(
         'default'           => '4-col',
         'sanitize_callback' => function($input) {
@@ -480,6 +772,170 @@ function clarkes_customize_register($wp_customize) {
             '2-col' => '2 Columns',
             '3-col' => '3 Columns',
             '4-col' => '4 Columns',
+        ),
+    ));
+    
+    // Footer Background Color
+    $wp_customize->add_setting('footer_bg_color', array(
+        'default'           => '#0f0f0f',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_bg_color', array(
+        'label'   => esc_html__('Footer Background Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+    )));
+    
+    // Footer Background Image
+    $wp_customize->add_setting('footer_bg_image', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'footer_bg_image', array(
+        'label'       => esc_html__('Footer Background Image (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a background image for the footer', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'mime_type'   => 'image',
+    )));
+    
+    // Footer Text Color
+    $wp_customize->add_setting('footer_text_color', array(
+        'default'           => '#d4d4d4',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_text_color', array(
+        'label'   => esc_html__('Footer Text Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+    )));
+    
+    // Footer Link Color
+    $wp_customize->add_setting('footer_link_color', array(
+        'default'           => '#d4d4d4',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_link_color', array(
+        'label'   => esc_html__('Footer Link Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+    )));
+    
+    // Footer Link Hover Color
+    $wp_customize->add_setting('footer_link_hover_color', array(
+        'default'           => '#4ade80',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_link_hover_color', array(
+        'label'   => esc_html__('Footer Link Hover Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+    )));
+    
+    // Footer Border Color
+    $wp_customize->add_setting('footer_border_color', array(
+        'default'           => '#4ade804d',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'footer_border_color', array(
+        'label'   => esc_html__('Footer Border Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+    )));
+    
+    // Footer Padding Top
+    $wp_customize->add_setting('footer_padding_top', array(
+        'default'           => '64',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('footer_padding_top', array(
+        'label'       => esc_html__('Footer Padding Top (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 20,
+            'max'  => 120,
+            'step' => 4,
+        ),
+    ));
+    
+    // Footer Padding Bottom
+    $wp_customize->add_setting('footer_padding_bottom', array(
+        'default'           => '32',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('footer_padding_bottom', array(
+        'label'       => esc_html__('Footer Padding Bottom (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 20,
+            'max'  => 120,
+            'step' => 4,
+        ),
+    ));
+    
+    // Footer Padding Horizontal
+    $wp_customize->add_setting('footer_padding_horizontal', array(
+        'default'           => '16',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('footer_padding_horizontal', array(
+        'label'       => esc_html__('Footer Horizontal Padding (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 80,
+            'step' => 4,
+        ),
+    ));
+    
+    // Footer Font Size
+    $wp_customize->add_setting('footer_font_size', array(
+        'default'           => '14',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('footer_font_size', array(
+        'label'       => esc_html__('Footer Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 10,
+            'max'  => 20,
+            'step' => 1,
+        ),
+    ));
+    
+    // Footer Heading Font Size
+    $wp_customize->add_setting('footer_heading_font_size', array(
+        'default'           => '18',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('footer_heading_font_size', array(
+        'label'       => esc_html__('Footer Heading Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 14,
+            'max'  => 28,
+            'step' => 1,
         ),
     ));
     
@@ -511,6 +967,46 @@ function clarkes_customize_register($wp_customize) {
         'type'        => 'checkbox',
     ));
     
+    // Footer Copyright Text
+    $wp_customize->add_setting('footer_copyright_text', array(
+        'default'           => '© ' . date('Y') . ' Clarke\'s DPF & Engine Specialists. All rights reserved.',
+        'sanitize_callback' => 'sanitize_text_field',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('footer_copyright_text', array(
+        'label'       => esc_html__('Copyright Text', 'clarkes-terraclean'),
+        'description' => esc_html__('Text displayed in footer copyright area', 'clarkes-terraclean'),
+        'section'     => 'clarkes_footer',
+        'type'        => 'text',
+    ));
+    
+    // Footer Show Copyright
+    $wp_customize->add_setting('footer_show_copyright', array(
+        'default'           => 1,
+        'sanitize_callback' => 'clarkes_sanitize_checkbox',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('footer_show_copyright', array(
+        'label'   => esc_html__('Show Copyright Text', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+        'type'    => 'checkbox',
+    ));
+    
+    // Footer Social Links Section
+    $wp_customize->add_setting('footer_show_social', array(
+        'default'           => 1,
+        'sanitize_callback' => 'clarkes_sanitize_checkbox',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('footer_show_social', array(
+        'label'   => esc_html__('Show Social Links', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+        'type'    => 'checkbox',
+    ));
+    
     // Footer social Facebook
     $wp_customize->add_setting('footer_social_facebook', array(
         'default'           => 'https://www.facebook.com/Clarkesterraclean',
@@ -524,8 +1020,478 @@ function clarkes_customize_register($wp_customize) {
         'type'    => 'url',
     ));
     
+    // Footer social Twitter
+    $wp_customize->add_setting('footer_social_twitter', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('footer_social_twitter', array(
+        'label'   => esc_html__('Twitter URL (Optional)', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+        'type'    => 'url',
+    ));
+    
+    // Footer social Instagram
+    $wp_customize->add_setting('footer_social_instagram', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('footer_social_instagram', array(
+        'label'   => esc_html__('Instagram URL (Optional)', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+        'type'    => 'url',
+    ));
+    
+    // Footer social LinkedIn
+    $wp_customize->add_setting('footer_social_linkedin', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('footer_social_linkedin', array(
+        'label'   => esc_html__('LinkedIn URL (Optional)', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+        'type'    => 'url',
+    ));
+    
+    // Footer social YouTube
+    $wp_customize->add_setting('footer_social_youtube', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('footer_social_youtube', array(
+        'label'   => esc_html__('YouTube URL (Optional)', 'clarkes-terraclean'),
+        'section' => 'clarkes_footer',
+        'type'    => 'url',
+    ));
+    
     // ========================================
-    // SECTION G: Layout
+    // SECTION H: Typography
+    // ========================================
+    $wp_customize->add_section('clarkes_typography', array(
+        'title'    => esc_html__('Typography', 'clarkes-terraclean'),
+        'panel'    => 'clarkes_theme_options',
+        'priority' => 65,
+    ));
+    
+    // Body Font Family
+    $wp_customize->add_setting('body_font_family', array(
+        'default'           => 'system',
+        'sanitize_callback' => function($input) {
+            $choices = array('system', 'serif', 'sans-serif', 'monospace');
+            return in_array($input, $choices) ? $input : 'system';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('body_font_family', array(
+        'label'   => esc_html__('Body Font Family', 'clarkes-terraclean'),
+        'section' => 'clarkes_typography',
+        'type'    => 'select',
+        'choices' => array(
+            'system'     => 'System Default',
+            'sans-serif' => 'Sans Serif',
+            'serif'      => 'Serif',
+            'monospace'  => 'Monospace',
+        ),
+    ));
+    
+    // Body Font Size
+    $wp_customize->add_setting('body_font_size', array(
+        'default'           => '16',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('body_font_size', array(
+        'label'       => esc_html__('Body Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_typography',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 12,
+            'max'  => 20,
+            'step' => 1,
+        ),
+    ));
+    
+    // Body Line Height
+    $wp_customize->add_setting('body_line_height', array(
+        'default'           => '1.6',
+        'sanitize_callback' => function($input) {
+            return is_numeric($input) ? floatval($input) : 1.6;
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('body_line_height', array(
+        'label'       => esc_html__('Body Line Height', 'clarkes-terraclean'),
+        'section'     => 'clarkes_typography',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 1.0,
+            'max'  => 2.5,
+            'step' => 0.1,
+        ),
+    ));
+    
+    // Heading Font Family
+    $wp_customize->add_setting('heading_font_family', array(
+        'default'           => 'system',
+        'sanitize_callback' => function($input) {
+            $choices = array('system', 'serif', 'sans-serif', 'monospace');
+            return in_array($input, $choices) ? $input : 'system';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('heading_font_family', array(
+        'label'   => esc_html__('Heading Font Family', 'clarkes-terraclean'),
+        'section' => 'clarkes_typography',
+        'type'    => 'select',
+        'choices' => array(
+            'system'     => 'System Default',
+            'sans-serif' => 'Sans Serif',
+            'serif'      => 'Serif',
+            'monospace'  => 'Monospace',
+        ),
+    ));
+    
+    // Heading Font Weight
+    $wp_customize->add_setting('heading_font_weight', array(
+        'default'           => '700',
+        'sanitize_callback' => function($input) {
+            $choices = array('300', '400', '500', '600', '700', '800');
+            return in_array($input, $choices) ? $input : '700';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('heading_font_weight', array(
+        'label'   => esc_html__('Heading Font Weight', 'clarkes-terraclean'),
+        'section' => 'clarkes_typography',
+        'type'    => 'select',
+        'choices' => array(
+            '300' => 'Light (300)',
+            '400' => 'Normal (400)',
+            '500' => 'Medium (500)',
+            '600' => 'Semi-Bold (600)',
+            '700' => 'Bold (700)',
+            '800' => 'Extra Bold (800)',
+        ),
+    ));
+    
+    // H1 Font Size
+    $wp_customize->add_setting('h1_font_size', array(
+        'default'           => '36',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('h1_font_size', array(
+        'label'       => esc_html__('H1 Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_typography',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 24,
+            'max'  => 72,
+            'step' => 2,
+        ),
+    ));
+    
+    // H2 Font Size
+    $wp_customize->add_setting('h2_font_size', array(
+        'default'           => '30',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('h2_font_size', array(
+        'label'       => esc_html__('H2 Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_typography',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 20,
+            'max'  => 60,
+            'step' => 2,
+        ),
+    ));
+    
+    // H3 Font Size
+    $wp_customize->add_setting('h3_font_size', array(
+        'default'           => '24',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('h3_font_size', array(
+        'label'       => esc_html__('H3 Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_typography',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 18,
+            'max'  => 48,
+            'step' => 2,
+        ),
+    ));
+    
+    // ========================================
+    // SECTION I: Buttons & CTAs
+    // ========================================
+    $wp_customize->add_section('clarkes_buttons', array(
+        'title'    => esc_html__('Buttons & CTAs', 'clarkes-terraclean'),
+        'panel'    => 'clarkes_theme_options',
+        'priority' => 68,
+    ));
+    
+    // Primary Button Background Color
+    $wp_customize->add_setting('button_primary_bg', array(
+        'default'           => '#4ade80',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'button_primary_bg', array(
+        'label'   => esc_html__('Primary Button Background', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+    )));
+    
+    // Primary Button Text Color
+    $wp_customize->add_setting('button_primary_text', array(
+        'default'           => '#0f0f0f',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'button_primary_text', array(
+        'label'   => esc_html__('Primary Button Text Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+    )));
+    
+    // Primary Button Hover Background
+    $wp_customize->add_setting('button_primary_hover_bg', array(
+        'default'           => '#22c55e',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'button_primary_hover_bg', array(
+        'label'   => esc_html__('Primary Button Hover Background', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+    )));
+    
+    // Secondary Button Background Color
+    $wp_customize->add_setting('button_secondary_bg', array(
+        'default'           => 'transparent',
+        'sanitize_callback' => 'sanitize_text_field',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('button_secondary_bg', array(
+        'label'   => esc_html__('Secondary Button Background', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+        'type'    => 'text',
+    ));
+    
+    // Secondary Button Text Color
+    $wp_customize->add_setting('button_secondary_text', array(
+        'default'           => '#4ade80',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'button_secondary_text', array(
+        'label'   => esc_html__('Secondary Button Text Color', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+    )));
+    
+    // Button Border Radius
+    $wp_customize->add_setting('button_border_radius', array(
+        'default'           => 'full',
+        'sanitize_callback' => function($input) {
+            $choices = array('none', 'sm', 'md', 'lg', 'xl', 'full');
+            return in_array($input, $choices) ? $input : 'full';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('button_border_radius', array(
+        'label'   => esc_html__('Button Border Radius', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+        'type'    => 'select',
+        'choices' => array(
+            'none' => 'None (Square)',
+            'sm'   => 'Small',
+            'md'   => 'Medium',
+            'lg'   => 'Large',
+            'xl'   => 'Extra Large',
+            'full' => 'Full (Pill)',
+        ),
+    ));
+    
+    // Button Padding Vertical
+    $wp_customize->add_setting('button_padding_vertical', array(
+        'default'           => '12',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('button_padding_vertical', array(
+        'label'       => esc_html__('Button Vertical Padding (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_buttons',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 6,
+            'max'  => 24,
+            'step' => 2,
+        ),
+    ));
+    
+    // Button Padding Horizontal
+    $wp_customize->add_setting('button_padding_horizontal', array(
+        'default'           => '24',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('button_padding_horizontal', array(
+        'label'       => esc_html__('Button Horizontal Padding (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_buttons',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 12,
+            'max'  => 48,
+            'step' => 2,
+        ),
+    ));
+    
+    // Button Font Size
+    $wp_customize->add_setting('button_font_size', array(
+        'default'           => '16',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('button_font_size', array(
+        'label'       => esc_html__('Button Font Size (px)', 'clarkes-terraclean'),
+        'section'     => 'clarkes_buttons',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 12,
+            'max'  => 20,
+            'step' => 1,
+        ),
+    ));
+    
+    // Button Font Weight
+    $wp_customize->add_setting('button_font_weight', array(
+        'default'           => '600',
+        'sanitize_callback' => function($input) {
+            $choices = array('400', '500', '600', '700');
+            return in_array($input, $choices) ? $input : '600';
+        },
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('button_font_weight', array(
+        'label'   => esc_html__('Button Font Weight', 'clarkes-terraclean'),
+        'section' => 'clarkes_buttons',
+        'type'    => 'select',
+        'choices' => array(
+            '400' => 'Normal (400)',
+            '500' => 'Medium (500)',
+            '600' => 'Semi-Bold (600)',
+            '700' => 'Bold (700)',
+        ),
+    ));
+    
+    // ========================================
+    // SECTION J: Advanced
+    // ========================================
+    $wp_customize->add_section('clarkes_advanced', array(
+        'title'    => esc_html__('Advanced', 'clarkes-terraclean'),
+        'panel'    => 'clarkes_theme_options',
+        'priority' => 100,
+    ));
+    
+    // Custom CSS
+    $wp_customize->add_setting('custom_css', array(
+        'default'           => '',
+        'sanitize_callback' => 'wp_strip_all_tags',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('custom_css', array(
+        'label'       => esc_html__('Custom CSS', 'clarkes-terraclean'),
+        'description' => esc_html__('Add custom CSS code. This will be added to the theme styles.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_advanced',
+        'type'        => 'textarea',
+    ));
+    
+    // Custom JavaScript (Head)
+    $wp_customize->add_setting('custom_js_head', array(
+        'default'           => '',
+        'sanitize_callback' => 'wp_strip_all_tags',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('custom_js_head', array(
+        'label'       => esc_html__('Custom JavaScript (Head)', 'clarkes-terraclean'),
+        'description' => esc_html__('Add custom JavaScript code to be placed in the &lt;head&gt; section', 'clarkes-terraclean'),
+        'section'     => 'clarkes_advanced',
+        'type'        => 'textarea',
+    ));
+    
+    // Custom JavaScript (Footer)
+    $wp_customize->add_setting('custom_js_footer', array(
+        'default'           => '',
+        'sanitize_callback' => 'wp_strip_all_tags',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('custom_js_footer', array(
+        'label'       => esc_html__('Custom JavaScript (Footer)', 'clarkes-terraclean'),
+        'description' => esc_html__('Add custom JavaScript code to be placed before closing &lt;/body&gt; tag', 'clarkes-terraclean'),
+        'section'     => 'clarkes_advanced',
+        'type'        => 'textarea',
+    ));
+    
+    // Enable Lazy Loading
+    $wp_customize->add_setting('enable_lazy_loading', array(
+        'default'           => 1,
+        'sanitize_callback' => 'clarkes_sanitize_checkbox',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('enable_lazy_loading', array(
+        'label'       => esc_html__('Enable Lazy Loading', 'clarkes-terraclean'),
+        'description' => esc_html__('Lazy load images for better performance', 'clarkes-terraclean'),
+        'section'     => 'clarkes_advanced',
+        'type'        => 'checkbox',
+    ));
+    
+    // Enable Smooth Scroll
+    $wp_customize->add_setting('enable_smooth_scroll', array(
+        'default'           => 1,
+        'sanitize_callback' => 'clarkes_sanitize_checkbox',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('enable_smooth_scroll', array(
+        'label'       => esc_html__('Enable Smooth Scroll', 'clarkes-terraclean'),
+        'description' => esc_html__('Enable smooth scrolling for anchor links', 'clarkes-terraclean'),
+        'section'     => 'clarkes_advanced',
+        'type'        => 'checkbox',
+    ));
+    
+    // ========================================
+    // SECTION K: Layout
     // ========================================
     $wp_customize->add_section('clarkes_layout', array(
         'title'    => esc_html__('Layout', 'clarkes-terraclean'),
@@ -573,6 +1539,82 @@ function clarkes_customize_register($wp_customize) {
             'lg'  => 'Large',
             'xl'  => 'Extra Large',
             '2xl' => '2X Large',
+        ),
+    ));
+    
+    // Section Padding Vertical
+    $wp_customize->add_setting('section_padding_vertical', array(
+        'default'           => '96',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('section_padding_vertical', array(
+        'label'       => esc_html__('Section Vertical Padding (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Default top and bottom padding for sections', 'clarkes-terraclean'),
+        'section'     => 'clarkes_layout',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 40,
+            'max'  => 200,
+            'step' => 8,
+        ),
+    ));
+    
+    // Section Padding Horizontal
+    $wp_customize->add_setting('section_padding_horizontal', array(
+        'default'           => '16',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('section_padding_horizontal', array(
+        'label'       => esc_html__('Section Horizontal Padding (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Default left and right padding for sections', 'clarkes-terraclean'),
+        'section'     => 'clarkes_layout',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 80,
+            'step' => 4,
+        ),
+    ));
+    
+    // Content Gap (between elements)
+    $wp_customize->add_setting('content_gap', array(
+        'default'           => '24',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('content_gap', array(
+        'label'       => esc_html__('Content Gap (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Default spacing between content elements', 'clarkes-terraclean'),
+        'section'     => 'clarkes_layout',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 8,
+            'max'  => 64,
+            'step' => 4,
+        ),
+    ));
+    
+    // Grid Gap
+    $wp_customize->add_setting('grid_gap', array(
+        'default'           => '24',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('grid_gap', array(
+        'label'       => esc_html__('Grid Gap (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Default gap between grid items', 'clarkes-terraclean'),
+        'section'     => 'clarkes_layout',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 8,
+            'max'  => 64,
+            'step' => 4,
         ),
     ));
 }
