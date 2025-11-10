@@ -186,7 +186,7 @@ function clarkes_customize_register($wp_customize) {
             $choices = array('default', 'centered', 'split', 'minimal');
             return in_array($input, $choices) ? $input : 'default';
         },
-        'transport'         => 'refresh',
+        'transport'         => 'postMessage',
     ));
     
     $wp_customize->add_control('header_layout', array(
@@ -1605,11 +1605,14 @@ add_action('customize_register', 'clarkes_customize_register');
  */
 if (!function_exists('clarkes_customize_preview_init')) {
 function clarkes_customize_preview_init() {
+    $preview_file = get_template_directory() . '/inc/customizer-preview.js';
+    $preview_ver = file_exists($preview_file) ? filemtime($preview_file) : '1.0.0';
+    
     wp_enqueue_script(
         'clarkes-customizer-preview',
         get_template_directory_uri() . '/inc/customizer-preview.js',
         array('customize-preview', 'jquery'),
-        wp_get_theme()->get('Version'),
+        $preview_ver,
         true
     );
 }

@@ -24,17 +24,76 @@
 <body <?php body_class(); ?>>
 <?php if (function_exists('wp_body_open')) { wp_body_open(); } ?>
 
-<header class="<?php echo get_theme_mod('header_sticky', 1) ? 'fixed' : 'relative'; ?> top-0 left-0 right-0 z-50 bg-carbon-dark text-text-body border-b border-eco-green/30" role="banner">
-    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+<?php
+// Get header settings
+$header_layout = get_theme_mod('header_layout', 'default');
+$header_sticky = get_theme_mod('header_sticky', 1);
+$header_height = get_theme_mod('header_height', 64);
+$header_bg_color = get_theme_mod('header_bg_color', '#0f0f0f');
+$header_bg_image_id = get_theme_mod('header_bg_image', '');
+$header_text_color = get_theme_mod('header_text_color', '#d4d4d4');
+$header_link_color = get_theme_mod('header_link_color', '#d4d4d4');
+$header_link_hover_color = get_theme_mod('header_link_hover_color', '#4ade80');
+$header_border_color = get_theme_mod('header_border_color', '#4ade804d');
+$header_padding_vertical = get_theme_mod('header_padding_vertical', 0);
+$header_padding_horizontal = get_theme_mod('header_padding_horizontal', 16);
+$header_nav_font_size = get_theme_mod('header_nav_font_size', 14);
+$header_nav_font_weight = get_theme_mod('header_nav_font_weight', '500');
+$header_nav_letter_spacing = get_theme_mod('header_nav_letter_spacing', 0);
+$header_logo_size = get_theme_mod('header_logo_size', 'medium');
+$mobile_menu_bg_color = get_theme_mod('mobile_menu_bg_color', '#0f0f0f');
+
+// Build header style
+$header_style = 'background-color: ' . esc_attr($header_bg_color) . ';';
+$header_style .= ' color: ' . esc_attr($header_text_color) . ';';
+$header_style .= ' border-bottom-color: ' . esc_attr($header_border_color) . ';';
+$header_style .= ' padding-top: ' . absint($header_padding_vertical) . 'px;';
+$header_style .= ' padding-bottom: ' . absint($header_padding_vertical) . 'px;';
+$header_style .= ' padding-left: ' . absint($header_padding_horizontal) . 'px;';
+$header_style .= ' padding-right: ' . absint($header_padding_horizontal) . 'px;';
+$header_style .= ' height: ' . absint($header_height) . 'px;';
+
+if ($header_bg_image_id) {
+    $header_bg_image_url = wp_get_attachment_image_url($header_bg_image_id, 'full');
+    if ($header_bg_image_url) {
+        $header_style .= ' background-image: url(' . esc_url($header_bg_image_url) . ');';
+        $header_style .= ' background-size: cover; background-position: center;';
+    }
+}
+
+// Logo size classes
+$logo_size_classes = array(
+    'small'  => 'text-sm',
+    'medium' => 'text-base md:text-lg',
+    'large'  => 'text-lg md:text-xl',
+    'xlarge' => 'text-xl md:text-2xl',
+);
+$logo_class = isset($logo_size_classes[$header_logo_size]) ? $logo_size_classes[$header_logo_size] : $logo_size_classes['medium'];
+
+// Nav style
+$nav_style = 'font-size: ' . absint($header_nav_font_size) . 'px;';
+$nav_style .= ' font-weight: ' . esc_attr($header_nav_font_weight) . ';';
+$nav_style .= ' letter-spacing: ' . floatval($header_nav_letter_spacing) . 'px;';
+$nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
+?>
+<header 
+    id="site-header"
+    class="header-layout-<?php echo esc_attr($header_layout); ?> <?php echo $header_sticky ? 'fixed' : 'relative'; ?> top-0 left-0 right-0 z-50 border-b" 
+    role="banner"
+    style="<?php echo $header_style; ?>"
+    data-header-layout="<?php echo esc_attr($header_layout); ?>"
+    data-header-sticky="<?php echo $header_sticky ? '1' : '0'; ?>"
+>
+    <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">
         <!-- Site Title / Logo -->
         <div class="flex items-center">
-            <a href="<?php echo esc_url(home_url('/')); ?>" class="text-eco-green font-semibold text-base md:text-lg tracking-wide hover:text-eco-green/80 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
+            <a href="<?php echo esc_url(home_url('/')); ?>" class="font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;" onmouseover="this.style.color='<?php echo esc_js($header_link_hover_color); ?>'" onmouseout="this.style.color='<?php echo esc_js($header_link_color); ?>'">
                 <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
             </a>
         </div>
         
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex gap-6 text-sm font-medium text-text-body" role="navigation" aria-label="Primary Navigation">
+        <nav class="header-nav hidden md:flex gap-6 font-medium" role="navigation" aria-label="Primary Navigation" style="<?php echo $nav_style; ?>">
             <?php
             wp_nav_menu(array(
                 'theme_location' => 'primary_menu',
@@ -42,6 +101,8 @@
                 'menu_class' => 'flex gap-6 items-center',
                 'fallback_cb' => 'clarkes_terraclean_default_menu',
                 'depth' => 1,
+                'link_before' => '<span class="header-nav-link">',
+                'link_after' => '</span>',
             ));
             ?>
         </nav>
@@ -69,7 +130,7 @@
     </div>
     
     <!-- Mobile Navigation -->
-    <div id="mobile-nav" class="hidden bg-carbon-dark border-t border-eco-green/20">
+    <div id="mobile-nav" class="hidden border-t" style="background-color: <?php echo esc_attr($mobile_menu_bg_color); ?>; border-top-color: <?php echo esc_attr($header_border_color); ?>;">
         <?php
         // Mobile menu - use same fallback logic with anchors on front page
         $menu_locations = get_nav_menu_locations();
@@ -158,7 +219,7 @@
 
 <!-- Spacer to prevent content from going under fixed header -->
 <?php if (get_theme_mod('header_sticky', 1)) : ?>
-<div class="h-16"></div>
+<div id="header-spacer" style="height: <?php echo absint($header_height); ?>px;"></div>
 <?php endif; ?>
 
 <main role="main">

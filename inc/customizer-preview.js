@@ -40,6 +40,335 @@
         });
     });
     
+    // ========================================
+    // HEADER PREVIEW UPDATES
+    // ========================================
+    
+    // Header Layout
+    wp.customize('header_layout', function(value) {
+        value.bind(function(newval) {
+            var $header = $('#site-header');
+            $header.removeClass('header-layout-default header-layout-centered header-layout-split header-layout-minimal');
+            $header.addClass('header-layout-' + newval);
+            $header.attr('data-header-layout', newval);
+        });
+    });
+    
+    // Header Height
+    wp.customize('header_height', function(value) {
+        value.bind(function(newval) {
+            $('#site-header').css('height', newval + 'px');
+            $('#site-header > div').css('height', newval + 'px');
+            $('#header-spacer').css('height', newval + 'px');
+        });
+    });
+    
+    // Header Background Color
+    wp.customize('header_bg_color', function(value) {
+        value.bind(function(newval) {
+            $('#site-header').css('background-color', newval);
+        });
+    });
+    
+    // Header Text Color
+    wp.customize('header_text_color', function(value) {
+        value.bind(function(newval) {
+            $('#site-header').css('color', newval);
+        });
+    });
+    
+    // Header Link Color
+    wp.customize('header_link_color', function(value) {
+        value.bind(function(newval) {
+            $('#site-header a, #site-header nav a, .header-logo').css('color', newval);
+        });
+    });
+    
+    // Header Link Hover Color
+    wp.customize('header_link_hover_color', function(value) {
+        value.bind(function(newval) {
+            // Update CSS variable or add inline style
+            var style = '<style id="header-hover-color">#site-header a:hover { color: ' + newval + ' !important; }</style>';
+            $('#header-hover-color').remove();
+            $('head').append(style);
+        });
+    });
+    
+    // Header Border Color
+    wp.customize('header_border_color', function(value) {
+        value.bind(function(newval) {
+            $('#site-header').css('border-bottom-color', newval);
+            $('#mobile-nav').css('border-top-color', newval);
+        });
+    });
+    
+    // Header Padding Vertical
+    wp.customize('header_padding_vertical', function(value) {
+        value.bind(function(newval) {
+            $('#site-header').css({
+                'padding-top': newval + 'px',
+                'padding-bottom': newval + 'px'
+            });
+        });
+    });
+    
+    // Header Padding Horizontal
+    wp.customize('header_padding_horizontal', function(value) {
+        value.bind(function(newval) {
+            $('#site-header').css({
+                'padding-left': newval + 'px',
+                'padding-right': newval + 'px'
+            });
+        });
+    });
+    
+    // Navigation Font Size
+    wp.customize('header_nav_font_size', function(value) {
+        value.bind(function(newval) {
+            $('#site-header nav').css('font-size', newval + 'px');
+        });
+    });
+    
+    // Navigation Font Weight
+    wp.customize('header_nav_font_weight', function(value) {
+        value.bind(function(newval) {
+            $('#site-header nav').css('font-weight', newval);
+        });
+    });
+    
+    // Navigation Letter Spacing
+    wp.customize('header_nav_letter_spacing', function(value) {
+        value.bind(function(newval) {
+            $('#site-header nav').css('letter-spacing', newval + 'px');
+        });
+    });
+    
+    // Logo Size
+    wp.customize('header_logo_size', function(value) {
+        value.bind(function(newval) {
+            var $logo = $('#site-header > div > div > a');
+            $logo.removeClass('text-sm text-base text-lg text-xl text-2xl md:text-lg md:text-xl md:text-2xl');
+            var sizeMap = {
+                'small': 'text-sm',
+                'medium': 'text-base md:text-lg',
+                'large': 'text-lg md:text-xl',
+                'xlarge': 'text-xl md:text-2xl'
+            };
+            if (sizeMap[newval]) {
+                $logo.addClass(sizeMap[newval]);
+            }
+        });
+    });
+    
+    // Mobile Menu Background Color
+    wp.customize('mobile_menu_bg_color', function(value) {
+        value.bind(function(newval) {
+            $('#mobile-nav').css('background-color', newval);
+        });
+    });
+    
+    // ========================================
+    // FOOTER PREVIEW UPDATES
+    // ========================================
+    
+    // Footer Background Color
+    wp.customize('footer_bg_color', function(value) {
+        value.bind(function(newval) {
+            $('footer, #site-footer').css('background-color', newval);
+        });
+    });
+    
+    // Footer Text Color
+    wp.customize('footer_text_color', function(value) {
+        value.bind(function(newval) {
+            $('footer, #site-footer').css('color', newval);
+        });
+    });
+    
+    // Footer Link Color
+    wp.customize('footer_link_color', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer a, .footer-link, .footer-links a').css('color', newval);
+        });
+    });
+    
+    // Footer Link Hover Color
+    wp.customize('footer_link_hover_color', function(value) {
+        value.bind(function(newval) {
+            var style = '<style id="footer-hover-color">#site-footer a:hover, .footer-link:hover, .footer-links a:hover { color: ' + newval + ' !important; }</style>';
+            $('#footer-hover-color').remove();
+            $('head').append(style);
+        });
+    });
+    
+    // Footer Border Color
+    wp.customize('footer_border_color', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer').css('border-top-color', newval);
+            $('#site-footer .border-t').css('border-top-color', newval);
+        });
+    });
+    
+    // Footer Padding Top
+    wp.customize('footer_padding_top', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer').css('padding-top', newval + 'px');
+        });
+    });
+    
+    // Footer Padding Bottom
+    wp.customize('footer_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer').css('padding-bottom', newval + 'px');
+        });
+    });
+    
+    // Footer Padding Horizontal
+    wp.customize('footer_padding_horizontal', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer').css({
+                'padding-left': newval + 'px',
+                'padding-right': newval + 'px'
+            });
+        });
+    });
+    
+    // Footer Font Size
+    wp.customize('footer_font_size', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer').css('font-size', newval + 'px');
+        });
+    });
+    
+    // Footer Heading Font Size
+    wp.customize('footer_heading_font_size', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer h3, #site-footer h4').css('font-size', newval + 'px');
+        });
+    });
+    
+    // Footer Copyright Text
+    wp.customize('footer_copyright_text', function(value) {
+        value.bind(function(newval) {
+            $('#site-footer .border-t .max-w-7xl').text(newval);
+        });
+    });
+    
+    // ========================================
+    // TYPOGRAPHY PREVIEW UPDATES
+    // ========================================
+    
+    // Body Font Size
+    wp.customize('body_font_size', function(value) {
+        value.bind(function(newval) {
+            $('body').css('font-size', newval + 'px');
+        });
+    });
+    
+    // Body Line Height
+    wp.customize('body_line_height', function(value) {
+        value.bind(function(newval) {
+            $('body').css('line-height', newval);
+        });
+    });
+    
+    // H1 Font Size
+    wp.customize('h1_font_size', function(value) {
+        value.bind(function(newval) {
+            $('h1').css('font-size', newval + 'px');
+        });
+    });
+    
+    // H2 Font Size
+    wp.customize('h2_font_size', function(value) {
+        value.bind(function(newval) {
+            $('h2').css('font-size', newval + 'px');
+        });
+    });
+    
+    // H3 Font Size
+    wp.customize('h3_font_size', function(value) {
+        value.bind(function(newval) {
+            $('h3').css('font-size', newval + 'px');
+        });
+    });
+    
+    // Heading Font Weight
+    wp.customize('heading_font_weight', function(value) {
+        value.bind(function(newval) {
+            $('h1, h2, h3, h4, h5, h6').css('font-weight', newval);
+        });
+    });
+    
+    // ========================================
+    // BUTTON PREVIEW UPDATES
+    // ========================================
+    
+    // Primary Button Background
+    wp.customize('button_primary_bg', function(value) {
+        value.bind(function(newval) {
+            var style = '<style id="button-primary-bg">.border-eco-green, button[type="submit"], .bg-eco-green { background-color: ' + newval + ' !important; border-color: ' + newval + ' !important; }</style>';
+            $('#button-primary-bg').remove();
+            $('head').append(style);
+        });
+    });
+    
+    // Primary Button Text Color
+    wp.customize('button_primary_text', function(value) {
+        value.bind(function(newval) {
+            var style = '<style id="button-primary-text">.border-eco-green, button[type="submit"], .bg-eco-green { color: ' + newval + ' !important; }</style>';
+            $('#button-primary-text').remove();
+            $('head').append(style);
+        });
+    });
+    
+    // Primary Button Hover Background
+    wp.customize('button_primary_hover_bg', function(value) {
+        value.bind(function(newval) {
+            var style = '<style id="button-primary-hover">.border-eco-green:hover, button[type="submit"]:hover, .bg-eco-green:hover { background-color: ' + newval + ' !important; }</style>';
+            $('#button-primary-hover').remove();
+            $('head').append(style);
+        });
+    });
+    
+    // Button Font Size
+    wp.customize('button_font_size', function(value) {
+        value.bind(function(newval) {
+            $('button, .border-eco-green, a[class*="rounded-full"]').css('font-size', newval + 'px');
+        });
+    });
+    
+    // Button Font Weight
+    wp.customize('button_font_weight', function(value) {
+        value.bind(function(newval) {
+            $('button, .border-eco-green, a[class*="rounded-full"]').css('font-weight', newval);
+        });
+    });
+    
+    // Button Padding Vertical
+    wp.customize('button_padding_vertical', function(value) {
+        value.bind(function(newval) {
+            $('button, .border-eco-green, a[class*="rounded-full"]').css({
+                'padding-top': newval + 'px',
+                'padding-bottom': newval + 'px'
+            });
+        });
+    });
+    
+    // Button Padding Horizontal
+    wp.customize('button_padding_horizontal', function(value) {
+        value.bind(function(newval) {
+            $('button, .border-eco-green, a[class*="rounded-full"]').css({
+                'padding-left': newval + 'px',
+                'padding-right': newval + 'px'
+            });
+        });
+    });
+    
+    // ========================================
+    // COLOR SCHEME UPDATES
+    // ========================================
+    
     // Update CSS variables for colors
     function updateCSSVariable(property, value) {
         document.documentElement.style.setProperty(property, value);
@@ -48,6 +377,7 @@
     wp.customize('color_accent', function(value) {
         value.bind(function(newval) {
             updateCSSVariable('--accent', newval);
+            updateCSSVariable('--eco-green', newval);
         });
     });
     
@@ -74,6 +404,10 @@
             updateCSSVariable('--text-dark', newval);
         });
     });
+    
+    // ========================================
+    // LAYOUT UPDATES
+    // ========================================
     
     // Update container max width
     wp.customize('container_max', function(value) {
@@ -107,5 +441,38 @@
         });
     });
     
+    // Section Padding Vertical
+    wp.customize('section_padding_vertical', function(value) {
+        value.bind(function(newval) {
+            $('section').css({
+                'padding-top': newval + 'px',
+                'padding-bottom': newval + 'px'
+            });
+        });
+    });
+    
+    // Section Padding Horizontal
+    wp.customize('section_padding_horizontal', function(value) {
+        value.bind(function(newval) {
+            $('section > div').css({
+                'padding-left': newval + 'px',
+                'padding-right': newval + 'px'
+            });
+        });
+    });
+    
+    // Content Gap
+    wp.customize('content_gap', function(value) {
+        value.bind(function(newval) {
+            $('.space-y-6, .space-y-8').css('gap', newval + 'px');
+        });
+    });
+    
+    // Grid Gap
+    wp.customize('grid_gap', function(value) {
+        value.bind(function(newval) {
+            $('.grid').css('gap', newval + 'px');
+        });
+    });
+    
 })(jQuery);
-

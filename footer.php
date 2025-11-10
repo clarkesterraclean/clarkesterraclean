@@ -42,12 +42,43 @@ if (isset($menu_locations['social_menu']) && $menu_locations['social_menu'] > 0)
     $has_social_menu = true;
 }
 ?>
-<footer class="bg-carbon-dark text-text-body mt-16" role="contentinfo">
-    <div class="max-w-7xl mx-auto px-4 py-12 grid <?php echo esc_attr($grid_class); ?> gap-8">
+<?php
+// Get footer settings
+$footer_bg_color = get_theme_mod('footer_bg_color', '#0f0f0f');
+$footer_text_color = get_theme_mod('footer_text_color', '#d4d4d4');
+$footer_link_color = get_theme_mod('footer_link_color', '#d4d4d4');
+$footer_link_hover_color = get_theme_mod('footer_link_hover_color', '#4ade80');
+$footer_border_color = get_theme_mod('footer_border_color', '#4ade804d');
+$footer_padding_top = get_theme_mod('footer_padding_top', 64);
+$footer_padding_bottom = get_theme_mod('footer_padding_bottom', 32);
+$footer_padding_horizontal = get_theme_mod('footer_padding_horizontal', 16);
+$footer_font_size = get_theme_mod('footer_font_size', 14);
+$footer_heading_font_size = get_theme_mod('footer_heading_font_size', 18);
+$footer_bg_image_id = get_theme_mod('footer_bg_image', '');
+
+// Build footer style
+$footer_style = 'background-color: ' . esc_attr($footer_bg_color) . ';';
+$footer_style .= ' color: ' . esc_attr($footer_text_color) . ';';
+$footer_style .= ' padding-top: ' . absint($footer_padding_top) . 'px;';
+$footer_style .= ' padding-bottom: ' . absint($footer_padding_bottom) . 'px;';
+$footer_style .= ' padding-left: ' . absint($footer_padding_horizontal) . 'px;';
+$footer_style .= ' padding-right: ' . absint($footer_padding_horizontal) . 'px;';
+$footer_style .= ' font-size: ' . absint($footer_font_size) . 'px;';
+
+if ($footer_bg_image_id) {
+    $footer_bg_image_url = wp_get_attachment_image_url($footer_bg_image_id, 'full');
+    if ($footer_bg_image_url) {
+        $footer_style .= ' background-image: url(' . esc_url($footer_bg_image_url) . ');';
+        $footer_style .= ' background-size: cover; background-position: center;';
+    }
+}
+?>
+<footer id="site-footer" class="mt-16" role="contentinfo" style="<?php echo $footer_style; ?>">
+    <div class="max-w-7xl mx-auto grid <?php echo esc_attr($grid_class); ?> gap-8">
         <!-- Column 1: Brand -->
         <div>
-            <h3 class="text-white font-semibold mb-2">Clarke's DPF & Engine Specialists</h3>
-            <p class="brand-tagline text-text-body text-sm">
+            <h3 class="font-semibold mb-2" style="color: <?php echo esc_attr($footer_text_color); ?>; font-size: <?php echo absint($footer_heading_font_size); ?>px;">Clarke's DPF & Engine Specialists</h3>
+            <p class="brand-tagline text-sm" style="color: <?php echo esc_attr($footer_text_color); ?>;">
                 <?php echo esc_html($tagline); ?>
             </p>
         </div>
@@ -65,11 +96,11 @@ if (isset($menu_locations['social_menu']) && $menu_locations['social_menu'] > 0)
             <!-- Fallback: Quick Links -->
             <?php if (!$has_footer_menu || !$footer_show_menu) : ?>
             <div>
-                <h3 class="text-white font-semibold mb-4">Quick Links</h3>
+                <h3 class="font-semibold mb-4" style="color: <?php echo esc_attr($footer_text_color); ?>; font-size: <?php echo absint($footer_heading_font_size); ?>px;">Quick Links</h3>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="<?php echo esc_url(home_url('/')); ?>" class="hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Home</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/services/')); ?>" class="hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Services</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/contact-us/')); ?>" class="hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">Contact</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/')); ?>" class="footer-link transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($footer_link_color); ?>;">Home</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/services/')); ?>" class="footer-link transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($footer_link_color); ?>;">Services</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/contact-us/')); ?>" class="footer-link transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($footer_link_color); ?>;">Contact</a></li>
                 </ul>
             </div>
             <?php endif; ?>
@@ -77,12 +108,12 @@ if (isset($menu_locations['social_menu']) && $menu_locations['social_menu'] > 0)
             <!-- Footer Menu (if assigned and enabled) -->
             <?php if ($has_footer_menu && $footer_show_menu) : ?>
             <div>
-                <h3 class="text-white font-semibold mb-4">Quick Links</h3>
+                <h3 class="font-semibold mb-4" style="color: <?php echo esc_attr($footer_text_color); ?>; font-size: <?php echo absint($footer_heading_font_size); ?>px;">Quick Links</h3>
                 <?php
                 wp_nav_menu(array(
                     'theme_location' => 'footer_menu',
                     'container'      => false,
-                    'menu_class'     => 'space-y-2 text-sm',
+                    'menu_class'     => 'space-y-2 text-sm footer-links',
                     'fallback_cb'    => false,
                     'depth'          => 1,
                 ));
@@ -92,7 +123,7 @@ if (isset($menu_locations['social_menu']) && $menu_locations['social_menu'] > 0)
             
             <!-- Column 3: Contact -->
             <div>
-                <h3 class="text-white font-semibold mb-4">Contact</h3>
+                <h3 class="font-semibold mb-4" style="color: <?php echo esc_attr($footer_text_color); ?>; font-size: <?php echo absint($footer_heading_font_size); ?>px;">Contact</h3>
                 <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="inline-block border border-eco-green text-eco-green rounded-full px-4 py-2 text-sm font-semibold hover:bg-eco-green hover:text-carbon-dark transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
                     Call <?php echo esc_html($phone); ?>
                 </a>
@@ -100,7 +131,7 @@ if (isset($menu_locations['social_menu']) && $menu_locations['social_menu'] > 0)
             
             <!-- Column 4: Social -->
             <div>
-                <h3 class="text-white font-semibold mb-4">Follow Us</h3>
+                <h3 class="font-semibold mb-4" style="color: <?php echo esc_attr($footer_text_color); ?>; font-size: <?php echo absint($footer_heading_font_size); ?>px;">Follow Us</h3>
                 <?php if ($has_social_menu) : ?>
                     <?php
                     wp_nav_menu(array(
@@ -125,11 +156,16 @@ if (isset($menu_locations['social_menu']) && $menu_locations['social_menu'] > 0)
     </div>
     
     <!-- Bottom Bar -->
-    <div class="border-t border-eco-green/20 mt-8 pt-6 text-xs text-text-body/80">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            © <?php echo date('Y'); ?> Clarke's DPF & Engine Specialists. All rights reserved.
+    <?php 
+    $footer_copyright_text = get_theme_mod('footer_copyright_text', '© ' . date('Y') . ' Clarke\'s DPF & Engine Specialists. All rights reserved.');
+    if (get_theme_mod('footer_show_copyright', 1)) :
+    ?>
+    <div class="border-t mt-8 pt-6 text-xs" style="border-top-color: <?php echo esc_attr($footer_border_color); ?>; color: <?php echo esc_attr($footer_text_color); ?>;">
+        <div class="max-w-7xl mx-auto text-center">
+            <?php echo esc_html($footer_copyright_text); ?>
         </div>
     </div>
+    <?php endif; ?>
 </footer>
 
 <?php
