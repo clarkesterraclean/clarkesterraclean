@@ -644,12 +644,25 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     // ========================================
-    // SECTION F: Images
+    // SECTION F: Section Images
     // ========================================
     $wp_customize->add_section('clarkes_images', array(
         'title'    => esc_html__('Section Images', 'clarkes-terraclean'),
         'panel'    => 'clarkes_theme_options',
         'priority' => 55,
+    ));
+    
+    // Info about Case Studies
+    $wp_customize->add_setting('case_studies_info', array(
+        'default'           => '',
+        'sanitize_callback' => '__return_empty_string',
+    ));
+    
+    $wp_customize->add_control('case_studies_info', array(
+        'label'       => esc_html__('Case Study Images', 'clarkes-terraclean'),
+        'description' => esc_html__('Case study images are managed through the Case Studies post type. Go to Case Studies → Add New/Edit, and use the "Featured Image" option to add images. Images will automatically appear on the homepage and case studies page.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'type'        => 'hidden',
     ));
     
     // About Section Image
@@ -661,10 +674,23 @@ function clarkes_customize_register($wp_customize) {
     
     $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'about_section_image', array(
         'label'       => esc_html__('About Section Image', 'clarkes-terraclean'),
-        'description' => esc_html__('Upload an image for the About section on the homepage', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload an image for the About section on the homepage. This appears alongside the "Why Choose Clarke\'s?" content.', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
     )));
+    
+    // Service Images Header
+    $wp_customize->add_setting('service_images_info', array(
+        'default'           => '',
+        'sanitize_callback' => '__return_empty_string',
+    ));
+    
+    $wp_customize->add_control('service_images_info', array(
+        'label'       => esc_html__('Service Images', 'clarkes-terraclean'),
+        'description' => esc_html__('Add images for each service. These appear on the homepage Services section and the Services page.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'type'        => 'hidden',
+    ));
     
     // Service 1 Image (Engine Carbon Cleaning)
     $wp_customize->add_setting('service_1_image', array(
@@ -674,7 +700,8 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_1_image', array(
-        'label'       => esc_html__('Service 1: Engine Carbon Cleaning Image', 'clarkes-terraclean'),
+        'label'       => esc_html__('Engine Carbon Cleaning Image', 'clarkes-terraclean'),
+        'description' => esc_html__('Image for the Engine Carbon Cleaning service', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
     )));
@@ -687,7 +714,8 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_2_image', array(
-        'label'       => esc_html__('Service 2: DPF Cleaning Image', 'clarkes-terraclean'),
+        'label'       => esc_html__('DPF Cleaning Image', 'clarkes-terraclean'),
+        'description' => esc_html__('Image for the DPF Cleaning service', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
     )));
@@ -700,7 +728,8 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_3_image', array(
-        'label'       => esc_html__('Service 3: EGR Valve Cleaning Image', 'clarkes-terraclean'),
+        'label'       => esc_html__('EGR Valve Cleaning Image', 'clarkes-terraclean'),
+        'description' => esc_html__('Image for the EGR Valve Cleaning service', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
     )));
@@ -713,33 +742,8 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_4_image', array(
-        'label'       => esc_html__('Service 4: Injector Cleaning Image', 'clarkes-terraclean'),
-        'section'     => 'clarkes_images',
-        'mime_type'   => 'image',
-    )));
-    
-    // Case Study 1 Image
-    $wp_customize->add_setting('case_study_1_image', array(
-        'default'           => '',
-        'sanitize_callback' => 'absint',
-        'transport'         => 'refresh',
-    ));
-    
-    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'case_study_1_image', array(
-        'label'       => esc_html__('Case Study 1: Audi A4 TDI Image', 'clarkes-terraclean'),
-        'section'     => 'clarkes_images',
-        'mime_type'   => 'image',
-    )));
-    
-    // Case Study 2 Image
-    $wp_customize->add_setting('case_study_2_image', array(
-        'default'           => '',
-        'sanitize_callback' => 'absint',
-        'transport'         => 'refresh',
-    ));
-    
-    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'case_study_2_image', array(
-        'label'       => esc_html__('Case Study 2: Ford Transit Image', 'clarkes-terraclean'),
+        'label'       => esc_html__('Injector Cleaning & Diagnostics Image', 'clarkes-terraclean'),
+        'description' => esc_html__('Image for the Injector Cleaning & Diagnostics service', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
     )));

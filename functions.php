@@ -449,18 +449,26 @@ if (!function_exists('clarkes_customize_register')) {
 }
 
 /**
+ * Include Case Studies system
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_register_case_study_post_type')) {
+    $case_studies_file = get_template_directory() . '/inc/case-studies.php';
+    if (file_exists($case_studies_file)) {
+        require_once $case_studies_file;
+    }
+}
+
+/**
  * Include Reviews system
  * Only include if not already loaded (prevents redeclaration)
- * Temporarily disabled for debugging - uncomment to enable
  */
-/*
 if (!function_exists('clarkes_register_review_post_type')) {
     $reviews_file = get_template_directory() . '/inc/reviews.php';
     if (file_exists($reviews_file)) {
         require_once $reviews_file;
     }
 }
-*/
 
 /**
  * Include WhatsApp FAB system

@@ -22,75 +22,69 @@ get_header();
                 Below are real-world examples of how our engine decarbonisation services have helped customers. Results vary depending on vehicle condition, age, and driving patterns.
             </p>
 
-            <!-- Case Study 1: Audi A4 TDI -->
+            <?php 
+            $case_studies_query = clarkes_get_case_studies();
+            if ($case_studies_query->have_posts()) :
+                while ($case_studies_query->have_posts()) : $case_studies_query->the_post();
+                    $vehicle = get_post_meta(get_the_ID(), 'vehicle_make_model', true);
+                    $problem = get_post_meta(get_the_ID(), 'problem', true);
+                    $dealer_said = get_post_meta(get_the_ID(), 'dealer_said', true);
+                    $what_we_did = get_post_meta(get_the_ID(), 'what_we_did', true);
+                    $result = get_post_meta(get_the_ID(), 'result', true);
+                    if (empty($vehicle)) $vehicle = get_the_title();
+            ?>
             <section class="mb-12 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-                <?php 
-                $case1_image_id = get_theme_mod('case_study_1_image', '');
-                if ($case1_image_id) {
-                    echo '<div class="h-64 overflow-hidden">';
-                    echo wp_get_attachment_image($case1_image_id, 'large', false, array('class' => 'w-full h-full object-cover'));
-                    echo '</div>';
-                }
-                ?>
+                <?php if (has_post_thumbnail()) : ?>
+                    <div class="h-64 overflow-hidden">
+                        <?php the_post_thumbnail('large', array('class' => 'w-full h-full object-cover')); ?>
+                    </div>
+                <?php endif; ?>
                 <div class="p-6">
-                    <h2 class="text-2xl font-semibold mb-6 text-eco-green">Audi A4 TDI</h2>
+                    <h2 class="text-2xl font-semibold mb-6 text-eco-green"><?php echo esc_html($vehicle); ?></h2>
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-4">
+                            <?php if (!empty($problem)) : ?>
                             <div>
                                 <h3 class="text-lg font-semibold mb-2 text-text-dark">Problem</h3>
-                                <p class="leading-relaxed">Warning light and limp mode activation. Vehicle losing power and entering restricted performance mode.</p>
+                                <p class="leading-relaxed"><?php echo esc_html($problem); ?></p>
                             </div>
+                            <?php endif; ?>
+                            <?php if (!empty($dealer_said)) : ?>
                             <div>
                                 <h3 class="text-lg font-semibold mb-2 text-text-dark">Dealer Said</h3>
-                                <p class="leading-relaxed">"New DPF needed" – replacement cost estimated at over £1,500.</p>
+                                <p class="leading-relaxed"><?php echo esc_html($dealer_said); ?></p>
                             </div>
+                            <?php endif; ?>
                         </div>
                         <div class="space-y-4">
+                            <?php if (!empty($what_we_did)) : ?>
                             <div>
                                 <h3 class="text-lg font-semibold mb-2 text-eco-green">What We Did</h3>
-                                <p class="leading-relaxed">DPF cleaning service to remove carbon deposits and restore exhaust flow through the blocked filter.</p>
+                                <p class="leading-relaxed"><?php echo esc_html($what_we_did); ?></p>
                             </div>
+                            <?php endif; ?>
+                            <?php if (!empty($result)) : ?>
                             <div>
                                 <h3 class="text-lg font-semibold mb-2 text-eco-green">Result</h3>
-                                <p class="leading-relaxed">Warning light cleared, full performance restored. Vehicle no longer entering limp mode. Customer avoided costly DPF replacement.</p>
+                                <p class="leading-relaxed"><?php echo esc_html($result); ?></p>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
+                    <?php if (get_the_content()) : ?>
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <?php the_content(); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </section>
-
-            <!-- Case Study 2: Ford Transit -->
-            <section class="mb-12 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-                <?php 
-                $case2_image_id = get_theme_mod('case_study_2_image', '');
-                if ($case2_image_id) {
-                    echo '<div class="h-64 overflow-hidden">';
-                    echo wp_get_attachment_image($case2_image_id, 'large', false, array('class' => 'w-full h-full object-cover'));
-                    echo '</div>';
-                }
-                ?>
-                <div class="p-6">
-                    <h2 class="text-2xl font-semibold mb-6 text-eco-green">Ford Transit</h2>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <div>
-                                <h3 class="text-lg font-semibold mb-2 text-text-dark">Problem</h3>
-                                <p class="leading-relaxed">Low MPG and sluggish throttle response. Vehicle felt underpowered, especially when loaded.</p>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-semibold mb-2 text-eco-green">What We Did</h3>
-                                <p class="leading-relaxed">Full engine decarbonisation service covering engine carbon cleaning, EGR valve cleaning, and injector cleaning.</p>
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div>
-                                <h3 class="text-lg font-semibold mb-2 text-eco-green">Result</h3>
-                                <p class="leading-relaxed">MPG improved by approximately 10–15% (typical improvement range). Throttle response restored to normal operation. Vehicle performing as expected.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <?php 
+                endwhile;
+                wp_reset_postdata();
+            else :
+            ?>
+            <p class="text-gray-700">No case studies have been added yet. Go to <strong>Case Studies → Add New</strong> to create your first case study.</p>
+            <?php endif; ?>
 
             <!-- CTA -->
             <section class="mt-10 p-6 bg-white rounded-lg border border-eco-green/20 text-center">
