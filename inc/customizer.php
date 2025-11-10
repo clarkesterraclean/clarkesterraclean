@@ -647,22 +647,10 @@ function clarkes_customize_register($wp_customize) {
     // SECTION F: Section Images
     // ========================================
     $wp_customize->add_section('clarkes_images', array(
-        'title'    => esc_html__('Section Images', 'clarkes-terraclean'),
-        'panel'    => 'clarkes_theme_options',
-        'priority' => 55,
-    ));
-    
-    // Info about Case Studies
-    $wp_customize->add_setting('case_studies_info', array(
-        'default'           => '',
-        'sanitize_callback' => '__return_empty_string',
-    ));
-    
-    $wp_customize->add_control('case_studies_info', array(
-        'label'       => esc_html__('Case Study Images', 'clarkes-terraclean'),
-        'description' => esc_html__('Case study images are managed through the Case Studies post type. Go to Case Studies → Add New/Edit, and use the "Featured Image" option to add images. Images will automatically appear on the homepage and case studies page.', 'clarkes-terraclean'),
-        'section'     => 'clarkes_images',
-        'type'        => 'hidden',
+        'title'       => esc_html__('Section Images', 'clarkes-terraclean'),
+        'description' => esc_html__('Manage images for different sections of your site. Note: Case study images are managed through the Case Studies post type (use Featured Image when editing a case study).', 'clarkes-terraclean'),
+        'panel'       => 'clarkes_theme_options',
+        'priority'    => 55,
     ));
     
     // About Section Image
@@ -678,19 +666,6 @@ function clarkes_customize_register($wp_customize) {
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
     )));
-    
-    // Service Images Header
-    $wp_customize->add_setting('service_images_info', array(
-        'default'           => '',
-        'sanitize_callback' => '__return_empty_string',
-    ));
-    
-    $wp_customize->add_control('service_images_info', array(
-        'label'       => esc_html__('Service Images', 'clarkes-terraclean'),
-        'description' => esc_html__('Add images for each service. These appear on the homepage Services section and the Services page.', 'clarkes-terraclean'),
-        'section'     => 'clarkes_images',
-        'type'        => 'hidden',
-    ));
     
     // Service 1 Image (Engine Carbon Cleaning)
     $wp_customize->add_setting('service_1_image', array(
