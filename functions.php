@@ -440,16 +440,13 @@ add_action('wp_ajax_nopriv_clarkes_contact', 'clarkes_handle_contact_form');
 /**
  * Include Customizer settings
  * Only include if not already loaded (prevents redeclaration)
- * Temporarily disabled for debugging - uncomment to enable
  */
-/*
 if (!function_exists('clarkes_customize_register')) {
     $customizer_file = get_template_directory() . '/inc/customizer.php';
     if (file_exists($customizer_file)) {
         require_once $customizer_file;
     }
 }
-*/
 
 /**
  * Include Reviews system
