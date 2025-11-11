@@ -449,6 +449,39 @@ if (!function_exists('clarkes_customize_register')) {
 }
 
 /**
+ * Include Before/After Slider system
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_before_after_slider_shortcode')) {
+    $before_after_file = get_template_directory() . '/inc/before-after-slider.php';
+    if (file_exists($before_after_file)) {
+        require_once $before_after_file;
+    }
+}
+
+/**
+ * Include Recent Work system
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_register_recent_work_post_type')) {
+    $recent_work_file = get_template_directory() . '/inc/recent-work.php';
+    if (file_exists($recent_work_file)) {
+        require_once $recent_work_file;
+    }
+}
+
+/**
+ * Include Quick Add workflow
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_quick_add_menu')) {
+    $quick_add_file = get_template_directory() . '/inc/quick-add.php';
+    if (file_exists($quick_add_file)) {
+        require_once $quick_add_file;
+    }
+}
+
+/**
  * Include Case Studies system
  * Only include if not already loaded (prevents redeclaration)
  */
