@@ -186,7 +186,7 @@ function clarkes_customize_register($wp_customize) {
             $choices = array('default', 'centered', 'split', 'minimal');
             return in_array($input, $choices) ? $input : 'default';
         },
-        'transport'         => 'postMessage',
+        'transport'         => 'refresh', // Changed to refresh because layout changes HTML structure
     ));
     
     $wp_customize->add_control('header_layout', array(
