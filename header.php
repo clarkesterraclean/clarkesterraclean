@@ -84,42 +84,102 @@ $nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
     data-header-layout="<?php echo esc_attr($header_layout); ?>"
     data-header-sticky="<?php echo $header_sticky ? '1' : '0'; ?>"
 >
-    <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">
-        <!-- Site Title / Logo -->
-        <div class="flex items-center">
-            <a href="<?php echo esc_url(home_url('/')); ?>" class="font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;" onmouseover="this.style.color='<?php echo esc_js($header_link_hover_color); ?>'" onmouseout="this.style.color='<?php echo esc_js($header_link_color); ?>'">
-                <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
-            </a>
+    <?php
+    // Get phone settings
+    $show_phone = get_theme_mod('show_phone_in_header', 1);
+    $phone = get_theme_mod('business_phone', '07706 230867');
+    $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+    
+    // Render different layouts based on header_layout setting
+    if ($header_layout === 'centered') : ?>
+        <!-- Centered Layout: Logo Center, Nav Below -->
+        <div class="max-w-7xl mx-auto" style="height: <?php echo absint($header_height); ?>px;">
+            <div class="flex flex-col items-center justify-center h-full">
+                <!-- Logo Center -->
+                <div class="flex items-center mb-2">
+                    <a href="<?php echo esc_url(home_url('/')); ?>" class="header-logo font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;">
+                        <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
+                    </a>
+                </div>
+                
+                <!-- Navigation Below -->
+                <nav class="header-nav hidden md:flex gap-6 font-medium" role="navigation" aria-label="Primary Navigation" style="<?php echo $nav_style; ?>">
+                    <?php
+                    wp_nav_menu(array(
+                        'theme_location' => 'primary_menu',
+                        'container' => false,
+                        'menu_class' => 'flex gap-6 items-center',
+                        'fallback_cb' => 'clarkes_terraclean_default_menu',
+                        'depth' => 1,
+                        'link_before' => '<span class="header-nav-link">',
+                        'link_after' => '</span>',
+                    ));
+                    ?>
+                </nav>
+                
+                <!-- Mobile Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden absolute top-1/2 right-4 transform -translate-y-1/2 text-text-body hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green transition-colors" aria-label="Toggle mobile menu" aria-expanded="false">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
         
-        <!-- Desktop Navigation -->
-        <nav class="header-nav hidden md:flex gap-6 font-medium" role="navigation" aria-label="Primary Navigation" style="<?php echo $nav_style; ?>">
-            <?php
-            wp_nav_menu(array(
-                'theme_location' => 'primary_menu',
-                'container' => false,
-                'menu_class' => 'flex gap-6 items-center',
-                'fallback_cb' => 'clarkes_terraclean_default_menu',
-                'depth' => 1,
-                'link_before' => '<span class="header-nav-link">',
-                'link_after' => '</span>',
-            ));
-            ?>
-        </nav>
-        
-        <!-- Right Side: Phone CTA & Mobile Toggle -->
-        <div class="flex items-center gap-4">
-            <!-- Desktop Phone CTA -->
-            <?php if (get_theme_mod('show_phone_in_header', 1)) : 
-                $phone = get_theme_mod('business_phone', '07706 230867');
-                $phone_clean = preg_replace('/[^0-9]/', '', $phone);
-            ?>
-                <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="hidden md:inline-block border border-eco-green text-eco-green rounded-full px-4 py-2 text-sm font-semibold hover:bg-eco-green hover:text-carbon-dark transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
-                Call <?php echo esc_html($phone); ?>
-            </a>
-            <?php endif; ?>
+    <?php elseif ($header_layout === 'split') : ?>
+        <!-- Split Layout: Logo Left, Nav Center, CTA Right -->
+        <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">
+            <!-- Logo Left -->
+            <div class="flex items-center flex-1">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="header-logo font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;">
+                    <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
+                </a>
+            </div>
             
-            <!-- Mobile Toggle Button -->
+            <!-- Navigation Center -->
+            <nav class="header-nav hidden md:flex gap-6 font-medium flex-1 justify-center" role="navigation" aria-label="Primary Navigation" style="<?php echo $nav_style; ?>">
+                <?php
+                wp_nav_menu(array(
+                    'theme_location' => 'primary_menu',
+                    'container' => false,
+                    'menu_class' => 'flex gap-6 items-center',
+                    'fallback_cb' => 'clarkes_terraclean_default_menu',
+                    'depth' => 1,
+                    'link_before' => '<span class="header-nav-link">',
+                    'link_after' => '</span>',
+                ));
+                ?>
+            </nav>
+            
+            <!-- Right Side: Phone CTA & Mobile Toggle -->
+            <div class="flex items-center gap-4 flex-1 justify-end">
+                <?php if ($show_phone) : ?>
+                    <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="hidden md:inline-block border border-eco-green text-eco-green rounded-full px-4 py-2 text-sm font-semibold hover:bg-eco-green hover:text-carbon-dark transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
+                        Call <?php echo esc_html($phone); ?>
+                    </a>
+                <?php endif; ?>
+                
+                <button id="mobile-menu-toggle" class="md:hidden text-text-body hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green transition-colors" aria-label="Toggle mobile menu" aria-expanded="false">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+    <?php elseif ($header_layout === 'minimal') : ?>
+        <!-- Minimal Layout: Logo Only -->
+        <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="header-logo font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;">
+                    <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
+                </a>
+            </div>
+            
+            <!-- Mobile Toggle Only -->
             <button id="mobile-menu-toggle" class="md:hidden text-text-body hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green transition-colors" aria-label="Toggle mobile menu" aria-expanded="false">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -127,7 +187,51 @@ $nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
                 </svg>
             </button>
         </div>
-    </div>
+        
+    <?php else : ?>
+        <!-- Default Layout: Logo Left, Nav Right -->
+        <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">
+            <!-- Site Title / Logo -->
+            <div class="flex items-center">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="header-logo font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;">
+                    <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="header-nav hidden md:flex gap-6 font-medium" role="navigation" aria-label="Primary Navigation" style="<?php echo $nav_style; ?>">
+                <?php
+                wp_nav_menu(array(
+                    'theme_location' => 'primary_menu',
+                    'container' => false,
+                    'menu_class' => 'flex gap-6 items-center',
+                    'fallback_cb' => 'clarkes_terraclean_default_menu',
+                    'depth' => 1,
+                    'link_before' => '<span class="header-nav-link">',
+                    'link_after' => '</span>',
+                ));
+                ?>
+            </nav>
+            
+            <!-- Right Side: Phone CTA & Mobile Toggle -->
+            <div class="flex items-center gap-4">
+                <!-- Desktop Phone CTA -->
+                <?php if ($show_phone) : ?>
+                    <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="hidden md:inline-block border border-eco-green text-eco-green rounded-full px-4 py-2 text-sm font-semibold hover:bg-eco-green hover:text-carbon-dark transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
+                        Call <?php echo esc_html($phone); ?>
+                    </a>
+                <?php endif; ?>
+                
+                <!-- Mobile Toggle Button -->
+                <button id="mobile-menu-toggle" class="md:hidden text-text-body hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green transition-colors" aria-label="Toggle mobile menu" aria-expanded="false">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    <?php endif; ?>
     
     <!-- Mobile Navigation -->
     <div id="mobile-nav" class="hidden border-t" style="background-color: <?php echo esc_attr($mobile_menu_bg_color); ?>; border-top-color: <?php echo esc_attr($header_border_color); ?>;">
