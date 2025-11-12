@@ -53,15 +53,26 @@
             $('#select-media-btn').trigger('click');
         });
         
-        // Initialize editor if media is loaded
-        if ($('.media-editor-interface').length) {
+        // Initialize editor if media is loaded via URL parameter
+        if (getUrlParameter('media_id')) {
+            var mediaId = getUrlParameter('media_id');
+            currentMediaId = mediaId;
+            
+            // If editor interface exists, initialize it
+            if ($('.media-editor-interface').length) {
+                currentMediaType = $('.media-editor-interface').data('media-type');
+                initializeEditor();
+                initAllToolbarButtons();
+            } else {
+                // Load media and show preview with "Start Editing" button
+                loadMediaForEditing(mediaId);
+            }
+        } else if ($('.media-editor-interface').length) {
+            // Editor interface already exists (loaded via PHP)
             currentMediaId = $('.media-editor-interface').data('media-id');
             currentMediaType = $('.media-editor-interface').data('media-type');
             initializeEditor();
-        } else if (getUrlParameter('media_id')) {
-            // Load media from URL parameter
-            var mediaId = getUrlParameter('media_id');
-            loadMediaForEditing(mediaId);
+            initAllToolbarButtons();
         }
     });
     
@@ -107,35 +118,57 @@
                     var attachment = response.data;
                     showMediaPreview(attachment);
                     
-                    // Show editor interface
-                    if (!$('.media-editor-interface').length) {
-                        createEditorInterface(attachment);
+                    // Show "Start Editing" button in preview
+                    if (!$('#start-editing-btn').length) {
+                        var startBtn = $('<button>', {
+                            id: 'start-editing-btn',
+                            class: 'button button-primary button-large',
+                            style: 'margin-top: 20px;',
+                            html: '<span class="dashicons dashicons-edit"></span> Start Editing'
+                        });
+                        startBtn.on('click', function() {
+                            startEditing(attachment);
+                        });
+                        $('#media-preview-content').append(startBtn);
                     }
-                    
-                    currentMediaId = mediaId;
-                    currentMediaType = attachment.type.indexOf('video') !== -1 ? 'video' : 'image';
-                    initializeEditor();
                 }
             }
         });
     }
     
-    // Create Editor Interface
-    function createEditorInterface(attachment) {
-        var editorHtml = '<div class="media-editor-interface" data-media-id="' + attachment.id + '" data-media-type="' + (attachment.type.indexOf('video') !== -1 ? 'video' : 'image') + '">';
-        editorHtml += '<div class="editor-toolbar">';
-        // Toolbar will be added by initializeEditor
-        editorHtml += '</div>';
-        editorHtml += '<div class="editor-canvas-container">';
-        if (attachment.type.indexOf('video') !== -1) {
-            editorHtml += '<video id="editor-video" src="' + attachment.url + '" controls></video>';
-        } else {
-            editorHtml += '<div id="canvas-wrapper"><canvas id="editor-canvas"></canvas></div>';
-        }
-        editorHtml += '</div>';
-        editorHtml += '</div>';
+    // Start Editing - Create Full Editor Interface
+    function startEditing(attachment) {
+        // Hide preview container
+        $('#media-preview-container').slideUp();
         
-        $('#media-preview-container').after(editorHtml);
+        // Remove start button
+        $('#start-editing-btn').remove();
+        
+        // Create full editor interface
+        if (!$('.media-editor-interface').length) {
+            createFullEditorInterface(attachment);
+        } else {
+            // Update existing interface
+            $('.media-editor-interface').attr('data-media-id', attachment.id);
+            $('.media-editor-interface').attr('data-media-type', attachment.type.indexOf('video') !== -1 ? 'video' : 'image');
+        }
+        
+        currentMediaId = attachment.id;
+        currentMediaType = attachment.type.indexOf('video') !== -1 ? 'video' : 'image';
+        
+        // Initialize editor after a short delay to ensure DOM is ready
+        setTimeout(function() {
+            initializeEditor();
+            initAllToolbarButtons();
+        }, 100);
+    }
+    
+    // Create Full Editor Interface with all controls
+    function createFullEditorInterface(attachment) {
+        // Reload page with media_id to get full PHP-rendered interface
+        var currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('media_id', attachment.id);
+        window.location.href = currentUrl.toString();
     }
     
     // Get URL Parameter
@@ -164,40 +197,72 @@
     }
     
     function initializeImageEditor() {
-            $.ajax({
-                url: clarkesMediaEditor.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'clarkes_get_media',
-                    nonce: clarkesMediaEditor.nonce,
-                    media_id: currentMediaId
-                },
+        if (!currentMediaId) return;
+        
+        $.ajax({
+            url: clarkesMediaEditor.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'clarkes_get_media',
+                nonce: clarkesMediaEditor.nonce,
+                media_id: currentMediaId
+            },
             success: function(response) {
                 if (response.success) {
                     var img = new Image();
                     img.crossOrigin = 'anonymous';
                     img.onload = function() {
                         canvas = document.getElementById('editor-canvas');
+                        if (!canvas) {
+                            console.error('Canvas element not found');
+                            return;
+                        }
+                        
                         var maxWidth = 1200;
                         var maxHeight = 800;
                         var scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
                         
-                        fabricCanvas = new fabric.Canvas('editor-canvas', {
-                            width: img.width * scale,
-                            height: img.height * scale,
-                        });
-                        
-                        fabric.Image.fromURL(response.data.url, function(fabricImg) {
-                            fabricImg.scale(scale);
-                            fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas), {
-                                scaleX: scale,
-                                scaleY: scale
+                        try {
+                            fabricCanvas = new fabric.Canvas('editor-canvas', {
+                                width: img.width * scale,
+                                height: img.height * scale,
                             });
-                            currentImage = fabricImg;
-                        });
+                            
+                            fabric.Image.fromURL(response.data.url, function(fabricImg) {
+                                if (!fabricImg) {
+                                    console.error('Failed to load image into Fabric.js');
+                                    return;
+                                }
+                                
+                                fabricImg.scale(scale);
+                                fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas), {
+                                    scaleX: scale,
+                                    scaleY: scale
+                                });
+                                currentImage = fabricImg;
+                                
+                                // Initialize advanced features after image loads
+                                setTimeout(function() {
+                                    initAllToolbarButtons();
+                                    if (window.clarkesMediaEditorAdvanced && window.clarkesMediaEditorAdvanced.initAdvancedFeatures) {
+                                        window.clarkesMediaEditorAdvanced.initAdvancedFeatures();
+                                    }
+                                }, 500);
+                            });
+                        } catch (e) {
+                            console.error('Error initializing Fabric.js canvas:', e);
+                        }
+                    };
+                    img.onerror = function() {
+                        console.error('Failed to load image');
                     };
                     img.src = response.data.url;
+                } else {
+                    console.error('Failed to get media:', response.data);
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error loading media:', error);
             }
         });
     }
@@ -297,24 +362,44 @@
         }
     });
     
-    $('#btn-resize').on('click', function() {
+    $(document).on('click', '#btn-resize', function() {
         togglePanel('resize-controls');
     });
     
-    $('#btn-filters').on('click', function() {
+    $(document).on('click', '#btn-filters', function() {
         togglePanel('filter-controls');
     });
     
-    $('#btn-text-overlay').on('click', function() {
+    $(document).on('click', '#btn-text-overlay', function() {
         togglePanel('text-controls');
     });
     
-    $('#btn-markup').on('click', function() {
+    $(document).on('click', '#btn-markup', function() {
         togglePanel('markup-controls');
     });
     
-    $('#btn-ai-seo').on('click', function() {
+    $(document).on('click', '#btn-ai-seo', function() {
         togglePanel('ai-seo-panel');
+    });
+    
+    $(document).on('click', '#btn-adjustments', function() {
+        togglePanel('adjustments-controls');
+    });
+    
+    $(document).on('click', '#btn-effects', function() {
+        togglePanel('effects-controls');
+    });
+    
+    $(document).on('click', '#btn-presets', function() {
+        togglePanel('presets-controls');
+    });
+    
+    $(document).on('click', '#btn-layers', function() {
+        togglePanel('layers-controls');
+    });
+    
+    $(document).on('click', '#btn-video-tools', function() {
+        togglePanel('video-tools-controls');
     });
     
     // Filter Controls
@@ -359,11 +444,11 @@
         }
     }
     
-    $('#apply-filters').on('click', function() {
+    $(document).on('click', '#apply-filters', function() {
         applyFilters();
     });
     
-    $('#reset-filters').on('click', function() {
+    $(document).on('click', '#reset-filters', function() {
         filters = { brightness: 100, contrast: 100, saturation: 100, blur: 0 };
         $('#filter-brightness').val(100).trigger('input');
         $('#filter-contrast').val(100).trigger('input');
@@ -372,7 +457,7 @@
     });
     
     // Resize
-    $('#apply-resize').on('click', function() {
+    $(document).on('click', '#apply-resize', function() {
         var width = parseInt($('#resize-width').val());
         var height = parseInt($('#resize-height').val());
         var maintainAspect = $('#resize-maintain-aspect').is(':checked');
@@ -412,7 +497,7 @@
     });
     
     // Text Overlay
-    $('#add-text').on('click', function() {
+    $(document).on('click', '#add-text', function() {
         if (fabricCanvas) {
             var textOptions = {
                 left: parseInt($('#text-x').val()),
@@ -465,19 +550,21 @@
     
     // Markup Tools
     var currentMarkupTool = null;
-    $('#btn-rectangle').on('click', function() {
+    $(document).on('click', '#btn-rectangle', function() {
         currentMarkupTool = 'rect';
         fabricCanvas.isDrawingMode = false;
         fabricCanvas.selection = false;
     });
     
-    $('#btn-circle').on('click', function() {
+    $(document).on('click', '#btn-circle', function() {
         currentMarkupTool = 'circle';
-        fabricCanvas.isDrawingMode = false;
-        fabricCanvas.selection = false;
+        if (fabricCanvas) {
+            fabricCanvas.isDrawingMode = false;
+            fabricCanvas.selection = false;
+        }
     });
     
-    $('#btn-line').on('click', function() {
+    $(document).on('click', '#btn-line', function() {
         currentMarkupTool = 'line';
         fabricCanvas.isDrawingMode = false;
         fabricCanvas.selection = false;
@@ -573,7 +660,7 @@
     }
     
     // AI SEO
-    $('#generate-ai-seo').on('click', function() {
+    $(document).on('click', '#generate-ai-seo', function() {
         var $btn = $(this);
         $btn.prop('disabled', true).text('Generating...');
         
@@ -602,7 +689,7 @@
         });
     });
     
-    $('#apply-ai-seo').on('click', function() {
+    $(document).on('click', '#apply-ai-seo', function() {
         $.ajax({
             url: clarkesMediaEditor.ajax_url,
             type: 'POST',
@@ -624,7 +711,7 @@
     });
     
     // Video Mute
-    $('#btn-mute-video').on('click', function() {
+    $(document).on('click', '#btn-mute-video', function() {
         var video = document.getElementById('editor-video');
         if (video) {
             video.muted = !video.muted;
@@ -633,7 +720,7 @@
     });
     
     // Auto Orient
-    $('#btn-auto-orient').on('click', function() {
+    $(document).on('click', '#btn-auto-orient', function() {
         if (currentMediaType === 'video') {
             var video = document.getElementById('editor-video');
             if (video) {
@@ -712,14 +799,59 @@
     });
     
     // Reset
-    $('#btn-reset').on('click', function() {
+    $(document).on('click', '#btn-reset', function() {
         if (confirm('Reset all changes?')) {
             window.location.reload();
         }
     });
     
+    // Initialize All Toolbar Buttons
+    function initAllToolbarButtons() {
+        // This function ensures all toolbar buttons are wired up
+        // Most are already initialized, but we'll make sure they're all connected
+        
+        // Adjustments button
+        $('#btn-adjustments').off('click').on('click', function() {
+            togglePanel('adjustments-controls');
+        });
+        
+        // Effects button
+        $('#btn-effects').off('click').on('click', function() {
+            togglePanel('effects-controls');
+        });
+        
+        // Presets button
+        $('#btn-presets').off('click').on('click', function() {
+            togglePanel('presets-controls');
+        });
+        
+        // Video tools button
+        $('#btn-video-tools').off('click').on('click', function() {
+            togglePanel('video-tools-controls');
+        });
+        
+        // Initialize advanced features if available
+        if (window.clarkesMediaEditorAdvanced && window.clarkesMediaEditorAdvanced.initAdvancedFeatures) {
+            setTimeout(function() {
+                window.clarkesMediaEditorAdvanced.initAdvancedFeatures();
+            }, 500);
+        }
+    }
+    
     function togglePanel(panelId) {
-        $('.control-panel').hide();
+        // Hide all panels
+        $('.control-panel').hide().removeClass('active');
+        
+        // Show selected panel
+        var $panel = $('#' + panelId);
+        if ($panel.length) {
+            $panel.show().addClass('active');
+            
+            // Scroll to panel if needed
+            $('html, body').animate({
+                scrollTop: $panel.offset().top - 100
+            }, 300);
+        }
         $('#' + panelId).show();
     }
     

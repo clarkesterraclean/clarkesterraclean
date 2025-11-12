@@ -122,7 +122,10 @@ function clarkes_media_editor_page() {
     }
     ?>
     <div class="wrap clarkes-media-editor">
-        <h1><?php _e('Media Editor', 'clarkes-terraclean'); ?></h1>
+        <div class="media-editor-header-modern">
+            <h1><?php _e('Media Editor', 'clarkes-terraclean'); ?></h1>
+            <p class="description"><?php _e('Comprehensive image and video editing with advanced features', 'clarkes-terraclean'); ?></p>
+        </div>
         
         <?php if (!$media_id || !$media) : ?>
             <!-- Media Selection -->
