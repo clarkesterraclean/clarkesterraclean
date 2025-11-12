@@ -553,19 +553,42 @@ function clarkes_render_whatsapp_fab() {
             }
             
             // Clone elements to remove old listeners and attach fresh ones
-            // Cancel button
+            // Cancel button - must be attached BEFORE form handlers
             if (cancelBtn) {
                 const newCancelBtn = cancelBtn.cloneNode(true);
                 cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
                 
+                // Attach with capture phase and highest priority
                 newCancelBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
                     console.log('Cancel button clicked (WhatsApp handler)');
-                    closeCustomerInfoForm();
+                    const modal = document.getElementById('clarkes-customer-info-modal');
+                    const form = document.getElementById('clarkes-customer-info-form');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        if (form) form.reset();
+                    }
+                    pendingAction = null;
                     return false;
-                }, true);
+                }, true); // Capture phase - fires first
+                
+                // Also attach in bubble phase as backup
+                newCancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Cancel button clicked (WhatsApp handler - bubble)');
+                    const modal = document.getElementById('clarkes-customer-info-modal');
+                    const form = document.getElementById('clarkes-customer-info-form');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        if (form) form.reset();
+                    }
+                    pendingAction = null;
+                    return false;
+                }, false); // Bubble phase - backup
             }
             
             // Backdrop - clone modal to remove old listeners

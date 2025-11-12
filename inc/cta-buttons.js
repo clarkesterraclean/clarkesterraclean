@@ -65,17 +65,39 @@
             const newCancelBtn = cancelBtn.cloneNode(true);
             cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
             
+            // Attach with capture phase for highest priority
             newCancelBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                console.log('Cancel clicked (CTA handler)');
-                modal.style.display = 'none';
-                if (form) form.reset();
+                console.log('Cancel clicked (CTA handler - capture)');
+                const modalEl = document.getElementById('clarkes-customer-info-modal');
+                const formEl = document.getElementById('clarkes-customer-info-form');
+                if (modalEl) {
+                    modalEl.style.display = 'none';
+                    if (formEl) formEl.reset();
+                }
                 customerInfo = null;
                 pendingAction = null;
                 return false;
-            }, true);
+            }, true); // Capture phase - fires first
+            
+            // Also attach in bubble phase as backup
+            newCancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Cancel clicked (CTA handler - bubble)');
+                const modalEl = document.getElementById('clarkes-customer-info-modal');
+                const formEl = document.getElementById('clarkes-customer-info-form');
+                if (modalEl) {
+                    modalEl.style.display = 'none';
+                    if (formEl) formEl.reset();
+                }
+                customerInfo = null;
+                pendingAction = null;
+                return false;
+            }, false); // Bubble phase - backup
         }
         
         // Backdrop click - remove old, add new
