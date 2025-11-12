@@ -668,6 +668,27 @@ function clarkes_render_whatsapp_fab() {
                 if (callModal && callModal.style.display !== 'none') closeCallModal();
             }
         });
+        
+        // Auto-open chat if enabled
+        <?php 
+        $auto_open = get_option('whatsapp_auto_open', 0);
+        $auto_open_delay = get_option('whatsapp_auto_open_delay', 5);
+        if ($auto_open) : 
+        ?>
+        setTimeout(function() {
+            // Check if user hasn't interacted with the page
+            if (!document.querySelector('.clarkes-wa-button:active') && !sessionStorage.getItem('clarkes_wa_opened')) {
+                if (hasWhatsApp()) {
+                    // Try WhatsApp first
+                    window.open(clarkesWhatsApp.chat_url, '_blank');
+                } else {
+                    // Show chat window
+                    openChatWindow();
+                }
+                sessionStorage.setItem('clarkes_wa_opened', 'true');
+            }
+        }, <?php echo absint($auto_open_delay) * 1000; ?>);
+        <?php endif; ?>
     })();
     </script>
     <?php

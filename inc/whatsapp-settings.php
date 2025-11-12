@@ -125,12 +125,22 @@ function clarkes_whatsapp_settings_page() {
         foreach ($settings as $setting) {
             if (isset($_POST[$setting])) {
                 if ($setting === 'whatsapp_pretext') {
-                    update_option($setting, sanitize_textarea_field($_POST[$setting]));
-                } elseif (in_array($setting, array('whatsapp_show_desktop', 'whatsapp_show_mobile', 'whatsapp_auto_open', 'whatsapp_email_notifications'))) {
-                    update_option($setting, isset($_POST[$setting]) ? 1 : 0);
+                    $value = sanitize_textarea_field($_POST[$setting]);
+                    update_option($setting, $value);
+                    set_theme_mod($setting, $value); // Sync to theme mod
+                } elseif (in_array($setting, array('whatsapp_show_desktop', 'whatsapp_show_mobile', 'whatsapp_auto_open', 'whatsapp_email_notifications', 'enable_whatsapp_fab'))) {
+                    $value = isset($_POST[$setting]) ? 1 : 0;
+                    update_option($setting, $value);
+                    set_theme_mod($setting, $value); // Sync to theme mod
                 } else {
-                    update_option($setting, sanitize_text_field($_POST[$setting]));
+                    $value = sanitize_text_field($_POST[$setting]);
+                    update_option($setting, $value);
+                    set_theme_mod($setting, $value); // Sync to theme mod
                 }
+            } elseif (in_array($setting, array('whatsapp_show_desktop', 'whatsapp_show_mobile', 'whatsapp_auto_open', 'whatsapp_email_notifications', 'enable_whatsapp_fab'))) {
+                // Unchecked checkboxes
+                update_option($setting, 0);
+                set_theme_mod($setting, 0);
             }
         }
         
