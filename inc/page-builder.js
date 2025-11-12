@@ -21,10 +21,142 @@
             }
         }
         
+        // Check for existing page content
+        var pageContentData = $('#page-content-data').text();
+        if (pageContentData) {
+            try {
+                var pageData = JSON.parse(pageContentData);
+                if (pageData.has_content && builderData.length === 0) {
+                    // Show import option
+                    $('#btn-import-content').on('click', function() {
+                        importPageContent(pageData.content);
+                    });
+                    $('#btn-dismiss-import').on('click', function() {
+                        $('.import-content-notice').slideUp();
+                    });
+                }
+            } catch(e) {
+                console.error('Error parsing page content data:', e);
+            }
+        }
+        
         renderCanvas();
         initDragAndDrop();
         initElementSettings();
+        initPreview();
+        initSave();
     });
+    
+    // Import Page Content
+    function importPageContent(content) {
+        if (!content || content.trim() === '') {
+            alert('No content to import');
+            return;
+        }
+        
+        // Convert HTML content to builder elements
+        var $temp = $('<div>').html(content);
+        var elements = [];
+        
+        // Extract headings
+        $temp.find('h1, h2, h3, h4, h5, h6').each(function() {
+            var level = parseInt($(this).prop('tagName').substring(1));
+            elements.push({
+                id: 'element-' + (++elementIdCounter),
+                type: 'heading',
+                settings: {
+                    text: $(this).text(),
+                    level: level
+                },
+                children: []
+            });
+        });
+        
+        // Extract paragraphs
+        $temp.find('p').each(function() {
+            var text = $(this).text();
+            if (text.trim()) {
+                elements.push({
+                    id: 'element-' + (++elementIdCounter),
+                    type: 'text',
+                    settings: {
+                        text: text,
+                        tag: 'p'
+                    },
+                    children: []
+                });
+            }
+        });
+        
+        // Extract images
+        $temp.find('img').each(function() {
+            elements.push({
+                id: 'element-' + (++elementIdCounter),
+                type: 'image',
+                settings: {
+                    image_url: $(this).attr('src'),
+                    alt: $(this).attr('alt') || ''
+                },
+                children: []
+            });
+        });
+        
+        if (elements.length > 0) {
+            builderData = elements;
+            renderCanvas();
+            $('.import-content-notice').slideUp();
+            alert('Content imported successfully! ' + elements.length + ' elements added.');
+        } else {
+            alert('No importable content found. The content may already be in the builder format.');
+        }
+    }
+    
+    // Initialize Preview
+    function initPreview() {
+        $('#btn-preview').on('click', function() {
+            if (clarkesPageBuilder.preview_url) {
+                // Save first, then open preview
+                saveBuilderData(function() {
+                    window.open(clarkesPageBuilder.preview_url, '_blank');
+                });
+            } else {
+                alert('Preview URL not available');
+            }
+        });
+    }
+    
+    // Initialize Save
+    function initSave() {
+        $('#btn-save-builder').on('click', function() {
+            saveBuilderData(function() {
+                alert('Page saved successfully!');
+            });
+        });
+    }
+    
+    // Save Builder Data
+    function saveBuilderData(callback) {
+        $.ajax({
+            url: clarkesPageBuilder.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'clarkes_save_page_builder',
+                nonce: clarkesPageBuilder.nonce,
+                post_id: clarkesPageBuilder.post_id,
+                builder_data: JSON.stringify(builderData)
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (callback) callback();
+                } else {
+                    alert('Error saving: ' + (response.data.message || 'Unknown error'));
+                }
+            },
+            error: function() {
+                alert('AJAX error while saving');
+            }
+        });
+    }
     
     // Drag and Drop
     function initDragAndDrop() {
@@ -87,9 +219,14 @@
         canvas.empty();
         
         if (builderData.length === 0) {
-            canvas.html('<div class="canvas-empty-state" style="text-align: center; padding: 100px 20px; color: #999;"><p>Drag elements from the left sidebar to start building your page</p></div>');
+            if ($('.canvas-empty-state').length === 0) {
+                canvas.html('<div class="canvas-empty-state"><div class="empty-state-icon">🏗️</div><h3>Start Building Your Page</h3><p>Drag elements from the left sidebar to start building your page</p></div>');
+            }
             return;
         }
+        
+        // Remove empty state if elements exist
+        $('.canvas-empty-state').remove();
         
         builderData.forEach(function(element) {
             var $element = renderElement(element);

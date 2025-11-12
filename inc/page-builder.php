@@ -70,6 +70,8 @@ function clarkes_page_builder_scripts($hook) {
         wp_localize_script('clarkes-page-builder', 'clarkesPageBuilder', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('clarkes_page_builder'),
+            'post_id' => isset($_GET['post_id']) ? absint($_GET['post_id']) : 0,
+            'preview_url' => isset($_GET['post_id']) ? get_permalink(absint($_GET['post_id'])) : '',
         ));
         
         wp_enqueue_style(
@@ -204,10 +206,13 @@ function clarkes_page_builder_page() {
             </div>
         </div>
         
-        <div class="page-builder-container" style="display: flex; height: calc(100vh - 120px);">
+        <div class="page-builder-container">
             <!-- Left Sidebar - Elements -->
-            <div class="builder-sidebar-left" style="width: 300px; background: #f5f5f5; border-right: 1px solid #ddd; overflow-y: auto; padding: 15px;">
-                <h3 style="margin-top: 0;"><?php _e('Elements', 'clarkes-terraclean'); ?></h3>
+            <div class="builder-sidebar-left">
+                <div class="sidebar-header">
+                    <h3><?php _e('Elements', 'clarkes-terraclean'); ?></h3>
+                    <p class="description"><?php _e('Drag elements to the canvas', 'clarkes-terraclean'); ?></p>
+                </div>
                 
                 <div class="element-categories">
                     <div class="element-category">
@@ -340,6 +345,11 @@ function clarkes_page_builder_page() {
     </div>
     
     <script type="application/json" id="builder-data"><?php echo wp_json_encode($builder_data); ?></script>
+    <script type="application/json" id="page-content-data"><?php echo wp_json_encode(array(
+        'content' => $page_content,
+        'has_content' => $has_content,
+        'post_id' => $post_id,
+    )); ?></script>
     <?php
 }
 }
