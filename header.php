@@ -169,6 +169,40 @@ $nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
             </div>
         </div>
         
+    <?php elseif ($header_layout === 'simple') : ?>
+        <!-- Simple Layout: Logo Left, Nav Right, No CTA -->
+        <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">
+            <!-- Site Title / Logo -->
+            <div class="flex items-center">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="header-logo font-semibold <?php echo esc_attr($logo_class); ?> tracking-wide transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green" style="color: <?php echo esc_attr($header_link_color); ?>;">
+                    <?php echo esc_html(get_bloginfo('name') ?: "Clarke's DPF & Engine Specialists"); ?>
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="header-nav hidden md:flex gap-6 font-medium" role="navigation" aria-label="Primary Navigation" style="<?php echo $nav_style; ?>">
+                <?php
+                wp_nav_menu(array(
+                    'theme_location' => 'primary_menu',
+                    'container' => false,
+                    'menu_class' => 'flex gap-6 items-center',
+                    'fallback_cb' => 'clarkes_terraclean_default_menu',
+                    'depth' => 1,
+                    'link_before' => '<span class="header-nav-link">',
+                    'link_after' => '</span>',
+                ));
+                ?>
+            </nav>
+            
+            <!-- Mobile Toggle Button Only -->
+            <button id="mobile-menu-toggle" class="md:hidden text-text-body hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green transition-colors" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
     <?php elseif ($header_layout === 'minimal') : ?>
         <!-- Minimal Layout: Logo Only -->
         <div class="max-w-7xl mx-auto flex items-center justify-between" style="height: <?php echo absint($header_height); ?>px;">

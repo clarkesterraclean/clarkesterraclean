@@ -183,7 +183,7 @@ function clarkes_customize_register($wp_customize) {
     $wp_customize->add_setting('header_layout', array(
         'default'           => 'default',
         'sanitize_callback' => function($input) {
-            $choices = array('default', 'centered', 'split', 'minimal');
+            $choices = array('default', 'centered', 'split', 'minimal', 'simple');
             return in_array($input, $choices) ? $input : 'default';
         },
         'transport'         => 'refresh', // Changed to refresh because layout changes HTML structure
@@ -195,9 +195,10 @@ function clarkes_customize_register($wp_customize) {
         'section'     => 'clarkes_header',
         'type'        => 'select',
         'choices'     => array(
-            'default'  => 'Default (Logo Left, Nav Right)',
+            'default'  => 'Default (Logo Left, Nav Right, CTA Right)',
+            'simple'   => 'Simple (Logo Left, Nav Right, No CTA)',
             'centered' => 'Centered (Logo Center, Nav Below)',
-            'split'    => 'Split (Logo Left, Nav Right, CTA Right)',
+            'split'    => 'Split (Logo Left, Nav Center, CTA Right)',
             'minimal'  => 'Minimal (Logo Only)',
         ),
     ));
