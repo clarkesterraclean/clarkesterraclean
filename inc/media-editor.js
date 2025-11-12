@@ -552,8 +552,10 @@
     var currentMarkupTool = null;
     $(document).on('click', '#btn-rectangle', function() {
         currentMarkupTool = 'rect';
-        fabricCanvas.isDrawingMode = false;
-        fabricCanvas.selection = false;
+        if (typeof fabricCanvas !== 'undefined' && fabricCanvas) {
+            fabricCanvas.isDrawingMode = false;
+            fabricCanvas.selection = false;
+        }
     });
     
     $(document).on('click', '#btn-circle', function() {
@@ -566,8 +568,10 @@
     
     $(document).on('click', '#btn-line', function() {
         currentMarkupTool = 'line';
-        fabricCanvas.isDrawingMode = false;
-        fabricCanvas.selection = false;
+        if (typeof fabricCanvas !== 'undefined' && fabricCanvas) {
+            fabricCanvas.isDrawingMode = false;
+            fabricCanvas.selection = false;
+        }
     });
     
     // Handle markup drawing with Fabric.js
@@ -775,7 +779,7 @@
     });
     
     // Save
-    $('#btn-save').on('click', function() {
+    $(document).on('click', '#btn-save', function() {
         if (fabricCanvas) {
             var dataURL = fabricCanvas.toDataURL('image/png');
             $.ajax({
@@ -852,7 +856,6 @@
                 scrollTop: $panel.offset().top - 100
             }, 300);
         }
-        $('#' + panelId).show();
     }
     
 })(jQuery);
