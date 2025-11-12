@@ -396,24 +396,33 @@ function clarkes_render_whatsapp_fab() {
     <script>
     (function() {
         'use strict';
-        const toggle = document.getElementById('clarkes-wa-toggle');
-        const sheet = document.getElementById('clarkes-wa-sheet');
-        const chatBtn = document.getElementById('clarkes-wa-chat-btn');
-        const callBtn = document.getElementById('clarkes-wa-call-btn');
-        const chatWindow = document.getElementById('clarkes-wa-chat-window');
-        const callModal = document.getElementById('clarkes-wa-call-modal');
-        const closeChat = document.getElementById('clarkes-wa-close-chat');
-        const closeModal = document.getElementById('clarkes-wa-close-modal');
-        const messageInput = document.getElementById('clarkes-wa-message-input');
-        const sendBtn = document.getElementById('clarkes-wa-send-btn');
-        const attachBtn = document.getElementById('clarkes-wa-attach-btn');
-        const fileInput = document.getElementById('clarkes-wa-file-input');
-        const attachmentsDiv = document.getElementById('clarkes-wa-attachments');
-        const attachmentList = document.getElementById('clarkes-wa-attachment-list');
-        const messagesDiv = document.getElementById('clarkes-wa-messages');
-        const messageDirectBtn = document.getElementById('clarkes-wa-message-direct');
         
-        let attachments = [];
+        // Wait for DOM to be ready
+        function initWhatsApp() {
+            const toggle = document.getElementById('clarkes-wa-toggle');
+            const sheet = document.getElementById('clarkes-wa-sheet');
+            const chatBtn = document.getElementById('clarkes-wa-chat-btn');
+            const callBtn = document.getElementById('clarkes-wa-call-btn');
+            const chatWindow = document.getElementById('clarkes-wa-chat-window');
+            const callModal = document.getElementById('clarkes-wa-call-modal');
+            const closeChat = document.getElementById('clarkes-wa-close-chat');
+            const closeModal = document.getElementById('clarkes-wa-close-modal');
+            const messageInput = document.getElementById('clarkes-wa-message-input');
+            const sendBtn = document.getElementById('clarkes-wa-send-btn');
+            const attachBtn = document.getElementById('clarkes-wa-attach-btn');
+            const fileInput = document.getElementById('clarkes-wa-file-input');
+            const attachmentsDiv = document.getElementById('clarkes-wa-attachments');
+            const attachmentList = document.getElementById('clarkes-wa-attachment-list');
+            const messagesDiv = document.getElementById('clarkes-wa-messages');
+            const messageDirectBtn = document.getElementById('clarkes-wa-message-direct');
+            
+            // Check if elements exist
+            if (!toggle || !sheet) {
+                console.warn('WhatsApp button elements not found');
+                return;
+            }
+            
+            let attachments = [];
         
         // Detect WhatsApp
         function hasWhatsApp() {
@@ -438,7 +447,9 @@ function clarkes_render_whatsapp_fab() {
         function openChatWindow() {
             if (chatWindow) {
                 chatWindow.style.display = 'flex';
-                messageInput.focus();
+                if (messageInput) {
+                    messageInput.focus();
+                }
             }
         }
         
@@ -468,19 +479,25 @@ function clarkes_render_whatsapp_fab() {
                 e.preventDefault();
                 closeSheet();
                 
-                if (hasWhatsApp()) {
-                    // Try to open WhatsApp
-                    const chatUrl = clarkesWhatsApp.chat_url;
-                    window.open(chatUrl, '_blank');
-                    
-                    // Fallback: if WhatsApp doesn't open after 2 seconds, show chat window
-                    setTimeout(function() {
-                        if (document.hasFocus && !document.hasFocus()) {
-                            openChatWindow();
-                        }
-                    }, 2000);
+                if (typeof clarkesWhatsApp !== 'undefined' && clarkesWhatsApp.chat_url) {
+                    if (hasWhatsApp()) {
+                        // Try to open WhatsApp
+                        const chatUrl = clarkesWhatsApp.chat_url;
+                        window.open(chatUrl, '_blank');
+                        
+                        // Fallback: if WhatsApp doesn't open after 2 seconds, show chat window
+                        setTimeout(function() {
+                            if (document.hasFocus && !document.hasFocus()) {
+                                openChatWindow();
+                            }
+                        }, 2000);
+                    } else {
+                        // No WhatsApp detected, show chat window
+                        openChatWindow();
+                    }
                 } else {
-                    // No WhatsApp detected, show chat window
+                    // clarkesWhatsApp not defined, show chat window as fallback
+                    console.warn('clarkesWhatsApp object not found, opening chat window');
                     openChatWindow();
                 }
             });
@@ -500,8 +517,12 @@ function clarkes_render_whatsapp_fab() {
             messageDirectBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 closeCallModal();
-                if (hasWhatsApp()) {
-                    window.open(clarkesWhatsApp.chat_url, '_blank');
+                if (typeof clarkesWhatsApp !== 'undefined' && clarkesWhatsApp.chat_url) {
+                    if (hasWhatsApp()) {
+                        window.open(clarkesWhatsApp.chat_url, '_blank');
+                    } else {
+                        openChatWindow();
+                    }
                 } else {
                     openChatWindow();
                 }
@@ -689,6 +710,15 @@ function clarkes_render_whatsapp_fab() {
             }
         }, <?php echo absint($auto_open_delay) * 1000; ?>);
         <?php endif; ?>
+        } // End initWhatsApp function
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWhatsApp);
+        } else {
+            // DOM is already ready
+            initWhatsApp();
+        }
     })();
     </script>
     <?php
