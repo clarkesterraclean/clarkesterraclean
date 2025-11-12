@@ -572,16 +572,13 @@ if (!function_exists('clarkes_register_review_post_type')) {
 /**
  * Include WhatsApp FAB system
  * Only include if not already loaded (prevents redeclaration)
- * Temporarily disabled for debugging - uncomment to enable
  */
-/*
 if (!function_exists('clarkes_register_whatsapp_settings')) {
     $whatsapp_file = get_template_directory() . '/inc/whatsapp.php';
     if (file_exists($whatsapp_file)) {
         require_once $whatsapp_file;
     }
 }
-*/
 
 /**
  * Helper function to get color from theme mod with fallback
