@@ -171,7 +171,7 @@ $nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
             <!-- Right Side: Phone CTA & Mobile Toggle -->
             <div class="flex items-center gap-4 flex-1 justify-end">
                 <?php if ($show_phone) : ?>
-                    <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="hidden md:inline-block border border-eco-green text-eco-green rounded-full px-4 py-2 text-sm font-semibold hover:bg-eco-green hover:text-carbon-dark transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
+                    <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="header-phone-button <?php echo esc_attr($phone_button_classes); ?>" data-button-style="<?php echo esc_attr($phone_button_style); ?>">
                         Call <?php echo esc_html($phone); ?>
                     </a>
                 <?php endif; ?>
