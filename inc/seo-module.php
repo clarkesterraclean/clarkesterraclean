@@ -749,7 +749,6 @@ function clarkes_ajax_crawl_site() {
             
             if ($fixed) {
                 $fixed_count++;
-                $content_boosted = is_array($fix_result) && isset($fix_result['content_boosted']) ? $fix_result['content_boosted'] : false;
                 if ($content_boosted) {
                     $content_boosted_count++;
                 }
