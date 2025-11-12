@@ -959,6 +959,11 @@ function clarkes_send_whatsapp_message() {
         return;
     }
     
+    // Get customer info if provided
+    $customer_name = isset($_POST['customer_name']) ? sanitize_text_field($_POST['customer_name']) : '';
+    $customer_location = isset($_POST['customer_location']) ? sanitize_text_field($_POST['customer_location']) : '';
+    $vehicle_registration = isset($_POST['vehicle_registration']) ? sanitize_text_field($_POST['vehicle_registration']) : '';
+    
     $whatsapp_number = get_theme_mod('whatsapp_number', '07706 230867');
     $admin_email = get_option('admin_email');
     
@@ -966,6 +971,23 @@ function clarkes_send_whatsapp_message() {
     $subject = 'New WhatsApp Message from Website - ' . get_bloginfo('name');
     $body = "You have received a new message from your website:\n\n";
     $body .= "Message: " . $message . "\n\n";
+    
+    // Add customer info if available
+    if ($customer_name || $customer_location || $vehicle_registration) {
+        $body .= "---\n";
+        $body .= "Customer Information:\n";
+        if ($customer_name) {
+            $body .= "Name: " . $customer_name . "\n";
+        }
+        if ($customer_location) {
+            $body .= "Location: " . $customer_location . "\n";
+        }
+        if ($vehicle_registration) {
+            $body .= "Vehicle Registration: " . $vehicle_registration . "\n";
+        }
+        $body .= "---\n\n";
+    }
+    
     $body .= "From: " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'Website') . "\n";
     $body .= "Time: " . current_time('mysql') . "\n\n";
     $body .= "Reply to this number on WhatsApp: " . $whatsapp_number . "\n";
