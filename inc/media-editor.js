@@ -26,10 +26,31 @@
             
             mediaUploader.on('select', function() {
                 var attachment = mediaUploader.state().get('selection').first().toJSON();
-                window.location.href = '?page=clarkes-media-editor&media_id=' + attachment.id;
+                
+                // Show preview immediately
+                showMediaPreview(attachment);
+                
+                // Option to load editor or just preview
+                if (!$('#media-preview-container').is(':visible')) {
+                    $('#media-preview-container').slideDown();
+                }
+                
+                // Update URL without reload
+                var newUrl = window.location.pathname + '?page=clarkes-media-editor&media_id=' + attachment.id;
+                window.history.pushState({}, '', newUrl);
+                
+                // Load editor
+                currentMediaId = attachment.id;
+                currentMediaType = attachment.type.indexOf('video') !== -1 ? 'video' : 'image';
+                loadMediaForEditing(attachment.id);
             });
             
             mediaUploader.open();
+        });
+        
+        // Change Media Button
+        $('#change-media-btn').on('click', function() {
+            $('#select-media-btn').trigger('click');
         });
         
         // Initialize editor if media is loaded
@@ -37,8 +58,102 @@
             currentMediaId = $('.media-editor-interface').data('media-id');
             currentMediaType = $('.media-editor-interface').data('media-type');
             initializeEditor();
+        } else if (getUrlParameter('media_id')) {
+            // Load media from URL parameter
+            var mediaId = getUrlParameter('media_id');
+            loadMediaForEditing(mediaId);
         }
     });
+    
+    // Show Media Preview
+    function showMediaPreview(attachment) {
+        var previewHtml = '';
+        
+        if (attachment.type.indexOf('image') !== -1) {
+            previewHtml = '<div class="media-preview-image">';
+            previewHtml += '<img src="' + attachment.url + '" alt="' + (attachment.alt || '') + '" />';
+            previewHtml += '<div class="media-info">';
+            previewHtml += '<p><strong>File:</strong> ' + attachment.filename + '</p>';
+            previewHtml += '<p><strong>Size:</strong> ' + (attachment.filesizeHumanReadable || formatBytes(attachment.filesizeInBytes || 0)) + '</p>';
+            previewHtml += '<p><strong>Dimensions:</strong> ' + (attachment.width || 'N/A') + ' × ' + (attachment.height || 'N/A') + '</p>';
+            previewHtml += '</div>';
+            previewHtml += '</div>';
+        } else if (attachment.type.indexOf('video') !== -1) {
+            previewHtml = '<div class="media-preview-video">';
+            previewHtml += '<video src="' + attachment.url + '" controls style="max-width: 100%; max-height: 400px;"></video>';
+            previewHtml += '<div class="media-info">';
+            previewHtml += '<p><strong>File:</strong> ' + attachment.filename + '</p>';
+            previewHtml += '<p><strong>Size:</strong> ' + (attachment.filesizeHumanReadable || formatBytes(attachment.filesizeInBytes || 0)) + '</p>';
+            previewHtml += '<p><strong>Duration:</strong> ' + (attachment.lengthFormatted || 'N/A') + '</p>';
+            previewHtml += '</div>';
+            previewHtml += '</div>';
+        }
+        
+        $('#media-preview-content').html(previewHtml);
+    }
+    
+    // Load Media for Editing
+    function loadMediaForEditing(mediaId) {
+        $.ajax({
+            url: clarkesMediaEditor.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'clarkes_get_media',
+                nonce: clarkesMediaEditor.nonce,
+                media_id: mediaId
+            },
+            success: function(response) {
+                if (response.success) {
+                    var attachment = response.data;
+                    showMediaPreview(attachment);
+                    
+                    // Show editor interface
+                    if (!$('.media-editor-interface').length) {
+                        createEditorInterface(attachment);
+                    }
+                    
+                    currentMediaId = mediaId;
+                    currentMediaType = attachment.type.indexOf('video') !== -1 ? 'video' : 'image';
+                    initializeEditor();
+                }
+            }
+        });
+    }
+    
+    // Create Editor Interface
+    function createEditorInterface(attachment) {
+        var editorHtml = '<div class="media-editor-interface" data-media-id="' + attachment.id + '" data-media-type="' + (attachment.type.indexOf('video') !== -1 ? 'video' : 'image') + '">';
+        editorHtml += '<div class="editor-toolbar">';
+        // Toolbar will be added by initializeEditor
+        editorHtml += '</div>';
+        editorHtml += '<div class="editor-canvas-container">';
+        if (attachment.type.indexOf('video') !== -1) {
+            editorHtml += '<video id="editor-video" src="' + attachment.url + '" controls></video>';
+        } else {
+            editorHtml += '<div id="canvas-wrapper"><canvas id="editor-canvas"></canvas></div>';
+        }
+        editorHtml += '</div>';
+        editorHtml += '</div>';
+        
+        $('#media-preview-container').after(editorHtml);
+    }
+    
+    // Get URL Parameter
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+    
+    // Format Bytes
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        var k = 1024;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
     
     function initializeEditor() {
         if (currentMediaType === 'image') {

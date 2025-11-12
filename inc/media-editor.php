@@ -83,6 +83,15 @@ function clarkes_media_editor_scripts($hook) {
         'ai_api_key' => get_option('clarkes_ai_api_key', ''),
     ));
     
+    // Also localize for advanced editor
+    if (wp_script_is('clarkes-media-editor-advanced', 'registered')) {
+        wp_localize_script('clarkes-media-editor-advanced', 'clarkesMediaEditor', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('clarkes_media_editor'),
+            'ai_api_key' => get_option('clarkes_ai_api_key', ''),
+        ));
+    }
+    
     // Add ajaxurl for compatibility
     wp_add_inline_script('clarkes-media-editor', 'var ajaxurl = "' . admin_url('admin-ajax.php') . '";', 'before');
     
@@ -117,12 +126,26 @@ function clarkes_media_editor_page() {
         
         <?php if (!$media_id || !$media) : ?>
             <!-- Media Selection -->
-            <div class="media-selector" style="background: white; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin-top: 20px;">
-                <h2><?php _e('Select Media to Edit', 'clarkes-terraclean'); ?></h2>
-                <button type="button" id="select-media-btn" class="button button-primary button-large">
-                    <?php _e('Choose Image or Video', 'clarkes-terraclean'); ?>
-                </button>
-                <input type="hidden" id="selected-media-id" value="<?php echo esc_attr($media_id); ?>" />
+            <div class="media-selector-modern">
+                <div class="media-selector-header">
+                    <h2><?php _e('Select Media to Edit', 'clarkes-terraclean'); ?></h2>
+                    <p class="description"><?php _e('Choose an image or video from your media library to start editing', 'clarkes-terraclean'); ?></p>
+                </div>
+                <div class="media-selector-actions">
+                    <button type="button" id="select-media-btn" class="button button-primary button-large">
+                        <span class="dashicons dashicons-admin-media"></span>
+                        <?php _e('Choose from Media Library', 'clarkes-terraclean'); ?>
+                    </button>
+                </div>
+                <div id="media-preview-container" class="media-preview-container" style="display: none;">
+                    <div class="media-preview-header">
+                        <h3><?php _e('Selected Media Preview', 'clarkes-terraclean'); ?></h3>
+                        <button type="button" id="change-media-btn" class="button"><?php _e('Change Media', 'clarkes-terraclean'); ?></button>
+                    </div>
+                    <div id="media-preview-content" class="media-preview-content">
+                        <!-- Preview will be loaded here -->
+                    </div>
+                </div>
             </div>
         <?php else : ?>
             <!-- Editor Interface -->
@@ -499,13 +522,13 @@ function clarkes_media_editor_page() {
 }
 
 /**
- * Handle Media Selection
+ * AJAX: Get Media (Updated to return full attachment data)
  */
-if (!function_exists('clarkes_handle_media_selection')) {
-function clarkes_handle_media_selection() {
+if (!function_exists('clarkes_ajax_get_media')) {
+function clarkes_ajax_get_media() {
     check_ajax_referer('clarkes_media_editor', 'nonce');
     
-    if (!current_user_can('upload_files')) {
+    if (!current_user_can('edit_posts')) {
         wp_send_json_error(array('message' => 'Insufficient permissions'));
         return;
     }
@@ -513,31 +536,37 @@ function clarkes_handle_media_selection() {
     $media_id = isset($_POST['media_id']) ? absint($_POST['media_id']) : 0;
     
     if (!$media_id) {
-        wp_send_json_error(array('message' => 'No media ID provided'));
+        wp_send_json_error(array('message' => 'Invalid media ID'));
         return;
     }
     
-    $media = get_post($media_id);
-    if (!$media) {
+    $attachment = get_post($media_id);
+    if (!$attachment || $attachment->post_type !== 'attachment') {
         wp_send_json_error(array('message' => 'Media not found'));
         return;
     }
     
-    $media_url = wp_get_attachment_url($media_id);
-    $media_meta = wp_get_attachment_metadata($media_id);
+    $file_path = get_attached_file($media_id);
+    $metadata = wp_get_attachment_metadata($media_id);
+    $file_size = file_exists($file_path) ? filesize($file_path) : 0;
     
-    wp_send_json_success(array(
-        'id' => $media_id,
-        'url' => $media_url,
-        'type' => $media->post_mime_type,
-        'title' => $media->post_title,
+    $attachment_data = array(
+        'id' => $attachment->ID,
+        'title' => $attachment->post_title,
+        'filename' => basename($file_path),
+        'url' => wp_get_attachment_url($media_id),
+        'type' => $attachment->post_mime_type,
+        'filesizeInBytes' => $file_size,
+        'filesizeHumanReadable' => size_format($file_size),
+        'width' => isset($metadata['width']) ? $metadata['width'] : 0,
+        'height' => isset($metadata['height']) ? $metadata['height'] : 0,
         'alt' => get_post_meta($media_id, '_wp_attachment_image_alt', true),
-        'width' => isset($media_meta['width']) ? $media_meta['width'] : 0,
-        'height' => isset($media_meta['height']) ? $media_meta['height'] : 0,
-    ));
+    );
+    
+    wp_send_json_success($attachment_data);
 }
 }
-add_action('wp_ajax_clarkes_get_media', 'clarkes_handle_media_selection');
+add_action('wp_ajax_clarkes_get_media', 'clarkes_ajax_get_media');
 
 /**
  * Save Edited Media

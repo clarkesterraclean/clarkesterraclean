@@ -515,6 +515,28 @@ if (!function_exists('clarkes_add_page_builder_menu')) {
 }
 
 /**
+ * Include Theme Control Center
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_control_center_menu')) {
+    $control_center_file = get_template_directory() . '/inc/theme-control-center.php';
+    if (file_exists($control_center_file)) {
+        require_once $control_center_file;
+    }
+}
+
+/**
+ * Include Media Compression
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_media_compression_menu')) {
+    $compression_file = get_template_directory() . '/inc/media-compression.php';
+    if (file_exists($compression_file)) {
+        require_once $compression_file;
+    }
+}
+
+/**
  * Include Case Studies system
  * Only include if not already loaded (prevents redeclaration)
  */
