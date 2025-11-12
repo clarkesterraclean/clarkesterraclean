@@ -119,7 +119,7 @@ if ($hero_padding_bottom !== '') {
                 <button id="hero-whatsapp-cta" class="clarkes-cta-button inline-block rounded-full border border-eco-green bg-eco-green text-white px-6 py-3 text-base font-semibold hover:bg-eco-green/80 transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-wa-url="<?php echo esc_attr($wa_url); ?>">
                     WhatsApp
                 </button>
-                <a href="#contact" class="inline-block rounded-full border border-text-body/40 px-4 py-2 text-sm font-semibold hover:bg-white hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
+                <a href="#contact" class="inline-block rounded-full bg-white text-carbon-dark px-6 py-3 text-base font-semibold hover:bg-eco-green hover:text-white transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green shadow-md hover:shadow-lg">
                     Book a Service
                 </a>
             </div>
