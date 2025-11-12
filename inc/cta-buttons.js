@@ -46,17 +46,72 @@
         const nameInput = document.getElementById('customer-name');
         if (nameInput) nameInput.focus();
         
-        // Handle form submission
+        // Attach handlers when modal is shown (critical!)
+        attachCustomerInfoHandlersForCTA(action, button);
+    }
+    
+    function attachCustomerInfoHandlersForCTA(action, button) {
+        const modal = document.getElementById('clarkes-customer-info-modal');
+        const cancelBtn = document.getElementById('clarkes-customer-info-cancel');
         const form = document.getElementById('clarkes-customer-info-form');
-        if (form) {
-            // Remove existing listeners by cloning
-            const newForm = form.cloneNode(true);
-            form.parentNode.replaceChild(newForm, form);
+        const content = document.getElementById('clarkes-customer-info-content');
+        
+        if (!modal) return;
+        
+        // Remove old handlers by removing and re-adding listeners
+        // Cancel button - remove old, add new
+        if (cancelBtn) {
+            // Clone to remove all listeners
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
             
-            newForm.addEventListener('submit', function(e) {
+            newCancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Cancel clicked (CTA handler)');
+                modal.style.display = 'none';
+                if (form) form.reset();
+                customerInfo = null;
+                pendingAction = null;
+                return false;
+            }, true);
+        }
+        
+        // Backdrop click - remove old, add new
+        const newModal = modal.cloneNode(false);
+        while (modal.firstChild) {
+            newModal.appendChild(modal.firstChild);
+        }
+        modal.parentNode.replaceChild(newModal, modal);
+        
+        newModal.addEventListener('click', function(e) {
+            if (e.target === newModal) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Backdrop clicked (CTA handler)');
+                newModal.style.display = 'none';
+                if (form) form.reset();
+                customerInfo = null;
+                pendingAction = null;
+                return false;
+            }
+        }, true);
+        
+        // Content click - prevent bubbling
+        if (content) {
+            content.addEventListener('click', function(e) {
+                e.stopPropagation();
+            }, true);
+        }
+        
+        // Form submission
+        if (form) {
+            form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleCustomerInfoSubmit(action, button);
-            });
+            }, true);
         }
     }
     

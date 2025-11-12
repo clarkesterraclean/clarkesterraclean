@@ -552,39 +552,47 @@ function clarkes_render_whatsapp_fab() {
                 return; // Modal doesn't exist yet
             }
             
-            // Remove any existing handlers by cloning (prevents duplicates)
-            if (modal._handlersAttached) {
-                return; // Already attached
-            }
-            
-            // Cancel button handler
+            // Clone elements to remove old listeners and attach fresh ones
+            // Cancel button
             if (cancelBtn) {
-                cancelBtn.addEventListener('click', function(e) {
+                const newCancelBtn = cancelBtn.cloneNode(true);
+                cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+                
+                newCancelBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Cancel button clicked (direct handler)');
+                    e.stopImmediatePropagation();
+                    console.log('Cancel button clicked (WhatsApp handler)');
                     closeCustomerInfoForm();
-                });
+                    return false;
+                }, true);
             }
             
-            // Backdrop click handler - close when clicking on modal itself
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
+            // Backdrop - clone modal to remove old listeners
+            const newModal = modal.cloneNode(false);
+            while (modal.firstChild) {
+                newModal.appendChild(modal.firstChild);
+            }
+            modal.parentNode.replaceChild(newModal, modal);
+            
+            newModal.addEventListener('click', function(e) {
+                if (e.target === newModal) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Backdrop clicked (direct handler)');
+                    e.stopImmediatePropagation();
+                    console.log('Backdrop clicked (WhatsApp handler)');
                     closeCustomerInfoForm();
+                    return false;
                 }
-            });
+            }, true);
             
-            // Prevent clicks inside content from closing modal
-            if (content) {
-                content.addEventListener('click', function(e) {
+            // Content click - prevent bubbling
+            const newContent = document.getElementById('clarkes-customer-info-content');
+            if (newContent) {
+                newContent.addEventListener('click', function(e) {
                     e.stopPropagation();
-                });
+                }, true);
             }
-            
-            modal._handlersAttached = true;
         }
         
         // Also try to attach on init if modal already exists
