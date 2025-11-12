@@ -552,22 +552,25 @@ function clarkes_render_whatsapp_fab() {
                 return; // Modal doesn't exist yet
             }
             
-            // Cancel button - use document-level delegation to ensure it always works
-            // Don't clone, just attach handler directly
+            // Cancel button - use multiple event types and ensure button type is correct
             if (cancelBtn) {
+                // Ensure button type is 'button' not 'submit'
+                cancelBtn.setAttribute('type', 'button');
+                
                 // Remove any existing handlers by cloning
                 const newCancelBtn = cancelBtn.cloneNode(true);
+                newCancelBtn.setAttribute('type', 'button'); // Ensure type is set
                 cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
                 
-                // Use onclick attribute as most reliable method
+                // Use onclick attribute
                 newCancelBtn.setAttribute('onclick', 'event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); const m = document.getElementById("clarkes-customer-info-modal"); const f = document.getElementById("clarkes-customer-info-form"); if(m) m.style.display="none"; if(f) f.reset(); return false;');
                 
-                // Also attach event listener as backup
-                newCancelBtn.addEventListener('click', function(e) {
+                // Use mousedown (fires before click and form validation)
+                newCancelBtn.addEventListener('mousedown', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
-                    console.log('Cancel button clicked (WhatsApp - listener)');
+                    console.log('Cancel button mousedown (WhatsApp)');
                     const modal = document.getElementById('clarkes-customer-info-modal');
                     const form = document.getElementById('clarkes-customer-info-form');
                     if (modal) {
@@ -576,8 +579,25 @@ function clarkes_render_whatsapp_fab() {
                     }
                     pendingAction = null;
                     return false;
-                }, true); // Capture phase
+                }, true);
                 
+                // Use click in capture phase
+                newCancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Cancel button clicked (WhatsApp - capture)');
+                    const modal = document.getElementById('clarkes-customer-info-modal');
+                    const form = document.getElementById('clarkes-customer-info-form');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        if (form) form.reset();
+                    }
+                    pendingAction = null;
+                    return false;
+                }, true);
+                
+                // Use click in bubble phase
                 newCancelBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -591,7 +611,7 @@ function clarkes_render_whatsapp_fab() {
                     }
                     pendingAction = null;
                     return false;
-                }, false); // Bubble phase
+                }, false);
             }
             
             // Backdrop - clone modal to remove old listeners
