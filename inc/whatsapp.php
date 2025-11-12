@@ -511,22 +511,27 @@ function clarkes_render_whatsapp_fab() {
         if (chatBtn) {
             chatBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                console.log('Chat button clicked');
                 closeSheet();
                 
                 if (typeof clarkesWhatsApp !== 'undefined' && clarkesWhatsApp.chat_url) {
+                    console.log('Opening WhatsApp:', clarkesWhatsApp.chat_url);
                     if (hasWhatsApp()) {
                         // Try to open WhatsApp
                         const chatUrl = clarkesWhatsApp.chat_url;
-                        window.open(chatUrl, '_blank');
+                        window.location.href = chatUrl; // Use location.href instead of window.open for better mobile support
                         
                         // Fallback: if WhatsApp doesn't open after 2 seconds, show chat window
                         setTimeout(function() {
                             if (document.hasFocus && !document.hasFocus()) {
+                                console.log('WhatsApp not opened, showing chat window');
                                 openChatWindow();
                             }
                         }, 2000);
                     } else {
                         // No WhatsApp detected, show chat window
+                        console.log('No WhatsApp detected, showing chat window');
                         openChatWindow();
                     }
                 } else {
@@ -535,15 +540,21 @@ function clarkes_render_whatsapp_fab() {
                     openChatWindow();
                 }
             });
+        } else {
+            console.warn('Chat button not found');
         }
         
         // Call button - show options
         if (callBtn) {
             callBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                console.log('Call button clicked');
                 closeSheet();
                 openCallModal();
             });
+        } else {
+            console.warn('Call button not found');
         }
         
         // Message direct from modal
