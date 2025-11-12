@@ -137,36 +137,94 @@
     function getElementHTML(element) {
         var type = element.type;
         var settings = element.settings || {};
+        var cssClass = settings.css_class || '';
+        var cssId = settings.css_id || '';
+        
+        var attrs = '';
+        if (cssId) attrs += ' id="' + cssId + '"';
+        if (cssClass) attrs += ' class="pb-' + type + ' ' + cssClass + '"';
+        else attrs += ' class="pb-' + type + '"';
         
         switch(type) {
             case 'text':
                 var tag = settings.tag || 'p';
-                return '<' + tag + ' class="pb-text">' + (settings.text || 'Text') + '</' + tag + '>';
+                return '<' + tag + attrs + '>' + (settings.text || 'Text') + '</' + tag + '>';
                 
             case 'heading':
                 var level = settings.level || 2;
-                return '<h' + level + ' class="pb-heading">' + (settings.text || 'Heading') + '</h' + level + '>';
+                return '<h' + level + attrs + '>' + (settings.text || 'Heading') + '</h' + level + '>';
                 
             case 'image':
-                if (settings.image_id) {
-                    return '<img src="' + settings.image_url + '" class="pb-image" />';
+                if (settings.image_id && settings.image_url) {
+                    return '<img src="' + settings.image_url + '"' + attrs + ' alt="' + (settings.alt || '') + '" />';
                 }
                 return '<div class="pb-image-placeholder">Image Placeholder</div>';
                 
+            case 'video':
+                if (settings.video_id && settings.video_url) {
+                    return '<video' + attrs + ' controls><source src="' + settings.video_url + '" type="video/mp4"></video>';
+                }
+                return '<div class="pb-video-placeholder">Video Placeholder</div>';
+                
+            case 'gallery':
+                var galleryHtml = '<div' + attrs + '>';
+                if (settings.images && settings.images.length > 0) {
+                    settings.images.forEach(function(img) {
+                        galleryHtml += '<img src="' + img.url + '" class="pb-gallery-image" />';
+                    });
+                } else {
+                    galleryHtml += 'Gallery Placeholder';
+                }
+                galleryHtml += '</div>';
+                return galleryHtml;
+                
             case 'button':
-                return '<a href="' + (settings.url || '#') + '" class="pb-button pb-button-' + (settings.style || 'primary') + '">' + (settings.text || 'Button') + '</a>';
+                return '<a href="' + (settings.url || '#') + '" class="pb-button pb-button-' + (settings.style || 'primary') + (cssClass ? ' ' + cssClass : '') + '"' + (cssId ? ' id="' + cssId + '"' : '') + '>' + (settings.text || 'Button') + '</a>';
                 
             case 'row':
-                return '<div class="pb-row">Row Container</div>';
+                var rowGap = settings.gap || '20px';
+                return '<div class="pb-row" style="display: flex; gap: ' + rowGap + ';">' + (element.children && element.children.length > 0 ? 'Row with ' + element.children.length + ' columns' : 'Empty Row') + '</div>';
                 
             case 'column':
-                return '<div class="pb-column">Column</div>';
+                var colWidth = settings.width || '50%';
+                return '<div class="pb-column" style="width: ' + colWidth + ';">' + (element.children && element.children.length > 0 ? 'Column content' : 'Empty Column') + '</div>';
+                
+            case 'container':
+                var containerWidth = settings.width || '1200px';
+                return '<div class="pb-container" style="max-width: ' + containerWidth + '; margin: 0 auto;">Container</div>';
                 
             case 'spacer':
                 return '<div class="pb-spacer" style="height: ' + (settings.height || '50px') + ';"></div>';
                 
             case 'divider':
-                return '<hr class="pb-divider" />';
+                var dividerStyle = settings.style || 'solid';
+                var dividerColor = settings.color || '#ddd';
+                return '<hr class="pb-divider" style="border-style: ' + dividerStyle + '; border-color: ' + dividerColor + ';" />';
+                
+            case 'accordion':
+                return '<div' + attrs + '><div class="pb-accordion-item"><div class="pb-accordion-header">Accordion Item 1</div><div class="pb-accordion-content">Content here</div></div></div>';
+                
+            case 'tabs':
+                return '<div' + attrs + '><div class="pb-tabs"><div class="pb-tab-header">Tab 1</div><div class="pb-tab-content">Tab content</div></div></div>';
+                
+            case 'testimonial':
+                return '<div' + attrs + '><blockquote class="pb-testimonial"><p>' + (settings.quote || 'Testimonial text') + '</p><cite>' + (settings.author || 'Author') + '</cite></blockquote></div>';
+                
+            case 'pricing':
+                return '<div' + attrs + '><div class="pb-pricing-table"><div class="pb-price">' + (settings.price || '£99') + '</div><div class="pb-features">Features list</div></div></div>';
+                
+            case 'countdown':
+                return '<div' + attrs + '><div class="pb-countdown">00:00:00</div></div>';
+                
+            case 'progress':
+                var progressValue = settings.value || 50;
+                return '<div' + attrs + '><div class="pb-progress-bar"><div class="pb-progress-fill" style="width: ' + progressValue + '%;">' + progressValue + '%</div></div></div>';
+                
+            case 'map':
+                return '<div' + attrs + '><div class="pb-map-placeholder">Google Map - ' + (settings.address || 'Address') + '</div></div>';
+                
+            case 'form':
+                return '<div' + attrs + '><form class="pb-contact-form"><input type="text" placeholder="Name" /><input type="email" placeholder="Email" /><textarea placeholder="Message"></textarea><button type="submit">Submit</button></form></div>';
                 
             default:
                 return '<div class="pb-element-' + type + '">' + type + '</div>';
@@ -203,43 +261,119 @@
         var type = element.type;
         var settings = element.settings || {};
         
-        panel.append('<h4>' + type.charAt(0).toUpperCase() + type.slice(1) + ' Settings</h4>');
+        panel.append('<h4>' + type.charAt(0).toUpperCase() + type.slice(1).replace(/-/g, ' ') + ' Settings</h4>');
         
         // Type-specific settings
         switch(type) {
             case 'text':
-                panel.append('<label>Text:<textarea class="pb-setting-text" rows="4">' + (settings.text || '') + '</textarea></label>');
-                panel.append('<label>Tag:<select class="pb-setting-tag"><option value="p">Paragraph</option><option value="div">Div</option><option value="span">Span</option></select></label>');
+                panel.append('<label>Text Content:<textarea class="pb-setting-text" rows="4">' + (settings.text || '') + '</textarea></label>');
+                panel.append('<label>HTML Tag:<select class="pb-setting-tag"><option value="p">Paragraph (p)</option><option value="div">Div</option><option value="span">Span</option></select></label>');
                 break;
                 
             case 'heading':
-                panel.append('<label>Text:<input type="text" class="pb-setting-text" value="' + (settings.text || '') + '" /></label>');
-                panel.append('<label>Level:<select class="pb-setting-level"><option value="1">H1</option><option value="2">H2</option><option value="3">H3</option><option value="4">H4</option></select></label>');
+                panel.append('<label>Heading Text:<input type="text" class="pb-setting-text" value="' + (settings.text || '') + '" /></label>');
+                panel.append('<label>Heading Level:<select class="pb-setting-level"><option value="1">H1</option><option value="2">H2</option><option value="3">H3</option><option value="4">H4</option><option value="5">H5</option><option value="6">H6</option></select></label>');
                 break;
                 
             case 'image':
                 panel.append('<button type="button" class="button pb-select-image">Select Image</button>');
-                panel.append('<label>Size:<select class="pb-setting-size"><option value="thumbnail">Thumbnail</option><option value="medium">Medium</option><option value="large">Large</option><option value="full">Full</option></select></label>');
+                panel.append('<label>Image Size:<select class="pb-setting-size"><option value="thumbnail">Thumbnail</option><option value="medium">Medium</option><option value="large">Large</option><option value="full">Full</option></select></label>');
+                panel.append('<label>Alt Text:<input type="text" class="pb-setting-alt" value="' + (settings.alt || '') + '" /></label>');
+                panel.append('<label>Alignment:<select class="pb-setting-alignment"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>');
+                break;
+                
+            case 'video':
+                panel.append('<button type="button" class="button pb-select-video">Select Video</button>');
+                panel.append('<label>Autoplay:<input type="checkbox" class="pb-setting-autoplay" ' + (settings.autoplay ? 'checked' : '') + ' /></label>');
+                panel.append('<label>Loop:<input type="checkbox" class="pb-setting-loop" ' + (settings.loop ? 'checked' : '') + ' /></label>');
+                panel.append('<label>Muted:<input type="checkbox" class="pb-setting-muted" ' + (settings.muted ? 'checked' : '') + ' /></label>');
+                break;
+                
+            case 'gallery':
+                panel.append('<button type="button" class="button pb-select-gallery">Select Images</button>');
+                panel.append('<label>Columns:<select class="pb-setting-columns"><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select></label>');
                 break;
                 
             case 'button':
-                panel.append('<label>Text:<input type="text" class="pb-setting-text" value="' + (settings.text || '') + '" /></label>');
-                panel.append('<label>URL:<input type="url" class="pb-setting-url" value="' + (settings.url || '') + '" /></label>');
-                panel.append('<label>Style:<select class="pb-setting-style"><option value="primary">Primary</option><option value="secondary">Secondary</option><option value="outline">Outline</option></select></label>');
+                panel.append('<label>Button Text:<input type="text" class="pb-setting-text" value="' + (settings.text || '') + '" /></label>');
+                panel.append('<label>Button URL:<input type="url" class="pb-setting-url" value="' + (settings.url || '') + '" /></label>');
+                panel.append('<label>Button Style:<select class="pb-setting-style"><option value="primary">Primary</option><option value="secondary">Secondary</option><option value="outline">Outline</option><option value="text">Text Link</option></select></label>');
+                panel.append('<label>Open in New Tab:<input type="checkbox" class="pb-setting-target" ' + (settings.target === '_blank' ? 'checked' : '') + ' /></label>');
+                break;
+                
+            case 'row':
+                panel.append('<label>Gap Between Columns (px):<input type="number" class="pb-setting-gap" value="' + (parseInt(settings.gap) || 20) + '" /></label>');
+                panel.append('<label>Number of Columns:<select class="pb-setting-columns"><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select></label>');
+                break;
+                
+            case 'column':
+                panel.append('<label>Column Width (%):<input type="number" class="pb-setting-width" value="' + (parseInt(settings.width) || 50) + '" min="1" max="100" /></label>');
+                break;
+                
+            case 'container':
+                panel.append('<label>Max Width (px):<input type="number" class="pb-setting-width" value="' + (parseInt(settings.width) || 1200) + '" /></label>');
                 break;
                 
             case 'spacer':
-                panel.append('<label>Height (px):<input type="number" class="pb-setting-height" value="' + (parseInt(settings.height) || 50) + '" /></label>');
+                panel.append('<label>Height (px):<input type="number" class="pb-setting-height" value="' + (parseInt(settings.height) || 50) + '" min="0" /></label>');
+                break;
+                
+            case 'divider':
+                panel.append('<label>Style:<select class="pb-setting-divider-style"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></label>');
+                panel.append('<label>Color:<input type="color" class="pb-setting-color" value="' + (settings.color || '#ddd') + '" /></label>');
+                break;
+                
+            case 'accordion':
+                panel.append('<label>Number of Items:<input type="number" class="pb-setting-items" value="' + (settings.items || 3) + '" min="1" max="10" /></label>');
+                break;
+                
+            case 'tabs':
+                panel.append('<label>Number of Tabs:<input type="number" class="pb-setting-tabs" value="' + (settings.tabs || 3) + '" min="1" max="10" /></label>');
+                break;
+                
+            case 'testimonial':
+                panel.append('<label>Quote Text:<textarea class="pb-setting-quote" rows="3">' + (settings.quote || '') + '</textarea></label>');
+                panel.append('<label>Author Name:<input type="text" class="pb-setting-author" value="' + (settings.author || '') + '" /></label>');
+                panel.append('<label>Author Title:<input type="text" class="pb-setting-title" value="' + (settings.title || '') + '" /></label>');
+                break;
+                
+            case 'pricing':
+                panel.append('<label>Price:<input type="text" class="pb-setting-price" value="' + (settings.price || '') + '" placeholder="£99" /></label>');
+                panel.append('<label>Currency Symbol:<input type="text" class="pb-setting-currency" value="' + (settings.currency || '£') + '" /></label>');
+                panel.append('<label>Period:<input type="text" class="pb-setting-period" value="' + (settings.period || '/month') + '" /></label>');
+                break;
+                
+            case 'countdown':
+                panel.append('<label>Target Date:<input type="datetime-local" class="pb-setting-date" value="' + (settings.date || '') + '" /></label>');
+                break;
+                
+            case 'progress':
+                panel.append('<label>Progress Value (%):<input type="number" class="pb-setting-value" value="' + (settings.value || 50) + '" min="0" max="100" /></label>');
+                panel.append('<label>Progress Color:<input type="color" class="pb-setting-color" value="' + (settings.color || '#3b82f6') + '" /></label>');
+                break;
+                
+            case 'map':
+                panel.append('<label>Address:<input type="text" class="pb-setting-address" value="' + (settings.address || '') + '" /></label>');
+                panel.append('<label>Zoom Level:<input type="number" class="pb-setting-zoom" value="' + (settings.zoom || 15) + '" min="1" max="20" /></label>');
+                break;
+                
+            case 'form':
+                panel.append('<label>Form Fields:<textarea class="pb-setting-fields" rows="4" placeholder="name, email, message"></textarea></label>');
+                panel.append('<label>Submit Button Text:<input type="text" class="pb-setting-submit-text" value="' + (settings.submit_text || 'Submit') + '" /></label>');
                 break;
         }
         
         // Common settings
         panel.append('<h4>Advanced</h4>');
-        panel.append('<label>CSS Class:<input type="text" class="pb-setting-class" value="' + (settings.css_class || '') + '" /></label>');
-        panel.append('<label>CSS ID:<input type="text" class="pb-setting-id" value="' + (settings.css_id || '') + '" /></label>');
+        panel.append('<label>CSS Class:<input type="text" class="pb-setting-class" value="' + (settings.css_class || '') + '" placeholder="custom-class" /></label>');
+        panel.append('<label>CSS ID:<input type="text" class="pb-setting-id" value="' + (settings.css_id || '') + '" placeholder="custom-id" /></label>');
+        panel.append('<label>Background Color:<input type="color" class="pb-setting-bg-color" value="' + (settings.bg_color || '') + '" /></label>');
+        panel.append('<label>Text Color:<input type="color" class="pb-setting-text-color" value="' + (settings.text_color || '') + '" /></label>');
+        panel.append('<label>Padding (px):<input type="number" class="pb-setting-padding" value="' + (settings.padding || '') + '" placeholder="20" /></label>');
+        panel.append('<label>Margin (px):<input type="number" class="pb-setting-margin" value="' + (settings.margin || '') + '" placeholder="10" /></label>');
         
         // Save button
-        panel.append('<button type="button" class="button button-primary pb-save-settings">Save Settings</button>');
+        panel.append('<button type="button" class="button button-primary pb-save-settings" style="margin-top: 15px;">Save Settings</button>');
         
         // Bind save
         $('.pb-save-settings').on('click', function() {
@@ -259,6 +393,47 @@
                 var attachment = mediaUploader.state().get('selection').first().toJSON();
                 element.settings.image_id = attachment.id;
                 element.settings.image_url = attachment.url;
+                renderCanvas();
+                showElementSettings(element);
+            });
+            
+            mediaUploader.open();
+        });
+        
+        // Video selector
+        $('.pb-select-video').on('click', function() {
+            var mediaUploader = wp.media({
+                title: 'Select Video',
+                button: { text: 'Select' },
+                library: { type: 'video' },
+                multiple: false
+            });
+            
+            mediaUploader.on('select', function() {
+                var attachment = mediaUploader.state().get('selection').first().toJSON();
+                element.settings.video_id = attachment.id;
+                element.settings.video_url = attachment.url;
+                renderCanvas();
+                showElementSettings(element);
+            });
+            
+            mediaUploader.open();
+        });
+        
+        // Gallery selector
+        $('.pb-select-gallery').on('click', function() {
+            var mediaUploader = wp.media({
+                title: 'Select Images for Gallery',
+                button: { text: 'Select' },
+                library: { type: 'image' },
+                multiple: true
+            });
+            
+            mediaUploader.on('select', function() {
+                var attachments = mediaUploader.state().get('selection').toJSON();
+                element.settings.images = attachments.map(function(att) {
+                    return { id: att.id, url: att.url };
+                });
                 renderCanvas();
                 showElementSettings(element);
             });
@@ -297,12 +472,85 @@
             element.settings.height = $(this).val() + 'px';
         });
         
+        $('.pb-setting-width').each(function() {
+            var val = $(this).val();
+            if ($(this).closest('#element-settings-panel').find('.pb-setting-width').parent().find('label').text().indexOf('%') > -1) {
+                element.settings.width = val + '%';
+            } else {
+                element.settings.width = val + 'px';
+            }
+        });
+        
+        $('.pb-setting-gap').each(function() {
+            element.settings.gap = $(this).val() + 'px';
+        });
+        
+        $('.pb-setting-alt').each(function() {
+            element.settings.alt = $(this).val();
+        });
+        
+        $('.pb-setting-target').each(function() {
+            element.settings.target = $(this).is(':checked') ? '_blank' : '_self';
+        });
+        
+        $('.pb-setting-autoplay').each(function() {
+            element.settings.autoplay = $(this).is(':checked');
+        });
+        
+        $('.pb-setting-loop').each(function() {
+            element.settings.loop = $(this).is(':checked');
+        });
+        
+        $('.pb-setting-muted').each(function() {
+            element.settings.muted = $(this).is(':checked');
+        });
+        
+        $('.pb-setting-quote').each(function() {
+            element.settings.quote = $(this).val();
+        });
+        
+        $('.pb-setting-author').each(function() {
+            element.settings.author = $(this).val();
+        });
+        
+        $('.pb-setting-price').each(function() {
+            element.settings.price = $(this).val();
+        });
+        
+        $('.pb-setting-value').each(function() {
+            element.settings.value = parseInt($(this).val());
+        });
+        
+        $('.pb-setting-color').each(function() {
+            element.settings.color = $(this).val();
+        });
+        
+        $('.pb-setting-address').each(function() {
+            element.settings.address = $(this).val();
+        });
+        
         $('.pb-setting-class').each(function() {
             element.settings.css_class = $(this).val();
         });
         
         $('.pb-setting-id').each(function() {
             element.settings.css_id = $(this).val();
+        });
+        
+        $('.pb-setting-bg-color').each(function() {
+            element.settings.bg_color = $(this).val();
+        });
+        
+        $('.pb-setting-text-color').each(function() {
+            element.settings.text_color = $(this).val();
+        });
+        
+        $('.pb-setting-padding').each(function() {
+            element.settings.padding = $(this).val() + 'px';
+        });
+        
+        $('.pb-setting-margin').each(function() {
+            element.settings.margin = $(this).val() + 'px';
         });
         
         renderCanvas();

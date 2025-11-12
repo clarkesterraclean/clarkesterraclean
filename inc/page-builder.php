@@ -435,10 +435,110 @@ function clarkes_render_builder_elements($elements) {
                 break;
                 
             case 'divider':
-                echo '<hr class="pb-divider" />';
+                $divider_style = isset($settings['style']) ? $settings['style'] : 'solid';
+                $divider_color = isset($settings['color']) ? $settings['color'] : '#ddd';
+                echo '<hr class="pb-divider" style="border-style: ' . esc_attr($divider_style) . '; border-color: ' . esc_attr($divider_color) . ';" />';
                 break;
                 
-            // Add more element types as needed
+            case 'video':
+                $video_id = isset($settings['video_id']) ? $settings['video_id'] : 0;
+                $video_url = isset($settings['video_url']) ? $settings['video_url'] : '';
+                if ($video_id && $video_url) {
+                    echo '<video class="pb-video" controls';
+                    if (isset($settings['autoplay']) && $settings['autoplay']) echo ' autoplay';
+                    if (isset($settings['loop']) && $settings['loop']) echo ' loop';
+                    if (isset($settings['muted']) && $settings['muted']) echo ' muted';
+                    echo '><source src="' . esc_url($video_url) . '" type="video/mp4"></video>';
+                } else {
+                    echo '<div class="pb-video-placeholder">Video Placeholder</div>';
+                }
+                break;
+                
+            case 'gallery':
+                $images = isset($settings['images']) ? $settings['images'] : array();
+                $columns = isset($settings['columns']) ? $settings['columns'] : 3;
+                if (!empty($images)) {
+                    echo '<div class="pb-gallery pb-gallery-' . esc_attr($columns) . '-cols" style="display: grid; grid-template-columns: repeat(' . esc_attr($columns) . ', 1fr); gap: 10px;">';
+                    foreach ($images as $img) {
+                        if (isset($img['url'])) {
+                            echo '<img src="' . esc_url($img['url']) . '" class="pb-gallery-image" />';
+                        }
+                    }
+                    echo '</div>';
+                } else {
+                    echo '<div class="pb-gallery-placeholder">Gallery Placeholder</div>';
+                }
+                break;
+                
+            case 'accordion':
+                $items = isset($settings['items']) ? intval($settings['items']) : 3;
+                echo '<div class="pb-accordion">';
+                for ($i = 1; $i <= $items; $i++) {
+                    echo '<div class="pb-accordion-item"><div class="pb-accordion-header">Accordion Item ' . $i . '</div><div class="pb-accordion-content">Content for item ' . $i . '</div></div>';
+                }
+                echo '</div>';
+                break;
+                
+            case 'tabs':
+                $tabs = isset($settings['tabs']) ? intval($settings['tabs']) : 3;
+                echo '<div class="pb-tabs"><div class="pb-tabs-nav">';
+                for ($i = 1; $i <= $tabs; $i++) {
+                    echo '<button class="pb-tab-button">Tab ' . $i . '</button>';
+                }
+                echo '</div><div class="pb-tabs-content">Tab content</div></div>';
+                break;
+                
+            case 'testimonial':
+                $quote = isset($settings['quote']) ? $settings['quote'] : 'Testimonial text';
+                $author = isset($settings['author']) ? $settings['author'] : 'Author';
+                $title = isset($settings['title']) ? $settings['title'] : '';
+                echo '<blockquote class="pb-testimonial"><p>' . esc_html($quote) . '</p><cite>' . esc_html($author);
+                if ($title) echo ' - ' . esc_html($title);
+                echo '</cite></blockquote>';
+                break;
+                
+            case 'pricing':
+                $price = isset($settings['price']) ? $settings['price'] : '£99';
+                $currency = isset($settings['currency']) ? $settings['currency'] : '£';
+                $period = isset($settings['period']) ? $settings['period'] : '/month';
+                echo '<div class="pb-pricing-table"><div class="pb-price">' . esc_html($currency) . esc_html($price) . '<span class="pb-period">' . esc_html($period) . '</span></div><div class="pb-features"><ul><li>Feature 1</li><li>Feature 2</li><li>Feature 3</li></ul></div></div>';
+                break;
+                
+            case 'countdown':
+                $date = isset($settings['date']) ? $settings['date'] : '';
+                echo '<div class="pb-countdown" data-date="' . esc_attr($date) . '">00:00:00</div>';
+                break;
+                
+            case 'progress':
+                $value = isset($settings['value']) ? intval($settings['value']) : 50;
+                $color = isset($settings['color']) ? $settings['color'] : '#3b82f6';
+                echo '<div class="pb-progress-bar"><div class="pb-progress-fill" style="width: ' . esc_attr($value) . '%; background-color: ' . esc_attr($color) . ';">' . esc_html($value) . '%</div></div>';
+                break;
+                
+            case 'map':
+                $address = isset($settings['address']) ? $settings['address'] : '';
+                $zoom = isset($settings['zoom']) ? intval($settings['zoom']) : 15;
+                echo '<div class="pb-map" data-address="' . esc_attr($address) . '" data-zoom="' . esc_attr($zoom) . '">Google Map - ' . esc_html($address) . '</div>';
+                break;
+                
+            case 'form':
+                $submit_text = isset($settings['submit_text']) ? $settings['submit_text'] : 'Submit';
+                echo '<form class="pb-contact-form"><input type="text" placeholder="Name" required /><input type="email" placeholder="Email" required /><textarea placeholder="Message" required></textarea><button type="submit">' . esc_html($submit_text) . '</button></form>';
+                break;
+        }
+        
+        // Apply custom styles if set
+        if (isset($settings['bg_color']) && $settings['bg_color']) {
+            echo '<style>.pb-element[data-element-id="' . esc_attr($element['id']) . '"] { background-color: ' . esc_attr($settings['bg_color']) . '; }</style>';
+        }
+        if (isset($settings['text_color']) && $settings['text_color']) {
+            echo '<style>.pb-element[data-element-id="' . esc_attr($element['id']) . '"] { color: ' . esc_attr($settings['text_color']) . '; }</style>';
+        }
+        if (isset($settings['padding']) && $settings['padding']) {
+            echo '<style>.pb-element[data-element-id="' . esc_attr($element['id']) . '"] { padding: ' . esc_attr($settings['padding']) . '; }</style>';
+        }
+        if (isset($settings['margin']) && $settings['margin']) {
+            echo '<style>.pb-element[data-element-id="' . esc_attr($element['id']) . '"] { margin: ' . esc_attr($settings['margin']) . '; }</style>';
         }
         
         echo '</div>';
