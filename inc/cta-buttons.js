@@ -5,10 +5,172 @@
 (function() {
     'use strict';
     
+    // Customer info storage
+    let customerInfo = null;
+    
     // Detect WhatsApp
     function hasWhatsApp() {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
         return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua.toLowerCase());
+    }
+    
+    function formatCustomerMessage() {
+        if (!customerInfo) return '';
+        return `Hi Mark,\n\nThis enquiry has come from your website.\n\nName: ${customerInfo.name}\nLocation: ${customerInfo.location}\nVehicle Registration: ${customerInfo.registration}\n\nI'm interested in a DPF/engine service.`;
+    }
+    
+    function formatWhatsAppURL(baseUrl, customerInfo) {
+        if (!customerInfo) return baseUrl;
+        const message = formatCustomerMessage();
+        const encodedMessage = encodeURIComponent(message);
+        const cleanUrl = baseUrl.split('?')[0];
+        return cleanUrl + '?text=' + encodedMessage;
+    }
+    
+    function showCustomerInfoFormForCTA(action, button) {
+        // Check if customer info modal exists (from WhatsApp module)
+        const customerInfoModal = document.getElementById('clarkes-customer-info-modal');
+        if (!customerInfoModal) {
+            // Create modal if it doesn't exist
+            createCustomerInfoModal(action, button);
+            return;
+        }
+        
+        // Store button reference for later use
+        window.clarkesPendingCTAButton = button;
+        window.clarkesPendingCTAAction = action;
+        
+        // Show the modal
+        customerInfoModal.style.display = 'flex';
+        const nameInput = document.getElementById('customer-name');
+        if (nameInput) nameInput.focus();
+        
+        // Handle form submission
+        const form = document.getElementById('clarkes-customer-info-form');
+        if (form) {
+            // Remove existing listeners by cloning
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleCustomerInfoSubmit(action, button);
+            });
+        }
+    }
+    
+    function createCustomerInfoModal(action, button) {
+        const modal = document.createElement('div');
+        modal.id = 'clarkes-customer-info-modal';
+        modal.style.cssText = 'display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10003; align-items: center; justify-content: center;';
+        
+        modal.innerHTML = `
+            <div style="background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+                <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1f2937;">Quick Contact Form</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">Please provide a few details to help us assist you better:</p>
+                <form id="clarkes-customer-info-form" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label for="customer-name" style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #374151;">Your Name *</label>
+                        <input type="text" id="customer-name" name="customer_name" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit;" placeholder="Enter your name">
+                    </div>
+                    <div>
+                        <label for="customer-location" style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #374151;">Location *</label>
+                        <input type="text" id="customer-location" name="customer_location" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit;" placeholder="e.g., Maidstone, Kent">
+                    </div>
+                    <div>
+                        <label for="vehicle-registration" style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #374151;">Vehicle Registration *</label>
+                        <input type="text" id="vehicle-registration" name="vehicle_registration" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; text-transform: uppercase;" placeholder="e.g., AB12 CDE" maxlength="10">
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 8px;">
+                        <button type="button" id="clarkes-customer-info-cancel" style="flex: 1; padding: 12px; background: #f3f4f6; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #6b7280; font-size: 14px;">Cancel</button>
+                        <button type="submit" id="clarkes-customer-info-submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; font-size: 14px;">Continue</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const form = modal.querySelector('#clarkes-customer-info-form');
+        const cancelBtn = modal.querySelector('#clarkes-customer-info-cancel');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleCustomerInfoSubmit(action, button);
+        });
+        
+        cancelBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+            const form = modal.querySelector('#clarkes-customer-info-form');
+            if (form) form.reset();
+        });
+        
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                const form = modal.querySelector('#clarkes-customer-info-form');
+                if (form) form.reset();
+            }
+        });
+        
+        modal.style.display = 'flex';
+        const nameInput = modal.querySelector('#customer-name');
+        if (nameInput) nameInput.focus();
+    }
+    
+    function handleCustomerInfoSubmit(action, button) {
+        const name = document.getElementById('customer-name').value.trim();
+        const location = document.getElementById('customer-location').value.trim();
+        const registration = document.getElementById('vehicle-registration').value.trim().toUpperCase();
+        
+        if (!name || !location || !registration) {
+            alert('Please fill in all fields.');
+            return;
+        }
+        
+        customerInfo = {
+            name: name,
+            location: location,
+            registration: registration
+        };
+        
+        const modal = document.getElementById('clarkes-customer-info-modal');
+        if (modal) {
+            modal.style.display = 'none';
+            const form = document.getElementById('clarkes-customer-info-form');
+            if (form) form.reset();
+        }
+        
+        if (action === 'whatsapp') {
+            const waUrl = button.getAttribute('data-wa-url');
+            if (!waUrl) {
+                console.warn('WhatsApp URL not found');
+                return;
+            }
+            
+            const formattedUrl = formatWhatsAppURL(waUrl, customerInfo);
+            
+            if (hasWhatsApp()) {
+                window.location.href = formattedUrl;
+            } else {
+                // Open chat window if available
+                if (typeof window.clarkesWhatsApp !== 'undefined' && document.getElementById('clarkes-wa-chat-window')) {
+                    const chatWindow = document.getElementById('clarkes-wa-chat-window');
+                    if (chatWindow) {
+                        chatWindow.style.display = 'flex';
+                        const messageInput = document.getElementById('clarkes-wa-message-input');
+                        if (messageInput) {
+                            messageInput.value = formatCustomerMessage();
+                            messageInput.focus();
+                        }
+                    } else {
+                        window.open(formattedUrl, '_blank');
+                    }
+                } else {
+                    window.open(formattedUrl, '_blank');
+                }
+            }
+        }
     }
     
     // Create modal for call options (phone or WhatsApp)
@@ -109,30 +271,9 @@
             if (clickedBtn.id.includes('whatsapp-cta')) {
                 e.preventDefault();
                 e.stopPropagation();
-                const waUrl = clickedBtn.getAttribute('data-wa-url');
                 
-                if (!waUrl) {
-                    console.warn('WhatsApp URL not found');
-                    return;
-                }
-                
-                if (hasWhatsApp()) {
-                    window.open(waUrl, '_blank');
-                } else {
-                    // Open chat window if available
-                    if (typeof window.clarkesWhatsApp !== 'undefined' && document.getElementById('clarkes-wa-chat-window')) {
-                        const chatWindow = document.getElementById('clarkes-wa-chat-window');
-                        if (chatWindow) {
-                            chatWindow.style.display = 'flex';
-                            const messageInput = document.getElementById('clarkes-wa-message-input');
-                            if (messageInput) messageInput.focus();
-                        } else {
-                            window.open(waUrl, '_blank');
-                        }
-                    } else {
-                        window.open(waUrl, '_blank');
-                    }
-                }
+                // Show customer info form first
+                showCustomerInfoFormForCTA('whatsapp', clickedBtn);
                 return;
             }
         });

@@ -351,6 +351,32 @@ function clarkes_render_whatsapp_fab() {
         </div>
     </div>
     
+    <!-- Customer Info Form Modal -->
+    <div id="clarkes-customer-info-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10003; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+            <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1f2937;">Quick Contact Form</h3>
+            <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">Please provide a few details to help us assist you better:</p>
+            <form id="clarkes-customer-info-form" style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label for="customer-name" style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #374151;">Your Name *</label>
+                    <input type="text" id="customer-name" name="customer_name" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit;" placeholder="Enter your name">
+                </div>
+                <div>
+                    <label for="customer-location" style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #374151;">Location *</label>
+                    <input type="text" id="customer-location" name="customer_location" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit;" placeholder="e.g., Maidstone, Kent">
+                </div>
+                <div>
+                    <label for="vehicle-registration" style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #374151;">Vehicle Registration *</label>
+                    <input type="text" id="vehicle-registration" name="vehicle_registration" required style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; text-transform: uppercase;" placeholder="e.g., AB12 CDE" maxlength="10">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 8px;">
+                    <button type="button" id="clarkes-customer-info-cancel" style="flex: 1; padding: 12px; background: #f3f4f6; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #6b7280; font-size: 14px;">Cancel</button>
+                    <button type="submit" id="clarkes-customer-info-submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: white; font-size: 14px;">Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- Call/Message Options Modal -->
     <div id="clarkes-wa-call-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10001; align-items: center; justify-content: center;">
         <div style="background: white; border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; margin: 20px;">
@@ -403,6 +429,10 @@ function clarkes_render_whatsapp_fab() {
     (function() {
         'use strict';
         
+        // Customer info storage
+        let customerInfo = null;
+        let pendingAction = null; // 'whatsapp' or 'chat'
+        
         // Wait for DOM to be ready
         function initWhatsApp() {
             const toggle = document.getElementById('clarkes-wa-toggle');
@@ -421,6 +451,9 @@ function clarkes_render_whatsapp_fab() {
             const attachmentList = document.getElementById('clarkes-wa-attachment-list');
             const messagesDiv = document.getElementById('clarkes-wa-messages');
             const messageDirectBtn = document.getElementById('clarkes-wa-message-direct');
+            const customerInfoModal = document.getElementById('clarkes-customer-info-modal');
+            const customerInfoForm = document.getElementById('clarkes-customer-info-form');
+            const customerInfoCancel = document.getElementById('clarkes-customer-info-cancel');
             
             // Check if elements exist
             if (!toggle || !sheet) {
@@ -473,7 +506,43 @@ function clarkes_render_whatsapp_fab() {
                 if (messageInput) {
                     messageInput.focus();
                 }
+                // Pre-fill message with customer info if available
+                if (customerInfo && messageInput) {
+                    const prefillMessage = formatCustomerMessage();
+                    messageInput.value = prefillMessage;
+                }
             }
+        }
+        
+        function formatCustomerMessage() {
+            if (!customerInfo) return '';
+            return `Hi Mark,\n\nThis enquiry has come from your website.\n\nName: ${customerInfo.name}\nLocation: ${customerInfo.location}\nVehicle Registration: ${customerInfo.registration}\n\nI'm interested in a DPF/engine service.`;
+        }
+        
+        function formatWhatsAppURL(baseUrl, customerInfo) {
+            if (!customerInfo) return baseUrl;
+            const message = formatCustomerMessage();
+            const encodedMessage = encodeURIComponent(message);
+            // Remove existing text parameter if any
+            const cleanUrl = baseUrl.split('?')[0];
+            return cleanUrl + '?text=' + encodedMessage;
+        }
+        
+        function showCustomerInfoForm(action) {
+            pendingAction = action;
+            if (customerInfoModal) {
+                customerInfoModal.style.display = 'flex';
+                const nameInput = document.getElementById('customer-name');
+                if (nameInput) nameInput.focus();
+            }
+        }
+        
+        function closeCustomerInfoForm() {
+            if (customerInfoModal) {
+                customerInfoModal.style.display = 'none';
+                if (customerInfoForm) customerInfoForm.reset();
+            }
+            pendingAction = null;
         }
         
         function closeCallModal() {
@@ -515,33 +584,73 @@ function clarkes_render_whatsapp_fab() {
                 console.log('Chat button clicked');
                 closeSheet();
                 
-                if (typeof clarkesWhatsApp !== 'undefined' && clarkesWhatsApp.chat_url) {
-                    console.log('Opening WhatsApp:', clarkesWhatsApp.chat_url);
-                    if (hasWhatsApp()) {
-                        // Try to open WhatsApp
-                        const chatUrl = clarkesWhatsApp.chat_url;
-                        window.location.href = chatUrl; // Use location.href instead of window.open for better mobile support
-                        
-                        // Fallback: if WhatsApp doesn't open after 2 seconds, show chat window
-                        setTimeout(function() {
-                            if (document.hasFocus && !document.hasFocus()) {
-                                console.log('WhatsApp not opened, showing chat window');
-                                openChatWindow();
-                            }
-                        }, 2000);
-                    } else {
-                        // No WhatsApp detected, show chat window
-                        console.log('No WhatsApp detected, showing chat window');
-                        openChatWindow();
-                    }
-                } else {
-                    // clarkesWhatsApp not defined, show chat window as fallback
-                    console.warn('clarkesWhatsApp object not found, opening chat window');
-                    openChatWindow();
-                }
+                // Show customer info form first
+                showCustomerInfoForm('whatsapp');
             });
         } else {
             console.warn('Chat button not found');
+        }
+        
+        // Handle customer info form submission
+        if (customerInfoForm) {
+            customerInfoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('customer-name').value.trim();
+                const location = document.getElementById('customer-location').value.trim();
+                const registration = document.getElementById('vehicle-registration').value.trim().toUpperCase();
+                
+                if (!name || !location || !registration) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+                
+                // Store customer info
+                customerInfo = {
+                    name: name,
+                    location: location,
+                    registration: registration
+                };
+                
+                closeCustomerInfoForm();
+                
+                // Proceed with pending action
+                if (pendingAction === 'whatsapp') {
+                    if (typeof clarkesWhatsApp !== 'undefined' && clarkesWhatsApp.chat_url) {
+                        const chatUrl = formatWhatsAppURL(clarkesWhatsApp.chat_url, customerInfo);
+                        console.log('Opening WhatsApp with customer info:', chatUrl);
+                        
+                        if (hasWhatsApp()) {
+                            window.location.href = chatUrl;
+                            setTimeout(function() {
+                                if (document.hasFocus && !document.hasFocus()) {
+                                    console.log('WhatsApp not opened, showing chat window');
+                                    openChatWindow();
+                                }
+                            }, 2000);
+                        } else {
+                            openChatWindow();
+                        }
+                    } else {
+                        openChatWindow();
+                    }
+                } else if (pendingAction === 'chat') {
+                    openChatWindow();
+                }
+            });
+        }
+        
+        if (customerInfoCancel) {
+            customerInfoCancel.addEventListener('click', closeCustomerInfoForm);
+        }
+        
+        // Close customer info modal on outside click
+        if (customerInfoModal) {
+            customerInfoModal.addEventListener('click', function(e) {
+                if (e.target === customerInfoModal) {
+                    closeCustomerInfoForm();
+                }
+            });
         }
         
         // Call button - show options
@@ -562,15 +671,7 @@ function clarkes_render_whatsapp_fab() {
             messageDirectBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 closeCallModal();
-                if (typeof clarkesWhatsApp !== 'undefined' && clarkesWhatsApp.chat_url) {
-                    if (hasWhatsApp()) {
-                        window.open(clarkesWhatsApp.chat_url, '_blank');
-                    } else {
-                        openChatWindow();
-                    }
-                } else {
-                    openChatWindow();
-                }
+                showCustomerInfoForm('whatsapp');
             });
         }
         
@@ -651,7 +752,20 @@ function clarkes_render_whatsapp_fab() {
                 const formData = new FormData();
                 formData.append('action', 'clarkes_send_whatsapp_message');
                 formData.append('nonce', clarkesWhatsApp.nonce);
-                formData.append('message', message);
+                
+                // Include customer info in message if available
+                let fullMessage = message;
+                if (customerInfo) {
+                    const customerInfoText = `\n\n---\nEnquiry from website:\nName: ${customerInfo.name}\nLocation: ${customerInfo.location}\nVehicle Registration: ${customerInfo.registration}`;
+                    fullMessage = message + customerInfoText;
+                }
+                
+                formData.append('message', fullMessage);
+                if (customerInfo) {
+                    formData.append('customer_name', customerInfo.name);
+                    formData.append('customer_location', customerInfo.location);
+                    formData.append('vehicle_registration', customerInfo.registration);
+                }
                 attachments.forEach(function(file, index) {
                     formData.append('attachments[]', file);
                 });
