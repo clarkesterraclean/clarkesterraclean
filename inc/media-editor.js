@@ -49,14 +49,14 @@
     }
     
     function initializeImageEditor() {
-        $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'clarkes_get_media',
-                nonce: clarkesMediaEditor.nonce,
-                media_id: currentMediaId
-            },
+            $.ajax({
+                url: clarkesMediaEditor.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'clarkes_get_media',
+                    nonce: clarkesMediaEditor.nonce,
+                    media_id: currentMediaId
+                },
             success: function(response) {
                 if (response.success) {
                     var img = new Image();
@@ -252,50 +252,91 @@
         fabricCanvas.selection = false;
     });
     
-    // Handle markup drawing
-    if (typeof fabric !== 'undefined') {
-        $(document).on('fabricCanvas:mouse:down', function(e, options) {
+    // Handle markup drawing with Fabric.js
+    var isDrawing = false;
+    var startX, startY, currentShape;
+    
+    if (typeof fabric !== 'undefined' && fabricCanvas) {
+        fabricCanvas.on('mouse:down', function(options) {
             if (currentMarkupTool && fabricCanvas) {
+                isDrawing = true;
                 var pointer = fabricCanvas.getPointer(options.e);
+                startX = pointer.x;
+                startY = pointer.y;
                 var color = $('#markup-color').val();
                 var width = parseInt($('#markup-width').val());
-                var shape;
                 
                 switch(currentMarkupTool) {
                     case 'rect':
-                        shape = new fabric.Rect({
-                            left: pointer.x,
-                            top: pointer.y,
+                        currentShape = new fabric.Rect({
+                            left: startX,
+                            top: startY,
                             width: 0,
                             height: 0,
                             stroke: color,
                             fill: 'transparent',
-                            strokeWidth: width
+                            strokeWidth: width,
+                            selectable: true
                         });
                         break;
                     case 'circle':
-                        shape = new fabric.Circle({
-                            left: pointer.x,
-                            top: pointer.y,
+                        currentShape = new fabric.Circle({
+                            left: startX,
+                            top: startY,
                             radius: 0,
                             stroke: color,
                             fill: 'transparent',
-                            strokeWidth: width
+                            strokeWidth: width,
+                            selectable: true
                         });
                         break;
                     case 'line':
-                        shape = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+                        currentShape = new fabric.Line([startX, startY, startX, startY], {
                             stroke: color,
-                            strokeWidth: width
+                            strokeWidth: width,
+                            selectable: true
                         });
                         break;
                 }
                 
-                if (shape) {
-                    fabricCanvas.add(shape);
-                    fabricCanvas.renderAll();
-                    currentMarkupTool = null;
+                if (currentShape) {
+                    fabricCanvas.add(currentShape);
                 }
+            }
+        });
+        
+        fabricCanvas.on('mouse:move', function(options) {
+            if (isDrawing && currentShape && currentMarkupTool) {
+                var pointer = fabricCanvas.getPointer(options.e);
+                var color = $('#markup-color').val();
+                var width = parseInt($('#markup-width').val());
+                
+                switch(currentMarkupTool) {
+                    case 'rect':
+                        currentShape.set({
+                            width: Math.abs(pointer.x - startX),
+                            height: Math.abs(pointer.y - startY),
+                            left: Math.min(startX, pointer.x),
+                            top: Math.min(startY, pointer.y)
+                        });
+                        break;
+                    case 'circle':
+                        var radius = Math.sqrt(Math.pow(pointer.x - startX, 2) + Math.pow(pointer.y - startY, 2));
+                        currentShape.set({ radius: radius });
+                        break;
+                    case 'line':
+                        currentShape.set({ x2: pointer.x, y2: pointer.y });
+                        break;
+                }
+                fabricCanvas.renderAll();
+            }
+        });
+        
+        fabricCanvas.on('mouse:up', function() {
+            if (isDrawing) {
+                isDrawing = false;
+                currentShape = null;
+                currentMarkupTool = null;
             }
         });
     }
@@ -306,7 +347,7 @@
         $btn.prop('disabled', true).text('Generating...');
         
         $.ajax({
-            url: ajaxurl,
+            url: clarkesMediaEditor.ajax_url,
             type: 'POST',
             data: {
                 action: 'clarkes_generate_ai_seo',
@@ -332,7 +373,7 @@
     
     $('#apply-ai-seo').on('click', function() {
         $.ajax({
-            url: ajaxurl,
+            url: clarkesMediaEditor.ajax_url,
             type: 'POST',
             data: {
                 action: 'clarkes_apply_ai_seo',
@@ -372,7 +413,7 @@
                     
                     if (confirm('Convert to ' + (isPortrait ? 'landscape' : 'portrait') + ' orientation?')) {
                         $.ajax({
-                            url: ajaxurl,
+                            url: clarkesMediaEditor.ajax_url,
                             type: 'POST',
                             data: {
                                 action: 'clarkes_process_video',
@@ -420,7 +461,7 @@
         if (fabricCanvas) {
             var dataURL = fabricCanvas.toDataURL('image/png');
             $.ajax({
-                url: ajaxurl,
+                url: clarkesMediaEditor.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'clarkes_save_edited_media',

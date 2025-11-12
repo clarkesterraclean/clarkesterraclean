@@ -61,6 +61,9 @@ function clarkes_media_editor_scripts($hook) {
         'ai_api_key' => get_option('clarkes_ai_api_key', ''),
     ));
     
+    // Add ajaxurl for compatibility
+    wp_add_inline_script('clarkes-media-editor', 'var ajaxurl = "' . admin_url('admin-ajax.php') . '";', 'before');
+    
     // Enqueue editor styles
     wp_enqueue_style(
         'clarkes-media-editor-style',
@@ -120,11 +123,13 @@ function clarkes_media_editor_page() {
                 </div>
                 
                 <!-- Editor Canvas -->
-                <div class="editor-canvas-container" style="background: #f0f0f0; padding: 20px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                <div class="editor-canvas-container" style="background: #f0f0f0; padding: 20px; border: 1px solid #ddd; border-radius: 4px; text-align: center; min-height: 400px;">
                     <?php if (strpos($media->post_mime_type, 'video') !== false) : ?>
-                        <video id="editor-video" src="<?php echo esc_url(wp_get_attachment_url($media_id)); ?>" controls style="max-width: 100%; max-height: 70vh;"></video>
+                        <video id="editor-video" src="<?php echo esc_url(wp_get_attachment_url($media_id)); ?>" controls style="max-width: 100%; max-height: 70vh; border-radius: 4px;"></video>
                     <?php else : ?>
-                        <canvas id="editor-canvas" style="max-width: 100%; border: 1px solid #ddd; background: white;"></canvas>
+                        <div id="canvas-wrapper" style="display: inline-block;">
+                            <canvas id="editor-canvas" style="max-width: 100%; border: 1px solid #ddd; background: white; border-radius: 4px;"></canvas>
+                        </div>
                     <?php endif; ?>
                 </div>
                 
