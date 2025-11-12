@@ -2,6 +2,44 @@
  * SEO Module Styles
  */
 
+/* Progress Bar Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Activity Log Scrollbar */
+#seo-activity-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+#seo-activity-log::-webkit-scrollbar-track {
+    background: #111827;
+    border-radius: 4px;
+}
+
+#seo-activity-log::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+
+#seo-activity-log::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Progress Container */
+#seo-progress {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#seo-progress-bar {
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
 .clarkes-seo-dashboard {
     max-width: 1400px;
 }

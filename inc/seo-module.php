@@ -240,11 +240,33 @@ function clarkes_seo_module_page() {
         
         <!-- Progress Indicator -->
         <div id="seo-progress" style="display: none; background: white; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin: 20px 0;">
-            <h3><?php _e('Processing...', 'clarkes-terraclean'); ?></h3>
-            <div style="background: #f3f4f6; border-radius: 4px; height: 30px; overflow: hidden;">
-                <div id="seo-progress-bar" style="background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;"><?php _e('Processing...', 'clarkes-terraclean'); ?></h3>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="button button-small" id="btn-clear-log" style="display: none;">
+                        <?php _e('Clear Log', 'clarkes-terraclean'); ?>
+                    </button>
+                    <button type="button" class="button button-small" id="btn-refresh-log" style="display: none;">
+                        <?php _e('Refresh', 'clarkes-terraclean'); ?>
+                    </button>
+                </div>
             </div>
-            <p id="seo-progress-text" style="margin: 10px 0 0 0;"></p>
+            <div style="background: #f3f4f6; border-radius: 4px; height: 30px; overflow: hidden; margin-bottom: 15px; position: relative;">
+                <div id="seo-progress-bar" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 100%; width: 0%; transition: width 0.3s; position: relative;">
+                    <div id="seo-progress-percent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold; font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">0%</div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <p id="seo-progress-text" style="margin: 0; font-weight: 500; color: #374151;"></p>
+                <span id="seo-progress-stats" style="color: #6b7280; font-size: 14px;"></span>
+            </div>
+            
+            <!-- Activity Log -->
+            <div id="seo-activity-log" style="background: #1f2937; color: #e5e7eb; padding: 15px; border-radius: 4px; max-height: 300px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6;">
+                <div id="seo-log-content">
+                    <div style="color: #9ca3af; font-style: italic;"><?php _e('Activity log will appear here...', 'clarkes-terraclean'); ?></div>
+                </div>
+            </div>
         </div>
     </div>
     <?php
