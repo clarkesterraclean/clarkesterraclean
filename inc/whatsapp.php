@@ -749,19 +749,39 @@ function clarkes_render_whatsapp_fab() {
     })();
     </script>
     <script>
-    // Additional check - ensure button is clickable
+    // Additional check - ensure button is clickable and works
     document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
             const toggle = document.getElementById('clarkes-wa-toggle');
-            if (toggle) {
-                console.log('WhatsApp toggle button found, adding direct click handler');
+            const sheet = document.getElementById('clarkes-wa-sheet');
+            
+            if (toggle && sheet) {
+                console.log('WhatsApp toggle button and sheet found');
+                
+                // Add a backup click handler that definitely works
                 toggle.addEventListener('click', function(e) {
-                    console.log('Direct click handler fired');
+                    console.log('Backup click handler fired');
                     e.preventDefault();
                     e.stopPropagation();
-                }, true); // Use capture phase
+                    
+                    const currentDisplay = window.getComputedStyle(sheet).display;
+                    console.log('Current sheet display:', currentDisplay);
+                    
+                    if (currentDisplay === 'none' || currentDisplay === '') {
+                        sheet.style.display = 'block';
+                        toggle.setAttribute('aria-expanded', 'true');
+                        console.log('Sheet opened via backup handler');
+                    } else {
+                        sheet.style.display = 'none';
+                        toggle.setAttribute('aria-expanded', 'false');
+                        console.log('Sheet closed via backup handler');
+                    }
+                }, true); // Use capture phase to catch early
             } else {
-                console.error('WhatsApp toggle button NOT FOUND in DOM');
+                console.error('WhatsApp elements NOT FOUND:', {
+                    toggle: !!toggle,
+                    sheet: !!sheet
+                });
             }
         }, 500);
     });
