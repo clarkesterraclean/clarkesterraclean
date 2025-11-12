@@ -480,6 +480,110 @@
         });
     });
     
+    // Section Spacing
+    wp.customize('section_padding_vertical', function(value) {
+        value.bind(function(newval) {
+            $('section').css('padding-top', newval + 'px');
+            $('section').css('padding-bottom', newval + 'px');
+        });
+    });
+    
+    wp.customize('hero_section_padding_top', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#top').css('padding-top', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('hero_section_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#top').css('padding-bottom', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('about_section_padding_top', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#about').css('padding-top', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('about_section_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#about').css('padding-bottom', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('services_section_padding_top', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#services').css('padding-top', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('services_section_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#services').css('padding-bottom', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('case_studies_section_padding_top', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#case-studies').css('padding-top', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('case_studies_section_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#case-studies').css('padding-bottom', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('testimonials_section_padding_top', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#testimonials').css('padding-top', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('testimonials_section_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#testimonials').css('padding-bottom', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('contact_section_padding_top', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#contact').css('padding-top', newval + 'px');
+            }
+        });
+    });
+    
+    wp.customize('contact_section_padding_bottom', function(value) {
+        value.bind(function(newval) {
+            if (newval !== '') {
+                $('#contact').css('padding-bottom', newval + 'px');
+            }
+        });
+    });
+    
     // Section Padding Vertical
     wp.customize('section_padding_vertical', function(value) {
         value.bind(function(newval) {

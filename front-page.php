@@ -41,7 +41,23 @@ switch ($hero_bg_type) {
         break;
 }
 ?>
-<section id="top" class="hero-section flex items-center text-text-body pt-24 md:pt-32 pb-16 md:pb-24 relative overflow-hidden" style="min-height:<?php echo esc_attr($hero_height); ?>; <?php echo esc_attr($hero_bg_style); ?>">
+<?php
+$hero_padding_top = get_theme_mod('hero_section_padding_top', '');
+$hero_padding_bottom = get_theme_mod('hero_section_padding_bottom', '');
+$global_padding = get_theme_mod('section_padding_vertical', 64);
+$hero_padding_style = '';
+if ($hero_padding_top !== '') {
+    $hero_padding_style .= 'padding-top: ' . absint($hero_padding_top) . 'px; ';
+} else {
+    $hero_padding_style .= 'padding-top: 96px; '; // Default for hero
+}
+if ($hero_padding_bottom !== '') {
+    $hero_padding_style .= 'padding-bottom: ' . absint($hero_padding_bottom) . 'px; ';
+} else {
+    $hero_padding_style .= 'padding-bottom: 64px; '; // Default for hero
+}
+?>
+<section id="top" class="hero-section flex items-center text-text-body relative overflow-hidden" style="min-height:<?php echo esc_attr($hero_height); ?>; <?php echo esc_attr($hero_bg_style); ?> <?php echo esc_attr($hero_padding_style); ?>">
     <?php if ($hero_bg_type === 'video' && !empty($hero_bg_video)) : 
         $hero_video_url = wp_get_attachment_url($hero_bg_video);
         if ($hero_video_url) : ?>
@@ -98,8 +114,13 @@ switch ($hero_bg_type) {
 </section>
 
 <!-- About Us Section -->
-<?php if (get_theme_mod('show_about', 1)) : ?>
-<section id="about" class="py-16 md:py-24 bg-carbon-light text-text-dark">
+<?php if (get_theme_mod('show_about', 1)) : 
+    $about_padding_top = get_theme_mod('about_section_padding_top', '');
+    $about_padding_bottom = get_theme_mod('about_section_padding_bottom', '');
+    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $about_style = 'padding-top: ' . ($about_padding_top !== '' ? absint($about_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($about_padding_bottom !== '' ? absint($about_padding_bottom) : $global_padding) . 'px;';
+?>
+<section id="about" class="bg-carbon-light text-text-dark" style="<?php echo esc_attr($about_style); ?>">
     <div class="max-w-7xl mx-auto px-4">
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <!-- Image/Video Column -->
@@ -372,8 +393,13 @@ endif; // show_case_studies
 ?>
 
 <!-- Testimonials Section -->
-<?php if (get_theme_mod('show_testimonials', 1)) : ?>
-<section id="testimonials" class="py-16 md:py-24 bg-carbon-dark text-text-body">
+<?php if (get_theme_mod('show_testimonials', 1)) : 
+    $testimonials_padding_top = get_theme_mod('testimonials_section_padding_top', '');
+    $testimonials_padding_bottom = get_theme_mod('testimonials_section_padding_bottom', '');
+    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $testimonials_style = 'padding-top: ' . ($testimonials_padding_top !== '' ? absint($testimonials_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($testimonials_padding_bottom !== '' ? absint($testimonials_padding_bottom) : $global_padding) . 'px;';
+?>
+<section id="testimonials" class="bg-carbon-dark text-text-body" style="<?php echo esc_attr($testimonials_style); ?>">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-center text-white">What Drivers Say</h2>
         

@@ -504,6 +504,17 @@ if (!function_exists('clarkes_add_seo_module_menu')) {
 }
 
 /**
+ * Include Page Builder
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_page_builder_menu')) {
+    $page_builder_file = get_template_directory() . '/inc/page-builder.php';
+    if (file_exists($page_builder_file)) {
+        require_once $page_builder_file;
+    }
+}
+
+/**
  * Include Case Studies system
  * Only include if not already loaded (prevents redeclaration)
  */
