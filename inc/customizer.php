@@ -1727,23 +1727,11 @@ function clarkes_customize_register($wp_customize) {
         'description' => esc_html__('Control the top and bottom padding for each section on your site. Leave empty to use the global default.', 'clarkes-terraclean'),
     ));
     
-    // Global Section Padding Vertical
+    // Register all settings first (required for custom control)
     $wp_customize->add_setting('section_padding_vertical_global', array(
         'default'           => '64',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
-    ));
-    
-    $wp_customize->add_control('section_padding_vertical_global', array(
-        'label'       => esc_html__('Global Section Top/Bottom Padding (px)', 'clarkes-terraclean'),
-        'description' => esc_html__('Default vertical padding for all sections. Individual section controls below override this.', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
     ));
     
     // Hero Section Spacing
@@ -1752,34 +1740,10 @@ function clarkes_customize_register($wp_customize) {
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
-    
-    $wp_customize->add_control('hero_section_padding_top', array(
-        'label'       => esc_html__('Hero Section - Top Padding (px)', 'clarkes-terraclean'),
-        'description' => esc_html__('Leave empty to use global setting', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
-    ));
-    
     $wp_customize->add_setting('hero_section_padding_bottom', array(
         'default'           => '',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
-    ));
-    
-    $wp_customize->add_control('hero_section_padding_bottom', array(
-        'label'       => esc_html__('Hero Section - Bottom Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
     ));
     
     // About Section Spacing
@@ -1788,33 +1752,10 @@ function clarkes_customize_register($wp_customize) {
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
-    
-    $wp_customize->add_control('about_section_padding_top', array(
-        'label'       => esc_html__('About Section - Top Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
-    ));
-    
     $wp_customize->add_setting('about_section_padding_bottom', array(
         'default'           => '',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
-    ));
-    
-    $wp_customize->add_control('about_section_padding_bottom', array(
-        'label'       => esc_html__('About Section - Bottom Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
     ));
     
     // Services Section Spacing
@@ -1823,33 +1764,10 @@ function clarkes_customize_register($wp_customize) {
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
-    
-    $wp_customize->add_control('services_section_padding_top', array(
-        'label'       => esc_html__('Services Section - Top Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
-    ));
-    
     $wp_customize->add_setting('services_section_padding_bottom', array(
         'default'           => '',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
-    ));
-    
-    $wp_customize->add_control('services_section_padding_bottom', array(
-        'label'       => esc_html__('Services Section - Bottom Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
     ));
     
     // Case Studies Section Spacing
@@ -1858,33 +1776,10 @@ function clarkes_customize_register($wp_customize) {
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
-    
-    $wp_customize->add_control('case_studies_section_padding_top', array(
-        'label'       => esc_html__('Case Studies Section - Top Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
-    ));
-    
     $wp_customize->add_setting('case_studies_section_padding_bottom', array(
         'default'           => '',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
-    ));
-    
-    $wp_customize->add_control('case_studies_section_padding_bottom', array(
-        'label'       => esc_html__('Case Studies Section - Bottom Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
     ));
     
     // Testimonials Section Spacing
@@ -1893,33 +1788,10 @@ function clarkes_customize_register($wp_customize) {
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
-    
-    $wp_customize->add_control('testimonials_section_padding_top', array(
-        'label'       => esc_html__('Testimonials Section - Top Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
-    ));
-    
     $wp_customize->add_setting('testimonials_section_padding_bottom', array(
         'default'           => '',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
-    ));
-    
-    $wp_customize->add_control('testimonials_section_padding_bottom', array(
-        'label'       => esc_html__('Testimonials Section - Bottom Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
     ));
     
     // Contact Section Spacing
@@ -1928,34 +1800,53 @@ function clarkes_customize_register($wp_customize) {
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
-    
-    $wp_customize->add_control('contact_section_padding_top', array(
-        'label'       => esc_html__('Contact Section - Top Padding (px)', 'clarkes-terraclean'),
-        'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
-        ),
-    ));
-    
     $wp_customize->add_setting('contact_section_padding_bottom', array(
         'default'           => '',
         'sanitize_callback' => 'absint',
         'transport'         => 'postMessage',
     ));
     
-    $wp_customize->add_control('contact_section_padding_bottom', array(
-        'label'       => esc_html__('Contact Section - Bottom Padding (px)', 'clarkes-terraclean'),
+    // Load custom control class
+    require_once get_template_directory() . '/inc/section-spacing-control.php';
+    
+    // Add enhanced custom control
+    $wp_customize->add_control(new Clarkes_Section_Spacing_Control($wp_customize, 'section_spacing_control', array(
+        'label'       => esc_html__('Section Spacing Controls', 'clarkes-terraclean'),
+        'description' => esc_html__('Control the top and bottom padding for each section. Leave empty to use the global default.', 'clarkes-terraclean'),
         'section'     => 'clarkes_section_spacing',
-        'type'        => 'number',
-        'input_attrs' => array(
-            'min'  => 0,
-            'max'  => 300,
-            'step' => 4,
+        'sections'    => array(
+            'hero' => array(
+                'title'    => 'Hero Section',
+                'subtitle' => 'Main landing section at the top',
+                'icon'     => '🏠',
+            ),
+            'about' => array(
+                'title'    => 'About Section',
+                'subtitle' => 'About us information',
+                'icon'     => 'ℹ️',
+            ),
+            'services' => array(
+                'title'    => 'Services Section',
+                'subtitle' => 'Services offered',
+                'icon'     => '🔧',
+            ),
+            'case_studies' => array(
+                'title'    => 'Case Studies Section',
+                'subtitle' => 'Project showcases',
+                'icon'     => '📊',
+            ),
+            'testimonials' => array(
+                'title'    => 'Testimonials Section',
+                'subtitle' => 'Customer reviews',
+                'icon'     => '⭐',
+            ),
+            'contact' => array(
+                'title'    => 'Contact Section',
+                'subtitle' => 'Contact form and details',
+                'icon'     => '📧',
+            ),
         ),
-    ));
+    )));
 }
 }
 add_action('customize_register', 'clarkes_customize_register');
