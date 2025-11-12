@@ -190,15 +190,16 @@ add_action('customize_register', 'clarkes_register_whatsapp_settings');
  */
 if (!function_exists('clarkes_render_whatsapp_fab')) {
 function clarkes_render_whatsapp_fab() {
-    // Check if enabled
-    if (!get_theme_mod('enable_whatsapp_fab', 1)) {
+    // Check if enabled (check options first, then theme mods)
+    $enable_fab = get_option('enable_whatsapp_fab', get_theme_mod('enable_whatsapp_fab', 1));
+    if (!$enable_fab) {
         return;
     }
 
     // Check device visibility
     $is_mobile = wp_is_mobile();
-    $show_desktop = get_theme_mod('whatsapp_show_desktop', 1);
-    $show_mobile = get_theme_mod('whatsapp_show_mobile', 1);
+    $show_desktop = get_option('whatsapp_show_desktop', get_theme_mod('whatsapp_show_desktop', 1));
+    $show_mobile = get_option('whatsapp_show_mobile', get_theme_mod('whatsapp_show_mobile', 1));
 
     if ($is_mobile && !$show_mobile) {
         return;
@@ -207,31 +208,41 @@ function clarkes_render_whatsapp_fab() {
         return;
     }
 
-    // Check scope - Default to front page only for this feature
-    $scope = get_theme_mod('whatsapp_show_scope', 'front_only');
+    // Check scope - Default to all pages for better visibility
+    $scope = get_option('whatsapp_show_scope', get_theme_mod('whatsapp_show_scope', 'all'));
     if ($scope === 'front_only' && !is_front_page()) {
         return;
     }
-    if ($scope === 'pages_only' && !is_page()) {
+    if ($scope === 'pages_only' && !is_page() && !is_front_page()) {
         return;
     }
 
-    // Get settings
-    $raw_phone = get_theme_mod('whatsapp_number', '07706 230867');
+    // Get settings from options (fallback to theme mods)
+    $raw_phone = get_option('whatsapp_number', get_theme_mod('whatsapp_number', '07706 230867'));
     $clean_phone = preg_replace('/\D+/', '', $raw_phone);
     
     // Optional: if starts with 0 and UK assumed, could normalize to 44
     // For now, just use clean digits as-is
     // $clean_phone = preg_replace('/^0/', '44', $clean_phone);
     
-    $prefill = urlencode(get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].'));
+    $prefill = urlencode(get_option('whatsapp_pretext', get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].')));
     $chat_href = 'https://wa.me/' . $clean_phone . '?text=' . $prefill;
     $tel_href = 'tel:' . $clean_phone;
 
     // Position
-    $position = get_theme_mod('whatsapp_position', 'bottom-right');
-    $offset_x = absint(get_theme_mod('whatsapp_offset_x', 20));
-    $offset_y = absint(get_theme_mod('whatsapp_offset_y', 20));
+    $position = get_option('whatsapp_position', get_theme_mod('whatsapp_position', 'bottom-right'));
+    $offset_x = absint(get_option('whatsapp_offset_x', get_theme_mod('whatsapp_offset_x', 20)));
+    $offset_y = absint(get_option('whatsapp_offset_y', get_theme_mod('whatsapp_offset_y', 20)));
+    
+    // Get settings from options (fallback to theme mods)
+    $chat_title = get_option('whatsapp_chat_title', 'Mark Clarke');
+    $chat_subtitle = get_option('whatsapp_chat_subtitle', 'Usually replies within minutes');
+    $button_size = get_option('whatsapp_button_size', 'medium');
+    $button_color = get_option('whatsapp_button_color', '#25D366');
+    
+    // Calculate button size
+    $size_map = array('small' => 50, 'medium' => 60, 'large' => 70);
+    $button_size_px = isset($size_map[$button_size]) ? $size_map[$button_size] : 60;
 
     $position_style = '';
     if ($position === 'bottom-right') {
@@ -242,6 +253,16 @@ function clarkes_render_whatsapp_fab() {
 
     // Enqueue and localize script
     wp_enqueue_script('jquery');
+    
+    // Enqueue CTA buttons script
+    wp_enqueue_script(
+        'clarkes-cta-buttons',
+        get_template_directory_uri() . '/inc/cta-buttons.js',
+        array(),
+        filemtime(get_template_directory() . '/inc/cta-buttons.js'),
+        true
+    );
+    
     wp_add_inline_script('jquery', 'var clarkesWhatsApp = ' . wp_json_encode(array(
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('clarkes_whatsapp_chat'),
@@ -251,10 +272,20 @@ function clarkes_render_whatsapp_fab() {
         'tel_url' => $tel_href,
     )) . ';', 'before');
     
+    // Get settings from options (fallback to theme mods)
+    $chat_title = get_option('whatsapp_chat_title', 'Mark Clarke');
+    $chat_subtitle = get_option('whatsapp_chat_subtitle', 'Usually replies within minutes');
+    $button_size = get_option('whatsapp_button_size', 'medium');
+    $button_color = get_option('whatsapp_button_color', '#25D366');
+    
+    // Calculate button size
+    $size_map = array('small' => 50, 'medium' => 60, 'large' => 70);
+    $button_size_px = isset($size_map[$button_size]) ? $size_map[$button_size] : 60;
+    
     ?>
     <!-- WhatsApp Floating Button -->
     <div id="clarkes-wa-fab" style="position: fixed; z-index: 9999; <?php echo esc_attr($position_style); ?>">
-        <button id="clarkes-wa-toggle" class="clarkes-wa-button" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: none; color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" aria-expanded="false" aria-controls="clarkes-wa-sheet" aria-label="Open WhatsApp contact options">
+        <button id="clarkes-wa-toggle" class="clarkes-wa-button" style="width: <?php echo $button_size_px; ?>px; height: <?php echo $button_size_px; ?>px; border-radius: 50%; background: linear-gradient(135deg, <?php echo esc_attr($button_color); ?> 0%, #128C7E 100%); border: none; color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" aria-expanded="false" aria-controls="clarkes-wa-sheet" aria-label="Open WhatsApp contact options">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
             </svg>
@@ -279,8 +310,8 @@ function clarkes_render_whatsapp_fab() {
     <div id="clarkes-wa-chat-window" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 380px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 10000; flex-direction: column; overflow: hidden;">
         <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Mark Clarke</h3>
-                <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">Usually replies within minutes</p>
+                <h3 style="margin: 0; font-size: 18px; font-weight: 600;"><?php echo esc_html($chat_title); ?></h3>
+                <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;"><?php echo esc_html($chat_subtitle); ?></p>
             </div>
             <button id="clarkes-wa-close-chat" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

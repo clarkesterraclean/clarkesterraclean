@@ -100,11 +100,18 @@ if ($hero_padding_bottom !== '') {
             <div class="flex flex-col sm:flex-row gap-4 mt-8">
                 <?php 
                 $phone = get_theme_mod('business_phone', '07706 230867');
+                $whatsapp_number = get_theme_mod('whatsapp_number', '07706 230867');
                 $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+                $wa_clean = preg_replace('/\D+/', '', $whatsapp_number);
+                $wa_prefill = urlencode(get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].'));
+                $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>
-                <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="border border-eco-green text-eco-green rounded-full px-6 py-3 text-base font-semibold hover:bg-eco-green hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
-                    Call <?php echo esc_html($phone); ?>
-                </a>
+                <button id="hero-call-cta" class="clarkes-cta-button border border-eco-green text-eco-green rounded-full px-6 py-3 text-base font-semibold hover:bg-eco-green hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
+                    📞 Call <?php echo esc_html($phone); ?>
+                </button>
+                <button id="hero-whatsapp-cta" class="clarkes-cta-button inline-block rounded-full border border-eco-green bg-eco-green text-white px-6 py-3 text-base font-semibold hover:bg-eco-green/80 transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-wa-url="<?php echo esc_attr($wa_url); ?>">
+                    💬 WhatsApp
+                </button>
                 <a href="#contact" class="inline-block rounded-full border border-text-body/40 px-4 py-2 text-sm font-semibold hover:bg-white hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
                     Book a Service
                 </a>
@@ -464,11 +471,15 @@ endif; // show_case_studies
             <div class="text-center mb-10">
                 <?php 
                 $phone = get_theme_mod('business_phone', '07706 230867');
+                $whatsapp_number = get_theme_mod('whatsapp_number', '07706 230867');
                 $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+                $wa_clean = preg_replace('/\D+/', '', $whatsapp_number);
+                $wa_prefill = urlencode(get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].'));
+                $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>
-                <a href="tel:<?php echo esc_attr($phone_clean); ?>" class="inline-block border border-eco-green text-eco-green rounded-full px-8 py-4 text-lg font-semibold hover:bg-eco-green hover:text-carbon-dark transition">
+                <button id="contact-call-cta" class="clarkes-cta-button inline-block border border-eco-green text-eco-green rounded-full px-8 py-4 text-lg font-semibold hover:bg-eco-green hover:text-carbon-dark transition cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
                     📞 Call <?php echo esc_html($phone); ?>
-                </a>
+                </button>
             </div>
             
             <!-- Contact Form -->
