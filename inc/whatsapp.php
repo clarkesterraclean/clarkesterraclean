@@ -714,10 +714,14 @@ function clarkes_render_whatsapp_fab() {
         
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initWhatsApp);
+            document.addEventListener('DOMContentLoaded', function() {
+                initWhatsApp();
+            });
         } else {
-            // DOM is already ready
-            initWhatsApp();
+            // DOM is already ready - use setTimeout to ensure all scripts are loaded
+            setTimeout(function() {
+                initWhatsApp();
+            }, 100);
         }
     })();
     </script>

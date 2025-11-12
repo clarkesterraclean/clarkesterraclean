@@ -5,6 +5,9 @@
 (function() {
     'use strict';
     
+    // Wait for DOM to be ready
+    function initCTAButtons() {
+    
     // Detect WhatsApp
     function hasWhatsApp() {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
@@ -142,5 +145,14 @@
             }
         }
     });
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCTAButtons);
+    } else {
+        // DOM is already ready
+        initCTAButtons();
+    }
 })();
 
