@@ -31,8 +31,22 @@ get_header();
                         </p>
                     </div>
                     <?php 
+                    $about_page_video_id = get_theme_mod('about_section_video', '');
                     $about_page_image_id = get_theme_mod('about_section_image', '');
-                    if ($about_page_image_id) {
+                    
+                    if ($about_page_video_id) {
+                        $about_page_video_url = wp_get_attachment_url($about_page_video_id);
+                        if ($about_page_video_url) {
+                            echo '<div class="order-first md:order-last">';
+                            echo '<div class="rounded-lg shadow-lg overflow-hidden">';
+                            echo '<video class="w-full h-auto" controls playsinline>';
+                            echo '<source src="' . esc_url($about_page_video_url) . '" type="' . esc_attr(get_post_mime_type($about_page_video_id)) . '">';
+                            echo 'Your browser does not support the video tag.';
+                            echo '</video>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } elseif ($about_page_image_id) {
                         echo '<div class="order-first md:order-last">';
                         echo wp_get_attachment_image($about_page_image_id, 'large', false, array('class' => 'rounded-lg shadow-lg w-full h-auto'));
                         echo '</div>';
