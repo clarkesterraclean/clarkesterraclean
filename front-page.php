@@ -474,6 +474,12 @@ endif; // show_case_studies
                 $whatsapp_number = get_theme_mod('whatsapp_number', '07706 230867');
                 $phone_clean = preg_replace('/[^0-9]/', '', $phone);
                 $wa_clean = preg_replace('/\D+/', '', $whatsapp_number);
+                
+                // Convert UK numbers starting with 0 to international format (44)
+                if (preg_match('/^0\d{10}$/', $wa_clean)) {
+                    $wa_clean = '44' . substr($wa_clean, 1);
+                }
+                
                 $wa_prefill = urlencode(get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].'));
                 $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>

@@ -221,9 +221,13 @@ function clarkes_render_whatsapp_fab() {
     $raw_phone = get_option('whatsapp_number', get_theme_mod('whatsapp_number', '07706 230867'));
     $clean_phone = preg_replace('/\D+/', '', $raw_phone);
     
-    // Optional: if starts with 0 and UK assumed, could normalize to 44
-    // For now, just use clean digits as-is
-    // $clean_phone = preg_replace('/^0/', '44', $clean_phone);
+    // Convert UK numbers starting with 0 to international format (44)
+    // UK numbers: if starts with 0 and is 11 digits, convert to 44 format
+    if (preg_match('/^0\d{10}$/', $clean_phone)) {
+        $clean_phone = '44' . substr($clean_phone, 1);
+    }
+    // If already has country code, use as-is
+    // Otherwise assume it's already in correct format
     
     $prefill = urlencode(get_option('whatsapp_pretext', get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].')));
     $chat_href = 'https://wa.me/' . $clean_phone . '?text=' . $prefill;
@@ -431,7 +435,10 @@ function clarkes_render_whatsapp_fab() {
         }
         
         function closeSheet() {
-            if (sheet) sheet.style.display = 'none';
+            if (sheet) {
+                sheet.style.display = 'none';
+                console.log('Sheet closed');
+            }
             if (toggle) toggle.setAttribute('aria-expanded', 'false');
         }
         
@@ -464,13 +471,23 @@ function clarkes_render_whatsapp_fab() {
         // Toggle sheet
         if (toggle) {
             toggle.addEventListener('click', function(e) {
+                e.preventDefault();
                 e.stopPropagation();
-                if (sheet && sheet.style.display === 'none') {
-                    openSheet();
+                console.log('WhatsApp toggle clicked');
+                if (sheet) {
+                    const isVisible = sheet.style.display !== 'none' && sheet.style.display !== '';
+                    console.log('Sheet visible:', isVisible);
+                    if (isVisible) {
+                        closeSheet();
+                    } else {
+                        openSheet();
+                    }
                 } else {
-                    closeSheet();
+                    console.warn('Sheet element not found');
                 }
             });
+        } else {
+            console.warn('WhatsApp toggle button not found');
         }
         
         // Chat button - detect WhatsApp
