@@ -54,6 +54,15 @@ function clarkes_media_editor_scripts($hook) {
         true
     );
     
+    // Enqueue advanced features
+    wp_enqueue_script(
+        'clarkes-media-editor-advanced',
+        get_template_directory_uri() . '/inc/media-editor-advanced.js',
+        array('jquery', 'clarkes-media-editor'),
+        filemtime(get_template_directory() . '/inc/media-editor-advanced.js'),
+        true
+    );
+    
     // Localize script
     wp_localize_script('clarkes-media-editor', 'clarkesMediaEditor', array(
         'ajax_url' => admin_url('admin-ajax.php'),
@@ -106,31 +115,57 @@ function clarkes_media_editor_page() {
             <!-- Editor Interface -->
             <div class="media-editor-interface" data-media-id="<?php echo esc_attr($media_id); ?>" data-media-type="<?php echo esc_attr(strpos($media->post_mime_type, 'video') !== false ? 'video' : 'image'); ?>">
                 
-                <!-- Toolbar -->
-                <div class="editor-toolbar" style="background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button type="button" class="button" id="btn-crop"><?php _e('Crop', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button" id="btn-resize"><?php _e('Resize', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button" id="btn-filters"><?php _e('Filters', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button" id="btn-text-overlay"><?php _e('Add Text', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button" id="btn-markup"><?php _e('Markup', 'clarkes-terraclean'); ?></button>
-                    <?php if (strpos($media->post_mime_type, 'video') !== false) : ?>
-                        <button type="button" class="button" id="btn-mute-video"><?php _e('Mute Audio', 'clarkes-terraclean'); ?></button>
-                        <button type="button" class="button" id="btn-auto-orient"><?php _e('Auto Orient', 'clarkes-terraclean'); ?></button>
-                    <?php endif; ?>
-                    <button type="button" class="button" id="btn-ai-seo"><?php _e('AI SEO', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button button-primary" id="btn-save"><?php _e('Save Changes', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button" id="btn-reset"><?php _e('Reset', 'clarkes-terraclean'); ?></button>
+                <!-- Advanced Toolbar -->
+                <div class="editor-toolbar" style="background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin: 20px 0;">
+                    <!-- Main Toolbar -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <button type="button" class="button" id="btn-undo" title="Undo (Ctrl+Z)">↶ <?php _e('Undo', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-redo" title="Redo (Ctrl+Y)">↷ <?php _e('Redo', 'clarkes-terraclean'); ?></button>
+                        <div style="width: 1px; background: #ddd; margin: 0 5px;"></div>
+                        <button type="button" class="button" id="btn-zoom-in" title="Zoom In">🔍+</button>
+                        <button type="button" class="button" id="btn-zoom-out" title="Zoom Out">🔍-</button>
+                        <button type="button" class="button" id="btn-zoom-fit"><?php _e('Fit', 'clarkes-terraclean'); ?></button>
+                        <span id="zoom-level" style="line-height: 30px; padding: 0 10px;">100%</span>
+                        <div style="width: 1px; background: #ddd; margin: 0 5px;"></div>
+                        <button type="button" class="button" id="btn-grid"><?php _e('Grid', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-guides"><?php _e('Guides', 'clarkes-terraclean'); ?></button>
+                    </div>
+                    <!-- Tool Buttons -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" class="button" id="btn-crop"><?php _e('Crop', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-resize"><?php _e('Resize', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-filters"><?php _e('Filters', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-adjustments"><?php _e('Adjustments', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-effects"><?php _e('Effects', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-text-overlay"><?php _e('Text', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-markup"><?php _e('Markup', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-layers"><?php _e('Layers', 'clarkes-terraclean'); ?></button>
+                        <?php if (strpos($media->post_mime_type, 'video') !== false) : ?>
+                            <button type="button" class="button" id="btn-video-tools"><?php _e('Video Tools', 'clarkes-terraclean'); ?></button>
+                        <?php endif; ?>
+                        <button type="button" class="button" id="btn-presets"><?php _e('Presets', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-ai-seo"><?php _e('AI SEO', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-export"><?php _e('Export', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button button-primary" id="btn-save"><?php _e('Save', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-reset"><?php _e('Reset', 'clarkes-terraclean'); ?></button>
+                    </div>
                 </div>
                 
                 <!-- Editor Canvas -->
-                <div class="editor-canvas-container" style="background: #f0f0f0; padding: 20px; border: 1px solid #ddd; border-radius: 4px; text-align: center; min-height: 400px;">
+                <div class="editor-canvas-container" style="background: #f0f0f0; padding: 20px; border: 1px solid #ddd; border-radius: 4px; text-align: center; min-height: 400px; position: relative; overflow: auto;">
                     <?php if (strpos($media->post_mime_type, 'video') !== false) : ?>
                         <video id="editor-video" src="<?php echo esc_url(wp_get_attachment_url($media_id)); ?>" controls style="max-width: 100%; max-height: 70vh; border-radius: 4px;"></video>
                     <?php else : ?>
-                        <div id="canvas-wrapper" style="display: inline-block;">
-                            <canvas id="editor-canvas" style="max-width: 100%; border: 1px solid #ddd; background: white; border-radius: 4px;"></canvas>
+                        <div id="canvas-wrapper" style="display: inline-block; position: relative;">
+                            <canvas id="editor-canvas" style="max-width: 100%; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: crosshair;"></canvas>
+                            <canvas id="grid-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none; display: none;"></canvas>
                         </div>
                     <?php endif; ?>
+                    <!-- History Panel -->
+                    <div id="history-panel" style="position: absolute; top: 10px; right: 10px; background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; max-width: 200px; display: none; max-height: 300px; overflow-y: auto;">
+                        <h4 style="margin: 0 0 10px 0;"><?php _e('History', 'clarkes-terraclean'); ?></h4>
+                        <div id="history-list"></div>
+                    </div>
                 </div>
                 
                 <!-- Sidebar Controls -->
@@ -169,7 +204,7 @@ function clarkes_media_editor_page() {
                     
                     <!-- Filter Controls -->
                     <div id="filter-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
-                        <h3><?php _e('Filters', 'clarkes-terraclean'); ?></h3>
+                        <h3><?php _e('Basic Filters', 'clarkes-terraclean'); ?></h3>
                         <label><?php _e('Brightness:', 'clarkes-terraclean'); ?>
                             <input type="range" id="filter-brightness" min="0" max="200" value="100" />
                             <span id="brightness-value">100</span>
@@ -186,21 +221,129 @@ function clarkes_media_editor_page() {
                             <input type="range" id="filter-blur" min="0" max="20" value="0" />
                             <span id="blur-value">0</span>
                         </label>
-                        <button type="button" class="button" id="apply-filters"><?php _e('Apply Filters', 'clarkes-terraclean'); ?></button>
+                        <h4 style="margin-top: 15px;"><?php _e('Advanced Filters', 'clarkes-terraclean'); ?></h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                            <button type="button" class="button" id="filter-sepia"><?php _e('Sepia', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="filter-grayscale"><?php _e('Grayscale', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="filter-invert"><?php _e('Invert', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="filter-vintage"><?php _e('Vintage', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="filter-sharpen"><?php _e('Sharpen', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="filter-emboss"><?php _e('Emboss', 'clarkes-terraclean'); ?></button>
+                        </div>
+                        <button type="button" class="button" id="apply-filters" style="margin-top: 15px;"><?php _e('Apply Filters', 'clarkes-terraclean'); ?></button>
                         <button type="button" class="button" id="reset-filters"><?php _e('Reset Filters', 'clarkes-terraclean'); ?></button>
+                    </div>
+                    
+                    <!-- Adjustments Panel -->
+                    <div id="adjustments-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                        <h3><?php _e('Image Adjustments', 'clarkes-terraclean'); ?></h3>
+                        <label><?php _e('Hue:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-hue" min="-180" max="180" value="0" />
+                            <span id="hue-value">0</span>
+                        </label>
+                        <label><?php _e('Exposure:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-exposure" min="-100" max="100" value="0" />
+                            <span id="exposure-value">0</span>
+                        </label>
+                        <label><?php _e('Vibrance:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-vibrance" min="-100" max="100" value="0" />
+                            <span id="vibrance-value">0</span>
+                        </label>
+                        <label><?php _e('Highlights:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-highlights" min="-100" max="100" value="0" />
+                            <span id="highlights-value">0</span>
+                        </label>
+                        <label><?php _e('Shadows:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-shadows" min="-100" max="100" value="0" />
+                            <span id="shadows-value">0</span>
+                        </label>
+                        <label><?php _e('Whites:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-whites" min="-100" max="100" value="0" />
+                            <span id="whites-value">0</span>
+                        </label>
+                        <label><?php _e('Blacks:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="adjust-blacks" min="-100" max="100" value="0" />
+                            <span id="blacks-value">0</span>
+                        </label>
+                        <button type="button" class="button" id="apply-adjustments"><?php _e('Apply', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="reset-adjustments"><?php _e('Reset', 'clarkes-terraclean'); ?></button>
+                    </div>
+                    
+                    <!-- Effects Panel -->
+                    <div id="effects-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                        <h3><?php _e('Special Effects', 'clarkes-terraclean'); ?></h3>
+                        <label><?php _e('Noise:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="effect-noise" min="0" max="100" value="0" />
+                            <span id="noise-value">0</span>
+                        </label>
+                        <label><?php _e('Pixelate:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="effect-pixelate" min="1" max="20" value="1" />
+                            <span id="pixelate-value">1</span>
+                        </label>
+                        <label><?php _e('Vignette:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="effect-vignette" min="0" max="100" value="0" />
+                            <span id="vignette-value">0</span>
+                        </label>
+                        <button type="button" class="button" id="apply-effects"><?php _e('Apply', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="reset-effects"><?php _e('Reset', 'clarkes-terraclean'); ?></button>
                     </div>
                     
                     <!-- Text Overlay Controls -->
                     <div id="text-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
                         <h3><?php _e('Text Overlay', 'clarkes-terraclean'); ?></h3>
                         <label><?php _e('Text:', 'clarkes-terraclean'); ?>
-                            <input type="text" id="text-content" class="regular-text" />
+                            <input type="text" id="text-content" class="regular-text" placeholder="Enter text here" />
+                        </label>
+                        <label><?php _e('Font Family:', 'clarkes-terraclean'); ?>
+                            <select id="text-font">
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Comic Sans MS">Comic Sans MS</option>
+                            </select>
                         </label>
                         <label><?php _e('Font Size:', 'clarkes-terraclean'); ?>
                             <input type="number" id="text-size" value="24" min="10" max="200" />
                         </label>
-                        <label><?php _e('Color:', 'clarkes-terraclean'); ?>
+                        <label><?php _e('Font Weight:', 'clarkes-terraclean'); ?>
+                            <select id="text-weight">
+                                <option value="normal">Normal</option>
+                                <option value="bold">Bold</option>
+                                <option value="300">Light</option>
+                                <option value="600">Semi-Bold</option>
+                            </select>
+                        </label>
+                        <label><?php _e('Text Color:', 'clarkes-terraclean'); ?>
                             <input type="color" id="text-color" value="#ffffff" />
+                        </label>
+                        <label><?php _e('Background Color (Optional):', 'clarkes-terraclean'); ?>
+                            <input type="color" id="text-bg-color" value="transparent" />
+                        </label>
+                        <label>
+                            <input type="checkbox" id="text-shadow" />
+                            <?php _e('Text Shadow', 'clarkes-terraclean'); ?>
+                        </label>
+                        <label>
+                            <input type="checkbox" id="text-outline" />
+                            <?php _e('Text Outline', 'clarkes-terraclean'); ?>
+                        </label>
+                        <label><?php _e('Outline Width:', 'clarkes-terraclean'); ?>
+                            <input type="number" id="text-outline-width" value="2" min="0" max="10" disabled />
+                        </label>
+                        <label><?php _e('Rotation (degrees):', 'clarkes-terraclean'); ?>
+                            <input type="number" id="text-rotation" value="0" min="-180" max="180" />
+                        </label>
+                        <label><?php _e('Alignment:', 'clarkes-terraclean'); ?>
+                            <select id="text-align">
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                                <option value="justify">Justify</option>
+                            </select>
                         </label>
                         <label><?php _e('Position X:', 'clarkes-terraclean'); ?>
                             <input type="number" id="text-x" value="50" />
@@ -208,22 +351,101 @@ function clarkes_media_editor_page() {
                         <label><?php _e('Position Y:', 'clarkes-terraclean'); ?>
                             <input type="number" id="text-y" value="50" />
                         </label>
-                        <button type="button" class="button" id="add-text"><?php _e('Add Text', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button button-primary" id="add-text"><?php _e('Add Text', 'clarkes-terraclean'); ?></button>
                     </div>
                     
                     <!-- Markup Controls -->
                     <div id="markup-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
                         <h3><?php _e('Markup Tools', 'clarkes-terraclean'); ?></h3>
-                        <button type="button" class="button" id="btn-arrow"><?php _e('Arrow', 'clarkes-terraclean'); ?></button>
-                        <button type="button" class="button" id="btn-rectangle"><?php _e('Rectangle', 'clarkes-terraclean'); ?></button>
-                        <button type="button" class="button" id="btn-circle"><?php _e('Circle', 'clarkes-terraclean'); ?></button>
-                        <button type="button" class="button" id="btn-line"><?php _e('Line', 'clarkes-terraclean'); ?></button>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                            <button type="button" class="button" id="btn-arrow"><?php _e('Arrow', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-rectangle"><?php _e('Rectangle', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-circle"><?php _e('Circle', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-line"><?php _e('Line', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-polygon"><?php _e('Polygon', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-freehand"><?php _e('Freehand', 'clarkes-terraclean'); ?></button>
+                        </div>
                         <label><?php _e('Color:', 'clarkes-terraclean'); ?>
                             <input type="color" id="markup-color" value="#4ade80" />
+                        </label>
+                        <label><?php _e('Fill Color:', 'clarkes-terraclean'); ?>
+                            <input type="color" id="markup-fill-color" value="transparent" />
                         </label>
                         <label><?php _e('Stroke Width:', 'clarkes-terraclean'); ?>
                             <input type="number" id="markup-width" value="3" min="1" max="20" />
                         </label>
+                        <label>
+                            <input type="checkbox" id="markup-filled" />
+                            <?php _e('Filled Shape', 'clarkes-terraclean'); ?>
+                        </label>
+                    </div>
+                    
+                    <!-- Layers Panel -->
+                    <div id="layers-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px; grid-column: 1 / -1;">
+                        <h3><?php _e('Layer Management', 'clarkes-terraclean'); ?></h3>
+                        <div id="layers-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
+                            <p class="description"><?php _e('Layers will appear here as you add elements', 'clarkes-terraclean'); ?></p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="button" id="btn-layer-up">↑ <?php _e('Move Up', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-layer-down">↓ <?php _e('Move Down', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-layer-delete"><?php _e('Delete Selected', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button" id="btn-layer-duplicate"><?php _e('Duplicate', 'clarkes-terraclean'); ?></button>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Tools Panel -->
+                    <?php if (strpos($media->post_mime_type, 'video') !== false) : ?>
+                    <div id="video-tools-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                        <h3><?php _e('Video Tools', 'clarkes-terraclean'); ?></h3>
+                        <button type="button" class="button" id="btn-mute-video"><?php _e('Mute Audio', 'clarkes-terraclean'); ?></button>
+                        <button type="button" class="button" id="btn-auto-orient"><?php _e('Auto Orient', 'clarkes-terraclean'); ?></button>
+                        <label><?php _e('Playback Speed:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="video-speed" min="0.25" max="2" step="0.25" value="1" />
+                            <span id="speed-value">1x</span>
+                        </label>
+                        <label><?php _e('Volume:', 'clarkes-terraclean'); ?>
+                            <input type="range" id="video-volume" min="0" max="100" value="100" />
+                            <span id="volume-value">100%</span>
+                        </label>
+                        <p class="description"><?php _e('Note: Advanced video editing (trim, effects) requires FFmpeg on server', 'clarkes-terraclean'); ?></p>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <!-- Presets Panel -->
+                    <div id="presets-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px; grid-column: 1 / -1;">
+                        <h3><?php _e('Presets & Templates', 'clarkes-terraclean'); ?></h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                            <button type="button" class="button preset-btn" data-preset="vintage"><?php _e('Vintage', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button preset-btn" data-preset="black-white"><?php _e('Black & White', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button preset-btn" data-preset="warm"><?php _e('Warm', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button preset-btn" data-preset="cool"><?php _e('Cool', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button preset-btn" data-preset="dramatic"><?php _e('Dramatic', 'clarkes-terraclean'); ?></button>
+                            <button type="button" class="button preset-btn" data-preset="soft"><?php _e('Soft', 'clarkes-terraclean'); ?></button>
+                        </div>
+                    </div>
+                    
+                    <!-- Export Panel -->
+                    <div id="export-controls" class="control-panel" style="display: none; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 4px; grid-column: 1 / -1;">
+                        <h3><?php _e('Export Options', 'clarkes-terraclean'); ?></h3>
+                        <label><?php _e('Format:', 'clarkes-terraclean'); ?>
+                            <select id="export-format">
+                                <option value="png">PNG</option>
+                                <option value="jpg">JPEG</option>
+                                <option value="webp">WebP</option>
+                            </select>
+                        </label>
+                        <label><?php _e('Quality (JPEG only):', 'clarkes-terraclean'); ?>
+                            <input type="range" id="export-quality" min="1" max="100" value="90" />
+                            <span id="quality-value">90</span>
+                        </label>
+                        <label><?php _e('Max Width (px, 0 = original):', 'clarkes-terraclean'); ?>
+                            <input type="number" id="export-width" value="0" min="0" />
+                        </label>
+                        <label><?php _e('Max Height (px, 0 = original):', 'clarkes-terraclean'); ?>
+                            <input type="number" id="export-height" value="0" min="0" />
+                        </label>
+                        <button type="button" class="button button-primary" id="btn-export-now"><?php _e('Export & Download', 'clarkes-terraclean'); ?></button>
                     </div>
                     
                     <!-- AI SEO Panel -->

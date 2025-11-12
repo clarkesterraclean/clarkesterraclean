@@ -299,14 +299,52 @@
     // Text Overlay
     $('#add-text').on('click', function() {
         if (fabricCanvas) {
-            var text = new fabric.Text($('#text-content').val(), {
+            var textOptions = {
                 left: parseInt($('#text-x').val()),
                 top: parseInt($('#text-y').val()),
                 fontSize: parseInt($('#text-size').val()),
                 fill: $('#text-color').val(),
-            });
+                fontFamily: $('#text-font').val() || 'Arial',
+                fontWeight: $('#text-weight').val() || 'normal',
+                textAlign: $('#text-align').val() || 'left',
+                angle: parseInt($('#text-rotation').val()) || 0
+            };
+            
+            // Background color
+            if ($('#text-bg-color').val() && $('#text-bg-color').val() !== 'transparent') {
+                textOptions.backgroundColor = $('#text-bg-color').val();
+                textOptions.padding = 5;
+            }
+            
+            // Text shadow
+            if ($('#text-shadow').is(':checked')) {
+                textOptions.shadow = {
+                    color: 'rgba(0, 0, 0, 0.5)',
+                    blur: 5,
+                    offsetX: 2,
+                    offsetY: 2
+                };
+            }
+            
+            // Text outline
+            if ($('#text-outline').is(':checked')) {
+                textOptions.stroke = '#000000';
+                textOptions.strokeWidth = parseInt($('#text-outline-width').val()) || 2;
+            }
+            
+            var text = new fabric.Text($('#text-content').val(), textOptions);
             fabricCanvas.add(text);
             fabricCanvas.renderAll();
+            
+            // Save to history
+            if (window.clarkesMediaEditorAdvanced && window.clarkesMediaEditorAdvanced.saveHistory) {
+                window.clarkesMediaEditorAdvanced.saveHistory();
+            }
+            
+            // Update layers
+            if (window.clarkesMediaEditorAdvanced && window.clarkesMediaEditorAdvanced.updateLayers) {
+                window.clarkesMediaEditorAdvanced.updateLayers();
+            }
         }
     });
     
