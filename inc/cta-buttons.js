@@ -369,6 +369,26 @@
         return modal;
     }
     
+    // Document-level handler for cancel button - must be BEFORE form handlers
+    document.addEventListener('click', function(e) {
+        // Check if cancel button was clicked
+        if (e.target && e.target.id === 'clarkes-customer-info-cancel') {
+            const modal = document.getElementById('clarkes-customer-info-modal');
+            if (modal && modal.style.display !== 'none') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Cancel button clicked (document-level handler - CTA)');
+                modal.style.display = 'none';
+                const form = document.getElementById('clarkes-customer-info-form');
+                if (form) form.reset();
+                customerInfo = null;
+                pendingAction = null;
+                return false;
+            }
+        }
+    }, true); // Capture phase - fires FIRST
+    
     // Wait for DOM to be ready
     function initCTAButtons() {
         // Handle CTA buttons

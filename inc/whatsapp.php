@@ -705,10 +705,34 @@ function clarkes_render_whatsapp_fab() {
             console.warn('Chat button not found');
         }
         
+        // Document-level handler for cancel button - must be BEFORE form handlers
+        document.addEventListener('click', function(e) {
+            // Check if cancel button was clicked
+            if (e.target && e.target.id === 'clarkes-customer-info-cancel') {
+                const modal = document.getElementById('clarkes-customer-info-modal');
+                if (modal && modal.style.display !== 'none') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Cancel button clicked (document-level handler)');
+                    modal.style.display = 'none';
+                    const form = document.getElementById('clarkes-customer-info-form');
+                    if (form) form.reset();
+                    pendingAction = null;
+                    return false;
+                }
+            }
+        }, true); // Capture phase - fires FIRST
+        
         // Handle customer info form submission
         if (customerInfoForm) {
             customerInfoForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                // Check if cancel was just clicked - if so, don't submit
+                if (pendingAction === null) {
+                    return;
+                }
                 
                 const name = document.getElementById('customer-name').value.trim();
                 const location = document.getElementById('customer-location').value.trim();
