@@ -645,11 +645,11 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     // ========================================
-    // SECTION F: Section Images
+    // SECTION F: Section Images & Videos
     // ========================================
     $wp_customize->add_section('clarkes_images', array(
-        'title'       => esc_html__('Section Images', 'clarkes-terraclean'),
-        'description' => esc_html__('Manage images for different sections of your site. Note: Case study images are managed through the Case Studies post type (use Featured Image when editing a case study).', 'clarkes-terraclean'),
+        'title'       => esc_html__('Section Images & Videos', 'clarkes-terraclean'),
+        'description' => esc_html__('Manage images and videos for different sections of your site. Videos will display instead of images if both are uploaded. Note: Case study images are managed through the Case Studies post type (use Featured Image when editing a case study).', 'clarkes-terraclean'),
         'panel'       => 'clarkes_theme_options',
         'priority'    => 55,
     ));
@@ -668,6 +668,20 @@ function clarkes_customize_register($wp_customize) {
         'mime_type'   => 'image',
     )));
     
+    // About Section Video
+    $wp_customize->add_setting('about_section_video', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'about_section_video', array(
+        'label'       => esc_html__('About Section Video (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a video for the About section. If both image and video are uploaded, the video will be displayed instead of the image.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'mime_type'   => 'video',
+    )));
+    
     // Service 1 Image (Engine Carbon Cleaning)
     $wp_customize->add_setting('service_1_image', array(
         'default'           => '',
@@ -680,6 +694,20 @@ function clarkes_customize_register($wp_customize) {
         'description' => esc_html__('Image for the Engine Carbon Cleaning service', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
+    )));
+    
+    // Service 1 Video (Engine Carbon Cleaning)
+    $wp_customize->add_setting('service_1_video', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_1_video', array(
+        'label'       => esc_html__('Engine Carbon Cleaning Video (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a video for this service. Video will display instead of image if both are uploaded.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'mime_type'   => 'video',
     )));
     
     // Service 2 Image (DPF Cleaning)
@@ -696,6 +724,20 @@ function clarkes_customize_register($wp_customize) {
         'mime_type'   => 'image',
     )));
     
+    // Service 2 Video (DPF Cleaning)
+    $wp_customize->add_setting('service_2_video', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_2_video', array(
+        'label'       => esc_html__('DPF Cleaning Video (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a video for this service. Video will display instead of image if both are uploaded.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'mime_type'   => 'video',
+    )));
+    
     // Service 3 Image (EGR Valve Cleaning)
     $wp_customize->add_setting('service_3_image', array(
         'default'           => '',
@@ -710,6 +752,20 @@ function clarkes_customize_register($wp_customize) {
         'mime_type'   => 'image',
     )));
     
+    // Service 3 Video (EGR Valve Cleaning)
+    $wp_customize->add_setting('service_3_video', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_3_video', array(
+        'label'       => esc_html__('EGR Valve Cleaning Video (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a video for this service. Video will display instead of image if both are uploaded.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'mime_type'   => 'video',
+    )));
+    
     // Service 4 Image (Injector Cleaning)
     $wp_customize->add_setting('service_4_image', array(
         'default'           => '',
@@ -722,6 +778,20 @@ function clarkes_customize_register($wp_customize) {
         'description' => esc_html__('Image for the Injector Cleaning & Diagnostics service', 'clarkes-terraclean'),
         'section'     => 'clarkes_images',
         'mime_type'   => 'image',
+    )));
+    
+    // Service 4 Video (Injector Cleaning)
+    $wp_customize->add_setting('service_4_video', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'service_4_video', array(
+        'label'       => esc_html__('Injector Cleaning & Diagnostics Video (Optional)', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a video for this service. Video will display instead of image if both are uploaded.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'mime_type'   => 'video',
     )));
     
     // ========================================

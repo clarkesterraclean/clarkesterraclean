@@ -40,8 +40,20 @@ get_header();
                         </ul>
                     </div>
                     <?php 
+                    $service1_video_id = get_theme_mod('service_1_video', '');
                     $service1_image_id = get_theme_mod('service_1_image', '');
-                    if ($service1_image_id) {
+                    
+                    if ($service1_video_id) {
+                        $service1_video_url = wp_get_attachment_url($service1_video_id);
+                        if ($service1_video_url) {
+                            echo '<div class="h-64 overflow-hidden rounded-lg">';
+                            echo '<video class="w-full h-full object-cover" controls playsinline>';
+                            echo '<source src="' . esc_url($service1_video_url) . '" type="' . esc_attr(get_post_mime_type($service1_video_id)) . '">';
+                            echo 'Your browser does not support the video tag.';
+                            echo '</video>';
+                            echo '</div>';
+                        }
+                    } elseif ($service1_image_id) {
                         echo '<div class="order-first md:order-last">';
                         echo wp_get_attachment_image($service1_image_id, 'medium', false, array('class' => 'rounded-lg shadow-lg w-full h-auto'));
                         echo '</div>';
@@ -73,8 +85,20 @@ get_header();
                         </ul>
                     </div>
                     <?php 
+                    $service2_video_id = get_theme_mod('service_2_video', '');
                     $service2_image_id = get_theme_mod('service_2_image', '');
-                    if ($service2_image_id) {
+                    
+                    if ($service2_video_id) {
+                        $service2_video_url = wp_get_attachment_url($service2_video_id);
+                        if ($service2_video_url) {
+                            echo '<div class="h-64 overflow-hidden rounded-lg">';
+                            echo '<video class="w-full h-full object-cover" controls playsinline>';
+                            echo '<source src="' . esc_url($service2_video_url) . '" type="' . esc_attr(get_post_mime_type($service2_video_id)) . '">';
+                            echo 'Your browser does not support the video tag.';
+                            echo '</video>';
+                            echo '</div>';
+                        }
+                    } elseif ($service2_image_id) {
                         echo '<div class="order-first md:order-last">';
                         echo wp_get_attachment_image($service2_image_id, 'medium', false, array('class' => 'rounded-lg shadow-lg w-full h-auto'));
                         echo '</div>';
@@ -106,8 +130,20 @@ get_header();
                         </ul>
                     </div>
                     <?php 
+                    $service3_video_id = get_theme_mod('service_3_video', '');
                     $service3_image_id = get_theme_mod('service_3_image', '');
-                    if ($service3_image_id) {
+                    
+                    if ($service3_video_id) {
+                        $service3_video_url = wp_get_attachment_url($service3_video_id);
+                        if ($service3_video_url) {
+                            echo '<div class="h-64 overflow-hidden rounded-lg">';
+                            echo '<video class="w-full h-full object-cover" controls playsinline>';
+                            echo '<source src="' . esc_url($service3_video_url) . '" type="' . esc_attr(get_post_mime_type($service3_video_id)) . '">';
+                            echo 'Your browser does not support the video tag.';
+                            echo '</video>';
+                            echo '</div>';
+                        }
+                    } elseif ($service3_image_id) {
                         echo '<div class="order-first md:order-last">';
                         echo wp_get_attachment_image($service3_image_id, 'medium', false, array('class' => 'rounded-lg shadow-lg w-full h-auto'));
                         echo '</div>';
@@ -139,8 +175,20 @@ get_header();
                         </ul>
                     </div>
                     <?php 
+                    $service4_video_id = get_theme_mod('service_4_video', '');
                     $service4_image_id = get_theme_mod('service_4_image', '');
-                    if ($service4_image_id) {
+                    
+                    if ($service4_video_id) {
+                        $service4_video_url = wp_get_attachment_url($service4_video_id);
+                        if ($service4_video_url) {
+                            echo '<div class="h-64 overflow-hidden rounded-lg">';
+                            echo '<video class="w-full h-full object-cover" controls playsinline>';
+                            echo '<source src="' . esc_url($service4_video_url) . '" type="' . esc_attr(get_post_mime_type($service4_video_id)) . '">';
+                            echo 'Your browser does not support the video tag.';
+                            echo '</video>';
+                            echo '</div>';
+                        }
+                    } elseif ($service4_image_id) {
                         echo '<div class="order-first md:order-last">';
                         echo wp_get_attachment_image($service4_image_id, 'medium', false, array('class' => 'rounded-lg shadow-lg w-full h-auto'));
                         echo '</div>';

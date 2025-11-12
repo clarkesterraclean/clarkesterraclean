@@ -75,17 +75,31 @@ if (!empty($hero_bg_image)) {
 <section id="about" class="py-16 md:py-24 bg-carbon-light text-text-dark">
     <div class="max-w-7xl mx-auto px-4">
         <div class="grid md:grid-cols-2 gap-12 items-center">
-            <!-- Image Column -->
+            <!-- Image/Video Column -->
             <div class="order-2 md:order-1">
                 <?php 
+                $about_video_id = get_theme_mod('about_section_video', '');
                 $about_image_id = get_theme_mod('about_section_image', '');
-                if ($about_image_id) {
+                
+                if ($about_video_id) {
+                    // Display video if available
+                    $about_video_url = wp_get_attachment_url($about_video_id);
+                    if ($about_video_url) {
+                        echo '<div class="rounded-lg shadow-lg overflow-hidden">';
+                        echo '<video class="w-full h-auto" controls playsinline>';
+                        echo '<source src="' . esc_url($about_video_url) . '" type="' . esc_attr(get_post_mime_type($about_video_id)) . '">';
+                        echo 'Your browser does not support the video tag.';
+                        echo '</video>';
+                        echo '</div>';
+                    }
+                } elseif ($about_image_id) {
+                    // Display image if no video
                     $about_image = wp_get_attachment_image($about_image_id, 'large', false, array('class' => 'rounded-lg shadow-lg w-full h-auto object-cover'));
                     echo $about_image;
                 } else {
-                    // Placeholder for when image is uploaded
+                    // Placeholder for when image/video is uploaded
                     echo '<div class="bg-carbon-dark/10 rounded-lg shadow-lg aspect-[4/3] flex items-center justify-center text-text-dark/40">';
-                    echo '<p class="text-center">Image placeholder<br><span class="text-sm">Upload image via Customizer</span></p>';
+                    echo '<p class="text-center">Image/Video placeholder<br><span class="text-sm">Upload via Customizer</span></p>';
                     echo '</div>';
                 }
                 ?>
@@ -124,8 +138,20 @@ if (!empty($hero_bg_image)) {
             <!-- Service 1: Engine Carbon Cleaning -->
             <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
                 <?php 
+                $service1_video_id = get_theme_mod('service_1_video', '');
                 $service1_image_id = get_theme_mod('service_1_image', '');
-                if ($service1_image_id) {
+                
+                if ($service1_video_id) {
+                    $service1_video_url = wp_get_attachment_url($service1_video_id);
+                    if ($service1_video_url) {
+                        echo '<div class="h-48 overflow-hidden">';
+                        echo '<video class="w-full h-full object-cover" controls playsinline>';
+                        echo '<source src="' . esc_url($service1_video_url) . '" type="' . esc_attr(get_post_mime_type($service1_video_id)) . '">';
+                        echo 'Your browser does not support the video tag.';
+                        echo '</video>';
+                        echo '</div>';
+                    }
+                } elseif ($service1_image_id) {
                     echo '<div class="h-48 overflow-hidden">';
                     echo wp_get_attachment_image($service1_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
                     echo '</div>';
@@ -150,8 +176,20 @@ if (!empty($hero_bg_image)) {
             <!-- Service 2: DPF Cleaning -->
             <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
                 <?php 
+                $service2_video_id = get_theme_mod('service_2_video', '');
                 $service2_image_id = get_theme_mod('service_2_image', '');
-                if ($service2_image_id) {
+                
+                if ($service2_video_id) {
+                    $service2_video_url = wp_get_attachment_url($service2_video_id);
+                    if ($service2_video_url) {
+                        echo '<div class="h-48 overflow-hidden">';
+                        echo '<video class="w-full h-full object-cover" controls playsinline>';
+                        echo '<source src="' . esc_url($service2_video_url) . '" type="' . esc_attr(get_post_mime_type($service2_video_id)) . '">';
+                        echo 'Your browser does not support the video tag.';
+                        echo '</video>';
+                        echo '</div>';
+                    }
+                } elseif ($service2_image_id) {
                     echo '<div class="h-48 overflow-hidden">';
                     echo wp_get_attachment_image($service2_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
                     echo '</div>';
@@ -176,8 +214,20 @@ if (!empty($hero_bg_image)) {
             <!-- Service 3: EGR Valve Cleaning -->
             <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
                 <?php 
+                $service3_video_id = get_theme_mod('service_3_video', '');
                 $service3_image_id = get_theme_mod('service_3_image', '');
-                if ($service3_image_id) {
+                
+                if ($service3_video_id) {
+                    $service3_video_url = wp_get_attachment_url($service3_video_id);
+                    if ($service3_video_url) {
+                        echo '<div class="h-48 overflow-hidden">';
+                        echo '<video class="w-full h-full object-cover" controls playsinline>';
+                        echo '<source src="' . esc_url($service3_video_url) . '" type="' . esc_attr(get_post_mime_type($service3_video_id)) . '">';
+                        echo 'Your browser does not support the video tag.';
+                        echo '</video>';
+                        echo '</div>';
+                    }
+                } elseif ($service3_image_id) {
                     echo '<div class="h-48 overflow-hidden">';
                     echo wp_get_attachment_image($service3_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
                     echo '</div>';
@@ -202,8 +252,20 @@ if (!empty($hero_bg_image)) {
             <!-- Service 4: Injector Cleaning & Diagnostics -->
             <div class="bg-carbon-light rounded-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-lg transition-all duration-300">
                 <?php 
+                $service4_video_id = get_theme_mod('service_4_video', '');
                 $service4_image_id = get_theme_mod('service_4_image', '');
-                if ($service4_image_id) {
+                
+                if ($service4_video_id) {
+                    $service4_video_url = wp_get_attachment_url($service4_video_id);
+                    if ($service4_video_url) {
+                        echo '<div class="h-48 overflow-hidden">';
+                        echo '<video class="w-full h-full object-cover" controls playsinline>';
+                        echo '<source src="' . esc_url($service4_video_url) . '" type="' . esc_attr(get_post_mime_type($service4_video_id)) . '">';
+                        echo 'Your browser does not support the video tag.';
+                        echo '</video>';
+                        echo '</div>';
+                    }
+                } elseif ($service4_image_id) {
                     echo '<div class="h-48 overflow-hidden">';
                     echo wp_get_attachment_image($service4_image_id, 'medium', false, array('class' => 'w-full h-full object-cover'));
                     echo '</div>';
