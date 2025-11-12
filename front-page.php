@@ -113,7 +113,7 @@ if ($hero_padding_bottom !== '') {
                 // Use wa.me format (works with or without +, but we'll use clean number)
                 $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>
-                <button id="hero-call-cta" class="clarkes-cta-button border border-eco-green text-eco-green rounded-full px-6 py-3 text-base font-semibold hover:bg-eco-green hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
+                <button id="hero-call-cta" class="clarkes-cta-button border border-eco-green text-eco-green rounded-full px-6 py-3 text-base font-semibold hover:bg-eco-green hover:text-white transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
                     Call <?php echo esc_html($phone); ?>
                 </button>
                 <button id="hero-whatsapp-cta" class="clarkes-cta-button inline-block rounded-full border border-eco-green bg-eco-green text-white px-6 py-3 text-base font-semibold hover:bg-eco-green/90 hover:scale-105 hover:shadow-lg transition-all duration-200 text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer shadow-md" data-wa-url="<?php echo esc_attr($wa_url); ?>">
@@ -494,7 +494,7 @@ endif; // show_case_studies
                 // Use wa.me format (works with or without +, but we'll use clean number)
                 $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>
-                <button id="contact-call-cta" class="clarkes-cta-button inline-block border border-eco-green text-eco-green rounded-full px-8 py-4 text-lg font-semibold hover:bg-eco-green hover:text-carbon-dark transition cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
+                <button id="contact-call-cta" class="clarkes-cta-button inline-block border border-eco-green text-eco-green rounded-full px-8 py-4 text-lg font-semibold hover:bg-eco-green hover:text-white transition cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
                     Call <?php echo esc_html($phone); ?>
                 </button>
             </div>
