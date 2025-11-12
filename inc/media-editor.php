@@ -19,7 +19,7 @@ function clarkes_add_media_editor_menu() {
     add_menu_page(
         __('Media Editor', 'clarkes-terraclean'),
         __('Media Editor', 'clarkes-terraclean'),
-        'upload_files',
+        'edit_posts', // Changed from upload_files to edit_posts for better visibility
         'clarkes-media-editor',
         'clarkes_media_editor_page',
         'dashicons-edit',
@@ -31,7 +31,7 @@ function clarkes_add_media_editor_menu() {
         'upload.php',
         __('Advanced Editor', 'clarkes-terraclean'),
         __('Advanced Editor', 'clarkes-terraclean'),
-        'upload_files',
+        'edit_posts',
         'clarkes-media-editor',
         'clarkes_media_editor_page'
     );
@@ -44,7 +44,8 @@ add_action('admin_menu', 'clarkes_add_media_editor_menu');
  */
 if (!function_exists('clarkes_media_editor_scripts')) {
 function clarkes_media_editor_scripts($hook) {
-    if ($hook !== 'media_page_clarkes-media-editor' && $hook !== 'toplevel_page_clarkes-media-editor') {
+    // Check for both menu locations
+    if ($hook !== 'media_page_clarkes-media-editor' && $hook !== 'toplevel_page_clarkes-media-editor' && strpos($hook, 'clarkes-media-editor') === false) {
         return;
     }
     

@@ -33,8 +33,11 @@ add_action('admin_menu', 'clarkes_add_page_builder_menu');
  */
 if (!function_exists('clarkes_page_builder_scripts')) {
 function clarkes_page_builder_scripts($hook) {
-    if (strpos($hook, 'clarkes-page-builder') === false && !is_admin()) {
-        return;
+    // Always load on admin pages, check hook for builder page
+    if (strpos($hook, 'clarkes-page-builder') === false) {
+        if (!is_admin() || (is_admin() && strpos($hook, 'post.php') === false && strpos($hook, 'post-new.php') === false)) {
+            return;
+        }
     }
     
     // Enqueue on page edit screen
