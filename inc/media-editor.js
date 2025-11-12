@@ -97,10 +97,88 @@
     // Toolbar Buttons
     $('#btn-crop').on('click', function() {
         togglePanel('crop-controls');
-        if (currentMediaType === 'image' && fabricCanvas && currentImage) {
-            // Enable crop mode
+        if (currentMediaType === 'image' && fabricCanvas) {
+            // Enable crop mode - allow selection
             fabricCanvas.isDrawingMode = false;
             fabricCanvas.selection = true;
+            // Add instructions
+            if (!$('#crop-instructions').length) {
+                $('#crop-controls').prepend('<p id="crop-instructions" style="color: #666; font-size: 13px; margin-bottom: 10px;">Select an area on the canvas, then click "Apply Crop"</p>');
+            }
+        }
+    });
+    
+    // Apply Crop
+    $('#apply-crop').on('click', function() {
+        if (fabricCanvas && fabricCanvas.backgroundImage) {
+            var aspect = $('#crop-aspect').val();
+            var aspectRatio = null;
+            
+            if (aspect !== 'free') {
+                var parts = aspect.split(':');
+                aspectRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
+            }
+            
+            // Get selected area or use full canvas
+            var activeObject = fabricCanvas.getActiveObject();
+            var bgImg = fabricCanvas.backgroundImage;
+            var imgElement = bgImg.getElement();
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            
+            var left, top, width, height;
+            
+            if (activeObject && activeObject.type !== 'image' && activeObject !== bgImg) {
+                // Use selected object as crop area
+                left = activeObject.left;
+                top = activeObject.top;
+                width = activeObject.width * activeObject.scaleX;
+                height = activeObject.height * activeObject.scaleY;
+            } else {
+                // Use full canvas
+                left = 0;
+                top = 0;
+                width = fabricCanvas.width;
+                height = fabricCanvas.height;
+            }
+            
+            if (aspectRatio) {
+                if (width / height > aspectRatio) {
+                    width = height * aspectRatio;
+                } else {
+                    height = width / aspectRatio;
+                }
+            }
+            
+            // Calculate source coordinates in original image
+            var scaleX = bgImg.scaleX;
+            var scaleY = bgImg.scaleY;
+            var sourceX = Math.max(0, left / scaleX);
+            var sourceY = Math.max(0, top / scaleY);
+            var sourceWidth = Math.min(width / scaleX, imgElement.width - sourceX);
+            var sourceHeight = Math.min(height / scaleY, imgElement.height - sourceY);
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            ctx.drawImage(imgElement, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+            
+            fabric.Image.fromURL(canvas.toDataURL(), function(croppedImg) {
+                // Remove all objects except background
+                var objects = fabricCanvas.getObjects();
+                objects.forEach(function(obj) {
+                    if (obj !== bgImg && obj.type !== 'image') {
+                        fabricCanvas.remove(obj);
+                    }
+                });
+                
+                fabricCanvas.setBackgroundImage(croppedImg, fabricCanvas.renderAll.bind(fabricCanvas), {
+                    scaleX: 1,
+                    scaleY: 1
+                });
+                fabricCanvas.setDimensions({ width: width, height: height });
+                fabricCanvas.renderAll();
+            });
         }
     });
     
