@@ -539,7 +539,7 @@ function clarkes_render_whatsapp_fab() {
         
         // Close on outside click
         document.addEventListener('click', function(e) {
-            if (sheet && !toggle.contains(e.target) && !sheet.contains(e.target)) {
+            if (sheet && toggle && !toggle.contains(e.target) && !sheet.contains(e.target)) {
                 closeSheet();
             }
             if (callModal && callModal === e.target) {
