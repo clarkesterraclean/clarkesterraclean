@@ -476,10 +476,11 @@ function clarkes_render_whatsapp_fab() {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('WhatsApp toggle clicked');
+                console.log('WhatsApp toggle clicked, sheet element:', sheet);
                 if (sheet) {
-                    const isVisible = sheet.style.display !== 'none' && sheet.style.display !== '';
-                    console.log('Sheet visible:', isVisible);
+                    const currentDisplay = window.getComputedStyle(sheet).display;
+                    const isVisible = currentDisplay !== 'none';
+                    console.log('Sheet current display:', currentDisplay, 'isVisible:', isVisible);
                     if (isVisible) {
                         closeSheet();
                     } else {
