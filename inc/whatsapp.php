@@ -230,8 +230,9 @@ function clarkes_render_whatsapp_fab() {
     // Otherwise assume it's already in correct format
     
     $prefill = urlencode(get_option('whatsapp_pretext', get_theme_mod('whatsapp_pretext', 'Hi, I\'m interested in a DPF/engine service. Vehicle: [make/model], Location: [area].')));
-    // WhatsApp API accepts numbers with or without +, but + is more reliable
+    // WhatsApp API - use + prefix for better mobile compatibility
     $chat_href = 'https://wa.me/' . $clean_phone . '?text=' . $prefill;
+    // Alternative format for better compatibility: https://api.whatsapp.com/send?phone=' . $clean_phone . '&text=' . $prefill;
     $tel_href = 'tel:' . $clean_phone;
 
     // Position
