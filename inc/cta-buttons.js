@@ -100,39 +100,44 @@
             handleCustomerInfoSubmit(action, button);
         });
         
+        // Cancel button handler - use capture phase for reliability
         cancelBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             console.log('Cancel button clicked (CTA)');
             modal.style.display = 'none';
             const form = modal.querySelector('#clarkes-customer-info-form');
             if (form) form.reset();
             customerInfo = null;
             pendingAction = null;
-        });
+            return false;
+        }, true); // Capture phase
         
-        // Close modal on backdrop click
+        // Close modal on backdrop click - use capture phase
         modal.addEventListener('click', function(e) {
             // Close if clicking on the backdrop (the modal itself, not its children)
             console.log('Modal clicked (CTA), target:', e.target, 'modal:', modal);
             if (e.target === modal) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
                 console.log('Closing modal via backdrop click (CTA)');
                 modal.style.display = 'none';
                 const form = modal.querySelector('#clarkes-customer-info-form');
                 if (form) form.reset();
                 customerInfo = null;
                 pendingAction = null;
+                return false;
             }
-        });
+        }, true); // Capture phase
         
         // Prevent clicks inside the content from closing the modal
         const content = modal.querySelector('#clarkes-customer-info-content');
         if (content) {
             content.addEventListener('click', function(e) {
                 e.stopPropagation(); // Prevent clicks inside from bubbling to modal
-            });
+            }, true); // Capture phase
         }
         
         modal.style.display = 'flex';
