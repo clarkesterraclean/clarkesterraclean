@@ -67,11 +67,18 @@ function clarkes_page_builder_scripts($hook) {
             true
         );
         
+        $preview_url = '';
+        if (isset($_GET['post_id'])) {
+            $post_id = absint($_GET['post_id']);
+            $preview_url = add_query_arg('clarkes_preview', '1', get_permalink($post_id));
+        }
+        
         wp_localize_script('clarkes-page-builder', 'clarkesPageBuilder', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('clarkes_page_builder'),
             'post_id' => isset($_GET['post_id']) ? absint($_GET['post_id']) : 0,
-            'preview_url' => isset($_GET['post_id']) ? get_permalink(absint($_GET['post_id'])) : '',
+            'preview_url' => $preview_url,
+            'auto_save_delay' => 2000, // 2 seconds debounce
         ));
         
         wp_enqueue_style(
@@ -199,14 +206,52 @@ function clarkes_page_builder_page() {
                     <p style="margin: 5px 0 0 0; color: #666;"><?php echo esc_html($post->post_title); ?></p>
                 </div>
                 <div>
-                    <button type="button" class="button" id="btn-preview"><?php _e('Preview', 'clarkes-terraclean'); ?></button>
-                    <button type="button" class="button button-primary" id="btn-save-builder"><?php _e('Save', 'clarkes-terraclean'); ?></button>
+                    <button type="button" class="button" id="btn-toggle-preview">
+                        <span class="dashicons dashicons-visibility"></span>
+                        <?php _e('Live Preview', 'clarkes-terraclean'); ?>
+                    </button>
+                    <button type="button" class="button" id="btn-preview" style="display:none;">
+                        <?php _e('Open in New Tab', 'clarkes-terraclean'); ?>
+                    </button>
+                    <button type="button" class="button button-primary" id="btn-save-builder">
+                        <span class="dashicons dashicons-yes"></span>
+                        <?php _e('Save', 'clarkes-terraclean'); ?>
+                    </button>
+                    <span id="auto-save-status" style="margin-left: 10px; color: #666; font-size: 12px;"></span>
                     <a href="<?php echo get_edit_post_link($post_id); ?>" class="button"><?php _e('Back to Editor', 'clarkes-terraclean'); ?></a>
                 </div>
             </div>
         </div>
         
-        <div class="page-builder-container">
+        <div class="page-builder-container" id="page-builder-container">
+            <!-- Live Preview Panel (Hidden by default) -->
+            <div class="builder-preview-panel" id="builder-preview-panel" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #1a1a1a; z-index: 10000; flex-direction: column;">
+                <div class="preview-header" style="background: #23282d; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #32373c;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: #fff; font-weight: 600;"><?php _e('Live Preview', 'clarkes-terraclean'); ?></span>
+                        <span id="preview-loading" style="color: #00a0d2; font-size: 12px; display: none;">
+                            <span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span>
+                            <?php _e('Updating...', 'clarkes-terraclean'); ?>
+                        </span>
+                        <span id="preview-saved" style="color: #46b450; font-size: 12px; display: none;">
+                            <span class="dashicons dashicons-yes"></span>
+                            <?php _e('Saved', 'clarkes-terraclean'); ?>
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" class="button" id="btn-refresh-preview" style="background: #32373c; color: #fff; border-color: #464646;">
+                            <span class="dashicons dashicons-update"></span>
+                            <?php _e('Refresh', 'clarkes-terraclean'); ?>
+                        </button>
+                        <button type="button" class="button" id="btn-close-preview" style="background: #dc3232; color: #fff; border-color: #dc3232;">
+                            <span class="dashicons dashicons-no"></span>
+                            <?php _e('Close', 'clarkes-terraclean'); ?>
+                        </button>
+                    </div>
+                </div>
+                <iframe id="builder-preview-iframe" src="<?php echo esc_url(add_query_arg('clarkes_preview', '1', get_permalink($post_id))); ?>" style="flex: 1; width: 100%; border: none; background: #fff;"></iframe>
+            </div>
+            
             <!-- Left Sidebar - Elements -->
             <div class="builder-sidebar-left">
                 <div class="sidebar-header">
@@ -365,7 +410,25 @@ function clarkes_render_page_builder_content($content) {
         return $content;
     }
     
+    // Check if preview mode is requested
+    $is_preview = isset($_GET['clarkes_preview']) && $_GET['clarkes_preview'] == '1';
+    
     $use_builder = get_post_meta($post->ID, '_clarkes_use_page_builder', true);
+    if (!$use_builder && !$is_preview) {
+        return $content;
+    }
+    
+    // In preview mode, always show builder content if it exists
+    if ($is_preview) {
+        $builder_data = get_post_meta($post->ID, '_clarkes_page_builder_data', true);
+        if (!empty($builder_data) && is_array($builder_data)) {
+            ob_start();
+            clarkes_render_builder_elements($builder_data);
+            $builder_content = ob_get_clean();
+            return $builder_content ?: $content;
+        }
+    }
+    
     if (!$use_builder) {
         return $content;
     }

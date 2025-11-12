@@ -9,6 +9,9 @@
     var builderData = [];
     var selectedElement = null;
     var elementIdCounter = 0;
+    var autoSaveTimer = null;
+    var previewIframe = null;
+    var isPreviewVisible = false;
     
     // Initialize
     $(document).ready(function() {
@@ -45,6 +48,7 @@
         initElementSettings();
         initPreview();
         initSave();
+        initLivePreview();
     });
     
     // Import Page Content
@@ -125,6 +129,130 @@
         });
     }
     
+    // Initialize Live Preview
+    function initLivePreview() {
+        previewIframe = document.getElementById('builder-preview-iframe');
+        
+        // Toggle preview panel
+        $('#btn-toggle-preview').on('click', function() {
+            togglePreview();
+        });
+        
+        // Close preview
+        $('#btn-close-preview').on('click', function() {
+            togglePreview(false);
+        });
+        
+        // Refresh preview
+        $('#btn-refresh-preview').on('click', function() {
+            refreshPreview();
+        });
+        
+        // Auto-save on changes
+        $(document).on('input change', '#element-settings-panel input, #element-settings-panel textarea, #element-settings-panel select', function() {
+            triggerAutoSave();
+        });
+    }
+    
+    // Toggle Preview
+    function togglePreview(show) {
+        var panel = $('#builder-preview-panel');
+        var container = $('#page-builder-container');
+        
+        if (show === undefined) {
+            isPreviewVisible = !isPreviewVisible;
+        } else {
+            isPreviewVisible = show;
+        }
+        
+        if (isPreviewVisible) {
+            panel.show();
+            container.hide();
+            refreshPreview();
+        } else {
+            panel.hide();
+            container.show();
+        }
+    }
+    
+    // Refresh Preview
+    function refreshPreview() {
+        if (!previewIframe || !isPreviewVisible) return;
+        
+        var statusLoading = $('#preview-loading');
+        var statusSaved = $('#preview-saved');
+        
+        // Show loading
+        statusLoading.show();
+        statusSaved.hide();
+        
+        // Save data first
+        saveBuilderData(function() {
+            // Reload iframe
+            var iframeSrc = previewIframe.src;
+            previewIframe.src = '';
+            setTimeout(function() {
+                previewIframe.src = iframeSrc + (iframeSrc.indexOf('?') > -1 ? '&' : '?') + '_t=' + Date.now();
+                
+                // Hide loading after a moment
+                setTimeout(function() {
+                    statusLoading.hide();
+                    statusSaved.show();
+                    setTimeout(function() {
+                        statusSaved.fadeOut();
+                    }, 2000);
+                }, 500);
+            }, 100);
+        }, true); // Silent save
+    }
+    
+    // Trigger Auto-Save
+    function triggerAutoSave() {
+        // Clear existing timer
+        if (autoSaveTimer) {
+            clearTimeout(autoSaveTimer);
+        }
+        
+        // Update status
+        updateAutoSaveStatus('saving');
+        
+        // Set new timer
+        autoSaveTimer = setTimeout(function() {
+            saveBuilderData(function() {
+                updateAutoSaveStatus('saved');
+                
+                // Refresh preview if visible
+                if (isPreviewVisible) {
+                    refreshPreview();
+                }
+            }, true); // Silent save
+        }, clarkesPageBuilder.auto_save_delay || 2000);
+    }
+    
+    // Update Auto-Save Status
+    function updateAutoSaveStatus(status) {
+        var statusEl = $('#auto-save-status');
+        
+        switch(status) {
+            case 'saving':
+                statusEl.html('<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> Saving...').css('color', '#666');
+                break;
+            case 'saved':
+                statusEl.html('<span class="dashicons dashicons-yes"></span> Saved').css('color', '#46b450');
+                setTimeout(function() {
+                    statusEl.fadeOut(function() {
+                        statusEl.html('').show();
+                    });
+                }, 2000);
+                break;
+            case 'error':
+                statusEl.html('<span class="dashicons dashicons-warning"></span> Error saving').css('color', '#dc3232');
+                break;
+            default:
+                statusEl.html('').hide();
+        }
+    }
+    
     // Initialize Save
     function initSave() {
         $('#btn-save-builder').on('click', function() {
@@ -135,7 +263,11 @@
     }
     
     // Save Builder Data
-    function saveBuilderData(callback) {
+    function saveBuilderData(callback, silent) {
+        if (!silent) {
+            updateAutoSaveStatus('saving');
+        }
+        
         $.ajax({
             url: clarkesPageBuilder.ajax_url,
             type: 'POST',
@@ -147,13 +279,22 @@
             },
             success: function(response) {
                 if (response.success) {
+                    if (!silent) {
+                        updateAutoSaveStatus('saved');
+                    }
                     if (callback) callback();
                 } else {
-                    alert('Error saving: ' + (response.data.message || 'Unknown error'));
+                    if (!silent) {
+                        updateAutoSaveStatus('error');
+                        alert('Error saving: ' + (response.data.message || 'Unknown error'));
+                    }
                 }
             },
             error: function() {
-                alert('AJAX error while saving');
+                if (!silent) {
+                    updateAutoSaveStatus('error');
+                    alert('AJAX error while saving');
+                }
             }
         });
     }
@@ -232,6 +373,9 @@
             var $element = renderElement(element);
             canvas.append($element);
         });
+        
+        // Trigger auto-save after rendering
+        triggerAutoSave();
     }
     
     // Render Element
@@ -692,6 +836,7 @@
         
         renderCanvas();
         showElementSettings(element);
+        triggerAutoSave();
     }
     
     // Delete Element
@@ -704,6 +849,7 @@
         
         renderCanvas();
         $('#element-settings-panel').html('<p class="description">Select an element to edit its settings</p>');
+        triggerAutoSave();
     }
     
     // Duplicate Element
@@ -720,6 +866,7 @@
         
         builderData.splice(index + 1, 0, cloned);
         renderCanvas();
+        triggerAutoSave();
     }
     
     // Save Builder
