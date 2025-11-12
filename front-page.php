@@ -177,8 +177,13 @@ if ($hero_padding_bottom !== '') {
 <?php endif; ?>
 
 <!-- Services Section -->
-<?php if (get_theme_mod('show_services', 1)) : ?>
-<section id="services" class="py-16 md:py-24 bg-white text-text-dark">
+<?php if (get_theme_mod('show_services', 1)) : 
+    $services_padding_top = get_theme_mod('services_section_padding_top', '');
+    $services_padding_bottom = get_theme_mod('services_section_padding_bottom', '');
+    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $services_style = 'padding-top: ' . ($services_padding_top !== '' ? absint($services_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($services_padding_bottom !== '' ? absint($services_padding_bottom) : $global_padding) . 'px;';
+?>
+<section id="services" class="bg-white text-text-dark" style="<?php echo esc_attr($services_style); ?>">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-center">Our Services</h2>
         
@@ -437,8 +442,13 @@ endif; // show_case_studies
 <?php endif; ?>
 
 <!-- Contact Section -->
-<?php if (get_theme_mod('show_contact', 1)) : ?>
-<section id="contact" class="py-16 md:py-24 bg-carbon-dark text-text-body">
+<?php if (get_theme_mod('show_contact', 1)) : 
+    $contact_padding_top = get_theme_mod('contact_section_padding_top', '');
+    $contact_padding_bottom = get_theme_mod('contact_section_padding_bottom', '');
+    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $contact_style = 'padding-top: ' . ($contact_padding_top !== '' ? absint($contact_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($contact_padding_bottom !== '' ? absint($contact_padding_bottom) : $global_padding) . 'px;';
+?>
+<section id="contact" class="bg-carbon-dark text-text-body" style="<?php echo esc_attr($contact_style); ?>">
     <div class="max-w-7xl mx-auto px-4">
         <div class="max-w-3xl mx-auto">
             <h2 class="text-3xl md:text-4xl font-semibold mb-4 text-center text-white">Book Your Service</h2>
