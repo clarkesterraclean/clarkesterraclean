@@ -240,64 +240,401 @@ function clarkes_render_whatsapp_fab() {
         $position_style = 'left: ' . $offset_x . 'px; bottom: ' . $offset_y . 'px;';
     }
 
+    // Enqueue and localize script
+    wp_enqueue_script('jquery');
+    wp_add_inline_script('jquery', 'var clarkesWhatsApp = ' . wp_json_encode(array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('clarkes_whatsapp_chat'),
+        'phone' => $clean_phone,
+        'raw_phone' => $raw_phone,
+        'chat_url' => $chat_href,
+        'tel_url' => $tel_href,
+    )) . ';', 'before');
+    
     ?>
-    <div id="clarkes-wa-fab" class="fixed z-50" style="<?php echo esc_attr($position_style); ?>">
-        <button id="clarkes-wa-toggle" class="rounded-full p-3 bg-eco-green/90 hover:bg-eco-green text-white shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green transition-colors" aria-expanded="false" aria-controls="clarkes-wa-sheet" aria-label="Open WhatsApp contact options">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <!-- WhatsApp Floating Button -->
+    <div id="clarkes-wa-fab" style="position: fixed; z-index: 9999; <?php echo esc_attr($position_style); ?>">
+        <button id="clarkes-wa-toggle" class="clarkes-wa-button" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: none; color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" aria-expanded="false" aria-controls="clarkes-wa-sheet" aria-label="Open WhatsApp contact options">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
             </svg>
         </button>
-        <div id="clarkes-wa-sheet" class="hidden mt-2 w-56 rounded-lg shadow-lg bg-carbon-dark text-text-body border border-eco-green/40 overflow-hidden">
-            <a <?php echo clarkes_link_attrs($chat_href, 'block px-4 py-3 hover:bg-carbon-dark/60 transition-colors'); ?> aria-label="Chat on WhatsApp (opens in new tab)">
-                Chat on WhatsApp
-            </a>
-            <a href="<?php echo esc_url($tel_href); ?>" class="block px-4 py-3 hover:bg-carbon-dark/60 transition-colors" aria-label="Call Clarke's DPF & Engine Specialists">
-                Call <?php echo esc_html($raw_phone); ?>
-            </a>
+        <div id="clarkes-wa-sheet" class="clarkes-wa-sheet" style="display: none; margin-top: 10px; width: 280px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); background: white; border: 1px solid #e5e7eb; overflow: hidden;">
+            <button id="clarkes-wa-chat-btn" class="clarkes-wa-action-btn" style="width: 100%; padding: 14px 16px; background: white; border: none; border-bottom: 1px solid #e5e7eb; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.2s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span style="font-weight: 600; color: #1f2937;">Chat on WhatsApp</span>
+            </button>
+            <button id="clarkes-wa-call-btn" class="clarkes-wa-action-btn" style="width: 100%; padding: 14px 16px; background: white; border: none; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.2s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#3b82f6">
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+                <span style="font-weight: 600; color: #1f2937;">Call <?php echo esc_html($raw_phone); ?></span>
+            </button>
         </div>
-        <noscript>
-            <a href="<?php echo esc_url($chat_href); ?>" class="block mt-2 rounded-lg px-4 py-2 bg-eco-green text-white text-center hover:bg-eco-green/80 transition-colors">
-                Chat on WhatsApp
-            </a>
-        </noscript>
     </div>
+    
+    <!-- Live Chat Window -->
+    <div id="clarkes-wa-chat-window" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 380px; max-width: calc(100vw - 40px); height: 600px; max-height: calc(100vh - 120px); background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 10000; flex-direction: column; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Mark Clarke</h3>
+                <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">Usually replies within minutes</p>
+            </div>
+            <button id="clarkes-wa-close-chat" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+        <div id="clarkes-wa-messages" style="flex: 1; overflow-y: auto; padding: 20px; background: #f0f2f5;">
+            <div style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 20px;">
+                <p>Start a conversation with Mark</p>
+            </div>
+        </div>
+        <div id="clarkes-wa-attachments" style="display: none; padding: 10px 20px; background: white; border-top: 1px solid #e5e7eb; max-height: 150px; overflow-y: auto;">
+            <div id="clarkes-wa-attachment-list" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+        </div>
+        <div style="padding: 16px; background: white; border-top: 1px solid #e5e7eb;">
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <button id="clarkes-wa-attach-btn" style="background: #f3f4f6; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#6b7280">
+                        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                    </svg>
+                </button>
+                <input type="file" id="clarkes-wa-file-input" multiple accept="image/*,video/*" style="display: none;">
+                <textarea id="clarkes-wa-message-input" placeholder="Type a message..." style="flex: 1; border: 1px solid #e5e7eb; border-radius: 20px; padding: 10px 16px; resize: none; font-family: inherit; font-size: 14px; min-height: 40px; max-height: 120px;" rows="1"></textarea>
+                <button id="clarkes-wa-send-btn" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: none; width: 40px; height: 40px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call/Message Options Modal -->
+    <div id="clarkes-wa-call-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10001; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; margin: 20px;">
+            <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1f2937;">Contact Mark</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a id="clarkes-wa-call-direct" href="<?php echo esc_url($tel_href); ?>" style="display: flex; align-items: center; gap: 12px; padding: 14px; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #1f2937; transition: background 0.2s;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6">
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    </svg>
+                    <div>
+                        <div style="font-weight: 600;">Call Now</div>
+                        <div style="font-size: 12px; color: #6b7280;"><?php echo esc_html($raw_phone); ?></div>
+                    </div>
+                </a>
+                <button id="clarkes-wa-message-direct" style="display: flex; align-items: center; gap: 12px; padding: 14px; background: #f3f4f6; border: none; border-radius: 8px; text-align: left; cursor: pointer; color: #1f2937; transition: background 0.2s;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    <div>
+                        <div style="font-weight: 600;">Message on WhatsApp</div>
+                        <div style="font-size: 12px; color: #6b7280;">Open WhatsApp chat</div>
+                    </div>
+                </button>
+            </div>
+            <button id="clarkes-wa-close-modal" style="margin-top: 16px; width: 100%; padding: 12px; background: #f3f4f6; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #6b7280;">Cancel</button>
+        </div>
+    </div>
+    
+    <style>
+    .clarkes-wa-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5) !important;
+    }
+    .clarkes-wa-action-btn:hover {
+        background: #f9fafb !important;
+    }
+    #clarkes-wa-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    #clarkes-wa-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #clarkes-wa-messages::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    </style>
+    
     <script>
     (function() {
         'use strict';
         const toggle = document.getElementById('clarkes-wa-toggle');
         const sheet = document.getElementById('clarkes-wa-sheet');
-        if (!toggle || !sheet) return;
-
+        const chatBtn = document.getElementById('clarkes-wa-chat-btn');
+        const callBtn = document.getElementById('clarkes-wa-call-btn');
+        const chatWindow = document.getElementById('clarkes-wa-chat-window');
+        const callModal = document.getElementById('clarkes-wa-call-modal');
+        const closeChat = document.getElementById('clarkes-wa-close-chat');
+        const closeModal = document.getElementById('clarkes-wa-close-modal');
+        const messageInput = document.getElementById('clarkes-wa-message-input');
+        const sendBtn = document.getElementById('clarkes-wa-send-btn');
+        const attachBtn = document.getElementById('clarkes-wa-attach-btn');
+        const fileInput = document.getElementById('clarkes-wa-file-input');
+        const attachmentsDiv = document.getElementById('clarkes-wa-attachments');
+        const attachmentList = document.getElementById('clarkes-wa-attachment-list');
+        const messagesDiv = document.getElementById('clarkes-wa-messages');
+        const messageDirectBtn = document.getElementById('clarkes-wa-message-direct');
+        
+        let attachments = [];
+        
+        // Detect WhatsApp
+        function hasWhatsApp() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua.toLowerCase());
+        }
+        
         function closeSheet() {
-            sheet.classList.add('hidden');
-            toggle.setAttribute('aria-expanded', 'false');
+            if (sheet) sheet.style.display = 'none';
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
         }
-
+        
         function openSheet() {
-            sheet.classList.remove('hidden');
-            toggle.setAttribute('aria-expanded', 'true');
+            if (sheet) sheet.style.display = 'block';
+            if (toggle) toggle.setAttribute('aria-expanded', 'true');
         }
-
-        toggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (sheet.classList.contains('hidden')) {
-                openSheet();
-            } else {
-                closeSheet();
+        
+        function closeChatWindow() {
+            if (chatWindow) chatWindow.style.display = 'none';
+        }
+        
+        function openChatWindow() {
+            if (chatWindow) {
+                chatWindow.style.display = 'flex';
+                messageInput.focus();
             }
-        });
-
+        }
+        
+        function closeCallModal() {
+            if (callModal) callModal.style.display = 'none';
+        }
+        
+        function openCallModal() {
+            if (callModal) callModal.style.display = 'flex';
+        }
+        
+        // Toggle sheet
+        if (toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (sheet && sheet.style.display === 'none') {
+                    openSheet();
+                } else {
+                    closeSheet();
+                }
+            });
+        }
+        
+        // Chat button - detect WhatsApp
+        if (chatBtn) {
+            chatBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSheet();
+                
+                if (hasWhatsApp()) {
+                    // Try to open WhatsApp
+                    const chatUrl = clarkesWhatsApp.chat_url;
+                    window.open(chatUrl, '_blank');
+                    
+                    // Fallback: if WhatsApp doesn't open after 2 seconds, show chat window
+                    setTimeout(function() {
+                        if (document.hasFocus && !document.hasFocus()) {
+                            openChatWindow();
+                        }
+                    }, 2000);
+                } else {
+                    // No WhatsApp detected, show chat window
+                    openChatWindow();
+                }
+            });
+        }
+        
+        // Call button - show options
+        if (callBtn) {
+            callBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSheet();
+                openCallModal();
+            });
+        }
+        
+        // Message direct from modal
+        if (messageDirectBtn) {
+            messageDirectBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeCallModal();
+                if (hasWhatsApp()) {
+                    window.open(clarkesWhatsApp.chat_url, '_blank');
+                } else {
+                    openChatWindow();
+                }
+            });
+        }
+        
+        // Close buttons
+        if (closeChat) {
+            closeChat.addEventListener('click', closeChatWindow);
+        }
+        if (closeModal) {
+            closeModal.addEventListener('click', closeCallModal);
+        }
+        
         // Close on outside click
         document.addEventListener('click', function(e) {
-            if (!toggle.contains(e.target) && !sheet.contains(e.target)) {
+            if (sheet && !toggle.contains(e.target) && !sheet.contains(e.target)) {
                 closeSheet();
             }
+            if (callModal && callModal === e.target) {
+                closeCallModal();
+            }
         });
-
-        // Close on Escape
+        
+        // File attachment
+        if (attachBtn && fileInput) {
+            attachBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                files.forEach(function(file) {
+                    if (file.size > 25 * 1024 * 1024) {
+                        alert('File too large. Maximum size is 25MB.');
+                        return;
+                    }
+                    
+                    attachments.push(file);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; background: #f3f4f6;';
+                        
+                        if (file.type.startsWith('image/')) {
+                            div.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;"><button class="remove-attach" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:white;border:none;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:12px;">×</button>';
+                        } else if (file.type.startsWith('video/')) {
+                            div.innerHTML = '<video src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;"></video><button class="remove-attach" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:white;border:none;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:12px;">×</button>';
+                        }
+                        
+                        const removeBtn = div.querySelector('.remove-attach');
+                        removeBtn.addEventListener('click', function() {
+                            attachments = attachments.filter(f => f !== file);
+                            div.remove();
+                            if (attachments.length === 0) {
+                                attachmentsDiv.style.display = 'none';
+                            }
+                        });
+                        
+                        attachmentList.appendChild(div);
+                        attachmentsDiv.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                });
+                });
+            });
+        }
+        
+        // Send message
+        if (sendBtn && messageInput) {
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message && attachments.length === 0) return;
+                
+                // Add user message to chat
+                if (message) {
+                    addMessage(message, 'user');
+                }
+                
+                // Send via AJAX
+                const formData = new FormData();
+                formData.append('action', 'clarkes_send_whatsapp_message');
+                formData.append('nonce', clarkesWhatsApp.nonce);
+                formData.append('message', message);
+                attachments.forEach(function(file, index) {
+                    formData.append('attachments[]', file);
+                });
+                
+                // Show sending indicator
+                addMessage('Sending...', 'system');
+                
+                fetch(clarkesWhatsApp.ajax_url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove sending indicator
+                    const systemMsgs = messagesDiv.querySelectorAll('.system-message');
+                    if (systemMsgs.length > 0) {
+                        systemMsgs[systemMsgs.length - 1].remove();
+                    }
+                    
+                    if (data.success) {
+                        addMessage('Message sent! Mark will reply soon.', 'system');
+                        messageInput.value = '';
+                        attachments = [];
+                        attachmentList.innerHTML = '';
+                        attachmentsDiv.style.display = 'none';
+                        fileInput.value = '';
+                    } else {
+                        addMessage('Failed to send. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    const systemMsgs = messagesDiv.querySelectorAll('.system-message');
+                    if (systemMsgs.length > 0) {
+                        systemMsgs[systemMsgs.length - 1].remove();
+                    }
+                    addMessage('Error sending message. Please try again.', 'error');
+                });
+            }
+            
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+        
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.style.cssText = 'margin-bottom: 12px; display: flex; ' + (type === 'user' ? 'justify-content: flex-end;' : 'justify-content: flex-start;');
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.style.cssText = 'max-width: 75%; padding: 10px 14px; border-radius: 12px; ' + 
+                (type === 'user' ? 'background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; border-bottom-right-radius: 4px;' : 
+                 type === 'error' ? 'background: #fee2e2; color: #991b1b;' :
+                 'background: white; color: #1f2937; border-bottom-left-radius: 4px;');
+            msgDiv.textContent = text;
+            
+            div.appendChild(msgDiv);
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            if (type === 'system' || type === 'error') {
+                div.classList.add('system-message');
+            }
+        }
+        
+        // Escape key to close
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && !sheet.classList.contains('hidden')) {
-                closeSheet();
+            if (e.key === 'Escape') {
+                if (sheet && sheet.style.display !== 'none') closeSheet();
+                if (chatWindow && chatWindow.style.display !== 'none') closeChatWindow();
+                if (callModal && callModal.style.display !== 'none') closeCallModal();
             }
         });
     })();
@@ -322,4 +659,81 @@ function clarkes_whatsapp_preview_init() {
 }
 }
 add_action('customize_preview_init', 'clarkes_whatsapp_preview_init');
+
+/**
+ * AJAX: Send WhatsApp Message
+ */
+if (!function_exists('clarkes_send_whatsapp_message')) {
+function clarkes_send_whatsapp_message() {
+    check_ajax_referer('clarkes_whatsapp_chat', 'nonce');
+    
+    $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
+    $attachments = isset($_FILES['attachments']) ? $_FILES['attachments'] : array();
+    
+    if (empty($message) && empty($attachments)) {
+        wp_send_json_error(array('message' => 'Message or attachment required'));
+        return;
+    }
+    
+    $whatsapp_number = get_theme_mod('whatsapp_number', '07706 230867');
+    $admin_email = get_option('admin_email');
+    
+    // Prepare email
+    $subject = 'New WhatsApp Message from Website - ' . get_bloginfo('name');
+    $body = "You have received a new message from your website:\n\n";
+    $body .= "Message: " . $message . "\n\n";
+    $body .= "From: " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'Website') . "\n";
+    $body .= "Time: " . current_time('mysql') . "\n\n";
+    $body .= "Reply to this number on WhatsApp: " . $whatsapp_number . "\n";
+    
+    $headers = array('Content-Type: text/plain; charset=UTF-8');
+    
+    // Handle attachments
+    $attachment_files = array();
+    if (!empty($attachments['name'][0])) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        
+        $upload_overrides = array('test_form' => false);
+        
+        foreach ($attachments['name'] as $key => $filename) {
+            if ($attachments['error'][$key] === UPLOAD_ERR_OK) {
+                $file = array(
+                    'name' => $attachments['name'][$key],
+                    'type' => $attachments['type'][$key],
+                    'tmp_name' => $attachments['tmp_name'][$key],
+                    'error' => $attachments['error'][$key],
+                    'size' => $attachments['size'][$key]
+                );
+                
+                $movefile = wp_handle_upload($file, $upload_overrides);
+                
+                if ($movefile && !isset($movefile['error'])) {
+                    $attachment_files[] = $movefile['file'];
+                    $body .= "\nAttachment: " . $filename . " (" . size_format($file['size']) . ")\n";
+                }
+            }
+        }
+    }
+    
+    // Send email
+    $sent = wp_mail($admin_email, $subject, $body, $headers, $attachment_files);
+    
+    // Clean up attachment files
+    foreach ($attachment_files as $file) {
+        if (file_exists($file)) {
+            @unlink($file);
+        }
+    }
+    
+    if ($sent) {
+        wp_send_json_success(array('message' => 'Message sent successfully'));
+    } else {
+        wp_send_json_error(array('message' => 'Failed to send message'));
+    }
+}
+}
+add_action('wp_ajax_clarkes_send_whatsapp_message', 'clarkes_send_whatsapp_message');
+add_action('wp_ajax_nopriv_clarkes_send_whatsapp_message', 'clarkes_send_whatsapp_message');
 
