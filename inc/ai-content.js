@@ -155,14 +155,34 @@
                 }
             } else if (contentType === 'content') {
                 // Use WordPress editor
-                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('content')) {
-                    tinyMCE.get('content').setContent(content);
-                } else if ($('#content').length) {
+                if (typeof tinyMCE !== 'undefined') {
+                    var editor = tinyMCE.get('content');
+                    if (editor) {
+                        editor.setContent(content);
+                    } else {
+                        // Try to initialize editor
+                        tinyMCE.init({
+                            selector: '#content',
+                            setup: function(ed) {
+                                ed.on('init', function() {
+                                    ed.setContent(content);
+                                });
+                            }
+                        });
+                    }
+                }
+                // Also set the textarea value as fallback
+                if ($('#content').length) {
                     $('#content').val(content);
                 }
             } else if (contentType === 'meta_description') {
                 // Try to find meta description field
-                $('input[name="_clarkes_seo_description"], textarea[name="_clarkes_seo_description"]').val(content);
+                var $metaDesc = $('input[name="_clarkes_seo_description"], textarea[name="_clarkes_seo_description"], #case_study_seo_description');
+                if ($metaDesc.length) {
+                    $metaDesc.val(content);
+                    // Trigger change event for character counter
+                    $metaDesc.trigger('input');
+                }
             }
             
             alert('Content inserted!');
