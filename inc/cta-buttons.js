@@ -111,10 +111,15 @@
         });
         
         modal.addEventListener('click', function(e) {
+            // Close if clicking on the backdrop (the modal itself, not its children)
             if (e.target === modal) {
+                e.preventDefault();
+                e.stopPropagation();
                 modal.style.display = 'none';
                 const form = modal.querySelector('#clarkes-customer-info-form');
                 if (form) form.reset();
+                customerInfo = null;
+                pendingAction = null;
             }
         });
         

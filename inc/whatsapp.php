@@ -654,7 +654,10 @@ function clarkes_render_whatsapp_fab() {
         // Close customer info modal on outside click
         if (customerInfoModal) {
             customerInfoModal.addEventListener('click', function(e) {
+                // Close if clicking on the backdrop (the modal itself, not its children)
                 if (e.target === customerInfoModal) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     closeCustomerInfoForm();
                 }
             });
