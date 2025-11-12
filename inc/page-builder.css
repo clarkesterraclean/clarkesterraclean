@@ -2,6 +2,51 @@
  * Modern Page Builder Styles
  */
 
+/* Live Preview Panel */
+.builder-preview-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #1a1a1a;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+}
+
+.preview-header {
+    background: #23282d;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #32373c;
+    flex-shrink: 0;
+}
+
+#builder-preview-iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+}
+
+/* Auto-save status animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#auto-save-status .dashicons {
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+#auto-save-status .dashicons-update {
+    animation: spin 1s linear infinite;
+}
+
 .clarkes-page-builder-wrap {
     margin: -20px -20px 0 -20px;
 }

@@ -336,6 +336,7 @@
         builderData.push(element);
         renderCanvas();
         selectElement(element.id);
+        triggerAutoSave();
     }
     
     // Get Default Settings
