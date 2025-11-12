@@ -581,6 +581,17 @@ if (!function_exists('clarkes_register_whatsapp_settings')) {
 }
 
 /**
+ * Include WhatsApp Settings Module
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_whatsapp_settings_menu')) {
+    $whatsapp_settings_file = get_template_directory() . '/inc/whatsapp-settings.php';
+    if (file_exists($whatsapp_settings_file)) {
+        require_once $whatsapp_settings_file;
+    }
+}
+
+/**
  * Helper function to get color from theme mod with fallback
  * Note: This function may not be available if clarkes_sanitize_hex_color doesn't exist yet
  */
