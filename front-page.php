@@ -155,9 +155,12 @@ if ($hero_padding_bottom !== '') {
                         echo '</div>';
                     }
                 } elseif ($about_image_id) {
-                    // Display image if no video
-                    $about_image = wp_get_attachment_image($about_image_id, 'large', false, array('class' => 'rounded-lg shadow-lg w-full h-auto object-cover'));
+                    // Display image if no video - constrain height to better match text content
+                    $max_height = get_theme_mod('about_section_image_max_height', 500);
+                    $about_image = wp_get_attachment_image($about_image_id, 'large', false, array('class' => 'rounded-lg shadow-lg w-full h-auto object-cover', 'style' => 'max-height: ' . absint($max_height) . 'px; object-fit: cover; width: 100%;'));
+                    echo '<div class="rounded-lg shadow-lg overflow-hidden" style="max-height: ' . absint($max_height) . 'px;">';
                     echo $about_image;
+                    echo '</div>';
                 } else {
                     // Placeholder for when image/video is uploaded
                     echo '<div class="bg-carbon-dark/10 rounded-lg shadow-lg aspect-[4/3] flex items-center justify-center text-text-dark/40">';

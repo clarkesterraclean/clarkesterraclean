@@ -731,6 +731,25 @@ function clarkes_customize_register($wp_customize) {
         'mime_type'   => 'video',
     )));
     
+    // About Section Image Max Height
+    $wp_customize->add_setting('about_section_image_max_height', array(
+        'default'           => '500',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control('about_section_image_max_height', array(
+        'label'       => esc_html__('About Section Image Max Height (px)', 'clarkes-terraclean'),
+        'description' => esc_html__('Maximum height for the About section image. Adjust to better match the text content height. Default: 500px', 'clarkes-terraclean'),
+        'section'     => 'clarkes_images',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 200,
+            'max'  => 800,
+            'step' => 50,
+        ),
+    ));
+    
     // Service 1 Image (Engine Carbon Cleaning)
     $wp_customize->add_setting('service_1_image', array(
         'default'           => '',
