@@ -540,9 +540,12 @@ function clarkes_render_whatsapp_fab() {
         function closeCustomerInfoForm() {
             if (customerInfoModal) {
                 customerInfoModal.style.display = 'none';
-                if (customerInfoForm) customerInfoForm.reset();
+                if (customerInfoForm) {
+                    customerInfoForm.reset();
+                }
             }
             pendingAction = null;
+            // Don't clear customerInfo here - it might be used for subsequent messages
         }
         
         function closeCallModal() {
@@ -641,7 +644,11 @@ function clarkes_render_whatsapp_fab() {
         }
         
         if (customerInfoCancel) {
-            customerInfoCancel.addEventListener('click', closeCustomerInfoForm);
+            customerInfoCancel.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeCustomerInfoForm();
+            });
         }
         
         // Close customer info modal on outside click

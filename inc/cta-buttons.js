@@ -7,6 +7,7 @@
     
     // Customer info storage
     let customerInfo = null;
+    let pendingAction = null;
     
     // Detect WhatsApp
     function hasWhatsApp() {
@@ -99,10 +100,14 @@
             handleCustomerInfoSubmit(action, button);
         });
         
-        cancelBtn.addEventListener('click', function() {
+        cancelBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             modal.style.display = 'none';
             const form = modal.querySelector('#clarkes-customer-info-form');
             if (form) form.reset();
+            customerInfo = null;
+            pendingAction = null;
         });
         
         modal.addEventListener('click', function(e) {
