@@ -443,7 +443,10 @@ function clarkes_render_whatsapp_fab() {
         }
         
         function openSheet() {
-            if (sheet) sheet.style.display = 'block';
+            if (sheet) {
+                sheet.style.display = 'block';
+                console.log('Sheet opened');
+            }
             if (toggle) toggle.setAttribute('aria-expanded', 'true');
         }
         
