@@ -1,0 +1,77 @@
+/**
+ * Media Editor Styles
+ */
+
+.clarkes-media-editor {
+    max-width: 1400px;
+}
+
+.editor-canvas-container {
+    position: relative;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#editor-canvas {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#editor-video {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.control-panel {
+    background: white;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.control-panel label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.control-panel input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+}
+
+.control-panel input[type="number"],
+.control-panel input[type="text"],
+.control-panel input[type="color"],
+.control-panel select,
+.control-panel textarea {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.editor-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.editor-toolbar .button {
+    margin: 0;
+}
+
+@media (max-width: 782px) {
+    .editor-sidebar {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .editor-toolbar {
+        flex-direction: column;
+    }
+    
+    .editor-toolbar .button {
+        width: 100%;
+    }
+}
+

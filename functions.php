@@ -482,6 +482,17 @@ if (!function_exists('clarkes_add_quick_add_menu')) {
 }
 
 /**
+ * Include Media Editor
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_media_editor_menu')) {
+    $media_editor_file = get_template_directory() . '/inc/media-editor.php';
+    if (file_exists($media_editor_file)) {
+        require_once $media_editor_file;
+    }
+}
+
+/**
  * Include Case Studies system
  * Only include if not already loaded (prevents redeclaration)
  */
