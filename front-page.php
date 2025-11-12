@@ -13,18 +13,45 @@ get_header();
 <?php
 $hero_title = get_theme_mod('hero_title', 'Restore Performance. Reduce Emissions. Save Fuel.');
 $hero_subtitle = get_theme_mod('hero_subtitle', 'Professional engine decarbonisation in Kent — DPF, EGR and injector specialists.');
+$hero_bg_type = get_theme_mod('hero_bg_type', 'color');
+$hero_bg_color = get_theme_mod('hero_bg_color', '#0f0f0f');
 $hero_bg_image = get_theme_mod('hero_bg_image', '');
+$hero_bg_video = get_theme_mod('hero_bg_video', '');
 $hero_height = get_theme_mod('hero_height', '70vh');
+
+// Build background style based on type
 $hero_bg_style = '';
-if (!empty($hero_bg_image)) {
-    $hero_bg_url = wp_get_attachment_image_url($hero_bg_image, 'full');
-    if ($hero_bg_url) {
-        $hero_bg_style = 'background-image:url(' . esc_url($hero_bg_url) . '); background-size:cover; background-position:center;';
-    }
+$hero_bg_class = '';
+
+switch ($hero_bg_type) {
+    case 'image':
+        if (!empty($hero_bg_image)) {
+            $hero_bg_url = wp_get_attachment_image_url($hero_bg_image, 'full');
+            if ($hero_bg_url) {
+                $hero_bg_style = 'background-image:url(' . esc_url($hero_bg_url) . '); background-size:cover; background-position:center;';
+            }
+        }
+        break;
+    case 'video':
+        // Video handled separately in HTML
+        break;
+    case 'color':
+    default:
+        $hero_bg_style = 'background-color:' . esc_attr($hero_bg_color) . ';';
+        break;
 }
 ?>
-<section id="top" class="flex items-center bg-carbon-dark text-text-body pt-24 md:pt-32 pb-16 md:pb-24" style="min-height:<?php echo esc_attr($hero_height); ?>; <?php echo esc_attr($hero_bg_style); ?>">
-    <div class="max-w-7xl mx-auto px-4 w-full">
+<section id="top" class="hero-section flex items-center text-text-body pt-24 md:pt-32 pb-16 md:pb-24 relative overflow-hidden" style="min-height:<?php echo esc_attr($hero_height); ?>; <?php echo esc_attr($hero_bg_style); ?>">
+    <?php if ($hero_bg_type === 'video' && !empty($hero_bg_video)) : 
+        $hero_video_url = wp_get_attachment_url($hero_bg_video);
+        if ($hero_video_url) : ?>
+            <video class="hero-background-video absolute inset-0 w-full h-full object-cover z-0" autoplay muted loop playsinline>
+                <source src="<?php echo esc_url($hero_video_url); ?>" type="<?php echo esc_attr(get_post_mime_type($hero_bg_video)); ?>">
+            </video>
+            <div class="hero-video-overlay absolute inset-0 bg-carbon-dark/60 z-10"></div>
+        <?php endif;
+    endif; ?>
+    <div class="max-w-7xl mx-auto px-4 w-full relative z-20">
         <div class="max-w-4xl">
             <h1 class="hero-title text-4xl md:text-5xl font-bold text-white leading-tight">
                 <?php echo esc_html($hero_title); ?>

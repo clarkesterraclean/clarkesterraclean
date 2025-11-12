@@ -535,6 +535,41 @@ function clarkes_customize_register($wp_customize) {
         'type'    => 'textarea',
     ));
     
+    // Hero Background Type
+    $wp_customize->add_setting('hero_bg_type', array(
+        'default'           => 'color',
+        'sanitize_callback' => function($input) {
+            $choices = array('color', 'image', 'video');
+            return in_array($input, $choices) ? $input : 'color';
+        },
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control('hero_bg_type', array(
+        'label'       => esc_html__('Hero Background Type', 'clarkes-terraclean'),
+        'description' => esc_html__('Choose the type of background for the hero section', 'clarkes-terraclean'),
+        'section'     => 'clarkes_hero',
+        'type'        => 'select',
+        'choices'     => array(
+            'color' => 'Solid Color',
+            'image' => 'Image',
+            'video' => 'Video',
+        ),
+    ));
+    
+    // Hero Background Color
+    $wp_customize->add_setting('hero_bg_color', array(
+        'default'           => '#0f0f0f',
+        'sanitize_callback' => 'clarkes_sanitize_hex_color',
+        'transport'         => 'postMessage',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'hero_bg_color', array(
+        'label'       => esc_html__('Hero Background Color', 'clarkes-terraclean'),
+        'description' => esc_html__('Background color when using "Solid Color" type', 'clarkes-terraclean'),
+        'section'     => 'clarkes_hero',
+    )));
+    
     // Hero background image
     $wp_customize->add_setting('hero_bg_image', array(
         'default'           => '',
@@ -543,10 +578,24 @@ function clarkes_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'hero_bg_image', array(
-        'label'       => esc_html__('Hero Background Image (Optional)', 'clarkes-terraclean'),
-        'description' => esc_html__('Upload a background image for the hero section', 'clarkes-terraclean'),
+        'label'       => esc_html__('Hero Background Image', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a background image. Used when background type is set to "Image"', 'clarkes-terraclean'),
         'section'     => 'clarkes_hero',
         'mime_type'   => 'image',
+    )));
+    
+    // Hero background video
+    $wp_customize->add_setting('hero_bg_video', array(
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+        'transport'         => 'refresh',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'hero_bg_video', array(
+        'label'       => esc_html__('Hero Background Video', 'clarkes-terraclean'),
+        'description' => esc_html__('Upload a background video. Used when background type is set to "Video". Video will autoplay, loop, and be muted.', 'clarkes-terraclean'),
+        'section'     => 'clarkes_hero',
+        'mime_type'   => 'video',
     )));
     
     // Hero height

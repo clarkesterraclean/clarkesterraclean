@@ -471,6 +471,15 @@
         });
     });
     
+    // Hero Background Color
+    wp.customize('hero_bg_color', function(value) {
+        value.bind(function(newval) {
+            if ($('#top').hasClass('hero-section')) {
+                $('#top').css('background-color', newval);
+            }
+        });
+    });
+    
     // Section Padding Vertical
     wp.customize('section_padding_vertical', function(value) {
         value.bind(function(newval) {
