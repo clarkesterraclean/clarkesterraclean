@@ -424,9 +424,20 @@ function clarkes_render_whatsapp_fab() {
             
             // Check if elements exist
             if (!toggle || !sheet) {
-                console.warn('WhatsApp button elements not found');
+                console.warn('WhatsApp button elements not found', {
+                    toggle: !!toggle,
+                    sheet: !!sheet,
+                    toggleId: toggle ? toggle.id : 'N/A',
+                    sheetId: sheet ? sheet.id : 'N/A'
+                });
                 return;
             }
+            
+            console.log('WhatsApp button initialized successfully', {
+                toggle: toggle.id,
+                sheet: sheet.id,
+                chatUrl: typeof clarkesWhatsApp !== 'undefined' ? clarkesWhatsApp.chat_url : 'N/A'
+            });
             
             let attachments = [];
         
