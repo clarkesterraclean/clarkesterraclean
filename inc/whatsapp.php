@@ -530,55 +530,75 @@ function clarkes_render_whatsapp_fab() {
         
         function showCustomerInfoForm(action) {
             pendingAction = action;
-            if (customerInfoModal) {
-                customerInfoModal.style.display = 'flex';
+            const modal = document.getElementById('clarkes-customer-info-modal');
+            if (modal) {
+                modal.style.display = 'flex';
                 const nameInput = document.getElementById('customer-name');
                 if (nameInput) nameInput.focus();
+                
+                // Attach handlers when modal is shown
+                attachCustomerInfoModalHandlers();
             }
         }
         
-        // Use document-level event delegation for reliability
-        // This ensures handlers work even if modal is dynamically created
-        document.addEventListener('click', function(e) {
+        // Attach handlers directly to modal elements (like the working CTA modal)
+        // This is more reliable than document-level delegation
+        function attachCustomerInfoModalHandlers() {
             const modal = document.getElementById('clarkes-customer-info-modal');
+            const cancelBtn = document.getElementById('clarkes-customer-info-cancel');
+            const content = document.getElementById('clarkes-customer-info-content');
+            
             if (!modal) {
-                return; // Modal doesn't exist
+                return; // Modal doesn't exist yet
             }
             
-            // Check if modal is visible
-            const isVisible = modal.style.display !== 'none' && 
-                             window.getComputedStyle(modal).display !== 'none';
-            if (!isVisible) {
-                return; // Modal not visible
+            // Remove any existing handlers by cloning (prevents duplicates)
+            if (modal._handlersAttached) {
+                return; // Already attached
             }
             
-            // Check if cancel button was clicked
-            if (e.target && (e.target.id === 'clarkes-customer-info-cancel' || 
-                e.target.closest && e.target.closest('#clarkes-customer-info-cancel'))) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                console.log('Cancel button clicked (document delegation)');
-                closeCustomerInfoForm();
-                return false;
+            // Cancel button handler
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Cancel button clicked (direct handler)');
+                    closeCustomerInfoForm();
+                });
             }
             
-            // Check if backdrop was clicked (modal itself, not its children)
-            if (e.target === modal) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                console.log('Backdrop clicked (document delegation)');
-                closeCustomerInfoForm();
-                return false;
+            // Backdrop click handler - close when clicking on modal itself
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Backdrop clicked (direct handler)');
+                    closeCustomerInfoForm();
+                }
+            });
+            
+            // Prevent clicks inside content from closing modal
+            if (content) {
+                content.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
             }
-        }, true); // Capture phase
+            
+            modal._handlersAttached = true;
+        }
+        
+        // Also try to attach on init if modal already exists
+        setTimeout(function() {
+            attachCustomerInfoModalHandlers();
+        }, 100);
         
         function closeCustomerInfoForm() {
-            if (customerInfoModal) {
-                customerInfoModal.style.display = 'none';
-                if (customerInfoForm) {
-                    customerInfoForm.reset();
+            const modal = document.getElementById('clarkes-customer-info-modal');
+            const form = document.getElementById('clarkes-customer-info-form');
+            if (modal) {
+                modal.style.display = 'none';
+                if (form) {
+                    form.reset();
                 }
             }
             pendingAction = null;
