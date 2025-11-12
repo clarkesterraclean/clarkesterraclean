@@ -530,40 +530,56 @@ function clarkes_add_seo_meta_tags() {
         }
         
         // Meta tags
-        echo '<meta name="description" content="' . esc_attr($meta_description) . '" />' . "\n";
+        if ($meta_description) {
+            echo '<meta name="description" content="' . esc_attr($meta_description) . '" />' . "\n";
+        }
         if ($meta_keywords) {
             echo '<meta name="keywords" content="' . esc_attr($meta_keywords) . '" />' . "\n";
         }
         
         // Open Graph
         echo '<meta property="og:title" content="' . esc_attr($meta_title) . '" />' . "\n";
-        echo '<meta property="og:description" content="' . esc_attr($meta_description) . '" />' . "\n";
+        if ($meta_description) {
+            echo '<meta property="og:description" content="' . esc_attr($meta_description) . '" />' . "\n";
+        }
         echo '<meta property="og:url" content="' . esc_url(get_permalink($post->ID)) . '" />' . "\n";
-        echo '<meta property="og:type" content="website" />' . "\n";
+        echo '<meta property="og:type" content="article" />' . "\n";
+        echo '<meta property="og:site_name" content="' . esc_attr(get_bloginfo('name')) . '" />' . "\n";
         
         if (has_post_thumbnail($post->ID)) {
             $image = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'large');
             if ($image) {
                 echo '<meta property="og:image" content="' . esc_url($image[0]) . '" />' . "\n";
+                echo '<meta property="og:image:width" content="' . esc_attr($image[1]) . '" />' . "\n";
+                echo '<meta property="og:image:height" content="' . esc_attr($image[2]) . '" />' . "\n";
             }
         }
         
         // Twitter Card
         echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
         echo '<meta name="twitter:title" content="' . esc_attr($meta_title) . '" />' . "\n";
-        echo '<meta name="twitter:description" content="' . esc_attr($meta_description) . '" />' . "\n";
+        if ($meta_description) {
+            echo '<meta name="twitter:description" content="' . esc_attr($meta_description) . '" />' . "\n";
+        }
         
         // Canonical URL
         echo '<link rel="canonical" href="' . esc_url(get_permalink($post->ID)) . '" />' . "\n";
     } else {
-        // Homepage
+        // Homepage or Archive pages
         $site_name = get_option('clarkes_seo_site_name', get_bloginfo('name'));
         $default_desc = get_option('clarkes_seo_default_description', '');
+        $home_desc = $default_desc ?: get_bloginfo('description');
         
-        echo '<meta name="description" content="' . esc_attr($default_desc ?: get_bloginfo('description')) . '" />' . "\n";
+        if ($home_desc) {
+            echo '<meta name="description" content="' . esc_attr($home_desc) . '" />' . "\n";
+        }
         echo '<meta property="og:title" content="' . esc_attr($site_name) . '" />' . "\n";
-        echo '<meta property="og:description" content="' . esc_attr($default_desc ?: get_bloginfo('description')) . '" />' . "\n";
+        if ($home_desc) {
+            echo '<meta property="og:description" content="' . esc_attr($home_desc) . '" />' . "\n";
+        }
         echo '<meta property="og:url" content="' . esc_url(home_url()) . '" />' . "\n";
+        echo '<meta property="og:type" content="website" />' . "\n";
+        echo '<meta property="og:site_name" content="' . esc_attr($site_name) . '" />' . "\n";
         echo '<link rel="canonical" href="' . esc_url(home_url()) . '" />' . "\n";
     }
 }

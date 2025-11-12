@@ -5,8 +5,11 @@
 (function($) {
     'use strict';
     
-    // Crawl Site
-    $('#btn-crawl-site').on('click', function() {
+    // Wait for DOM to be ready
+    $(document).ready(function() {
+        
+    // Crawl Site - Use delegated event
+    $(document).on('click', '#btn-crawl-site', function() {
         var $btn = $(this);
         $btn.prop('disabled', true).text('Crawling...');
         
@@ -38,8 +41,8 @@
         });
     });
     
-    // Generate Sitemap
-    $('#btn-generate-sitemap').on('click', function() {
+    // Generate Sitemap - Use delegated event
+    $(document).on('click', '#btn-generate-sitemap', function() {
         var $btn = $(this);
         $btn.prop('disabled', true).text('Generating...');
         
@@ -65,8 +68,8 @@
         });
     });
     
-    // Optimize All Pages
-    $('#btn-optimize-all').on('click', function() {
+    // Optimize All Pages - Use delegated event
+    $(document).on('click', '#btn-optimize-all', function() {
         if (!confirm('This will optimize all pages. This may take a while. Continue?')) {
             return;
         }
@@ -122,8 +125,8 @@
         });
     }
     
-    // Optimize Single Page
-    $('.optimize-page-btn').on('click', function() {
+    // Optimize Single Page - Use delegated event
+    $(document).on('click', '.optimize-page-btn', function() {
         var $btn = $(this);
         var postId = $btn.data('id');
         
@@ -159,8 +162,8 @@
         $('#seo-progress-text').text(text);
     }
     
-    // Start Analysis
-    $('#btn-start-analysis').on('click', function() {
+    // Start Analysis - Use delegated event
+    $(document).on('click', '#btn-start-analysis', function() {
         var $btn = $(this);
         $btn.prop('disabled', true).text('Analyzing...');
         
@@ -186,6 +189,8 @@
             }
         });
     });
+    
+    }); // End document.ready
     
 })(jQuery);
 
