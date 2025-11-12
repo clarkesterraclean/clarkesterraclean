@@ -1,0 +1,45 @@
+/**
+ * SEO Module Styles
+ */
+
+.clarkes-seo-dashboard {
+    max-width: 1400px;
+}
+
+.seo-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.seo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.seo-issues ul {
+    margin: 0;
+}
+
+.seo-issues li {
+    transition: background 0.2s;
+}
+
+.seo-issues li:hover {
+    background: #f9fafb !important;
+}
+
+#seo-progress {
+    margin-top: 20px;
+}
+
+#seo-progress-bar {
+    transition: width 0.3s ease;
+}
+
+.clarkes-seo-content table {
+    margin-top: 20px;
+}
+
+.optimize-page-btn {
+    margin: 0;
+}
+
