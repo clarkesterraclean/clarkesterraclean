@@ -397,6 +397,61 @@ if ($hero_padding_bottom !== '') {
 endif; // show_case_studies
 ?>
 
+<!-- Case Studies Section -->
+<?php if (get_theme_mod('show_case_studies', 1)) : 
+    $case_studies_padding_top = get_theme_mod('case_studies_section_padding_top', '');
+    $case_studies_padding_bottom = get_theme_mod('case_studies_section_padding_bottom', '');
+    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $case_studies_style = 'padding-top: ' . ($case_studies_padding_top !== '' ? absint($case_studies_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($case_studies_padding_bottom !== '' ? absint($case_studies_padding_bottom) : $global_padding) . 'px;';
+?>
+<section id="case-studies" class="bg-carbon-light text-text-dark" style="<?php echo esc_attr($case_studies_style); ?>">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-center">Recent Results</h2>
+        
+        <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-8">
+            <?php while ($case_studies_query->have_posts()) : $case_studies_query->the_post(); 
+                $vehicle = get_post_meta(get_the_ID(), 'vehicle_make_model', true);
+                $problem = get_post_meta(get_the_ID(), 'problem', true);
+                if (empty($vehicle)) $vehicle = get_the_title();
+            ?>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:border-eco-green hover:shadow-xl transition-all duration-300">
+                <?php if (has_post_thumbnail()) : ?>
+                    <div class="h-48 overflow-hidden">
+                        <?php the_post_thumbnail('medium', array('class' => 'w-full h-full object-cover')); ?>
+                    </div>
+                <?php endif; ?>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3 text-eco-green"><?php echo esc_html($vehicle); ?></h3>
+                    <?php if (!empty($problem)) : ?>
+                        <p class="text-sm text-gray-600 mb-4 font-medium"><?php echo esc_html($problem); ?></p>
+                    <?php endif; ?>
+                    <div class="text-text-dark leading-relaxed">
+                        <?php 
+                        $result = get_post_meta(get_the_ID(), 'result', true);
+                        if (!empty($result)) {
+                            echo '<p>' . esc_html($result) . '</p>';
+                        } else {
+                            the_excerpt();
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+            <?php endwhile; wp_reset_postdata(); ?>
+        </div>
+        
+        <div class="text-center">
+            <a href="<?php echo esc_url(home_url('/case-studies/')); ?>" class="text-eco-green font-semibold hover:underline inline-flex items-center">
+                View more →
+            </a>
+        </div>
+    </div>
+</section>
+<?php 
+    endif; // have_posts
+endif; // show_case_studies
+?>
+
 <!-- Testimonials Section -->
 <?php if (get_theme_mod('show_testimonials', 1)) : 
     $testimonials_padding_top = get_theme_mod('testimonials_section_padding_top', '');
