@@ -80,59 +80,6 @@
         return modal;
     }
     
-    // Handle CTA buttons
-    document.addEventListener('click', function(e) {
-        const clickedBtn = e.target.closest('.clarkes-cta-button');
-        if (!clickedBtn || !clickedBtn.id) return;
-        
-        // Handle Call CTA buttons
-        if (clickedBtn.id.includes('call-cta')) {
-            e.preventDefault();
-            e.stopPropagation();
-            const phone = clickedBtn.getAttribute('data-phone');
-            const phoneClean = clickedBtn.getAttribute('data-phone-clean');
-            const waUrl = clickedBtn.getAttribute('data-wa-url');
-            
-            let modal = document.getElementById('clarkes-cta-modal');
-            if (!modal) {
-                modal = createCTAModal(phone, phoneClean, waUrl);
-            }
-            modal.style.display = 'flex';
-            return;
-        }
-        
-        // Handle WhatsApp CTA buttons
-        if (clickedBtn.id.includes('whatsapp-cta')) {
-            e.preventDefault();
-            e.stopPropagation();
-            const waUrl = clickedBtn.getAttribute('data-wa-url');
-            
-            if (!waUrl) {
-                console.warn('WhatsApp URL not found');
-                return;
-            }
-            
-            if (hasWhatsApp()) {
-                window.open(waUrl, '_blank');
-            } else {
-                // Open chat window if available
-                if (typeof window.clarkesWhatsApp !== 'undefined' && document.getElementById('clarkes-wa-chat-window')) {
-                    const chatWindow = document.getElementById('clarkes-wa-chat-window');
-                    if (chatWindow) {
-                        chatWindow.style.display = 'flex';
-                        const messageInput = document.getElementById('clarkes-wa-message-input');
-                        if (messageInput) messageInput.focus();
-                    } else {
-                        window.open(waUrl, '_blank');
-                    }
-                } else {
-                    window.open(waUrl, '_blank');
-                }
-            }
-            return;
-        }
-    });
-    
     // Wait for DOM to be ready
     function initCTAButtons() {
         // Handle CTA buttons
