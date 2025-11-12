@@ -452,7 +452,7 @@ function clarkes_customize_register($wp_customize) {
             $choices = array('outline', 'solid', 'text');
             return in_array($input, $choices) ? $input : 'outline';
         },
-        'transport'         => 'refresh',
+        'transport'         => 'postMessage',
     ));
     
     $wp_customize->add_control('header_phone_button_style', array(

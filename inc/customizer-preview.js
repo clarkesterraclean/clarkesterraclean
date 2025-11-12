@@ -167,6 +167,36 @@
         });
     });
     
+    // Phone Button Style
+    wp.customize('header_phone_button_style', function(value) {
+        value.bind(function(newval) {
+            var $button = $('.header-phone-button');
+            if ($button.length === 0) return;
+            
+            // Remove all style classes
+            $button.removeClass('bg-eco-green text-carbon-dark hover:bg-eco-green/90 border border-eco-green text-eco-green hover:bg-eco-green hover:text-carbon-dark hover:text-eco-green/80');
+            
+            // Add classes based on style
+            switch(newval) {
+                case 'solid':
+                    $button.addClass('bg-eco-green text-carbon-dark hover:bg-eco-green/90');
+                    $button.removeClass('border');
+                    break;
+                case 'text':
+                    $button.addClass('text-eco-green hover:text-eco-green/80');
+                    $button.removeClass('border');
+                    break;
+                case 'outline':
+                default:
+                    $button.addClass('border border-eco-green text-eco-green hover:bg-eco-green hover:text-carbon-dark');
+                    break;
+            }
+            
+            // Update data attribute
+            $button.attr('data-button-style', newval);
+        });
+    });
+    
     // ========================================
     // FOOTER PREVIEW UPDATES
     // ========================================

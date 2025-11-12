@@ -42,6 +42,7 @@ $header_nav_font_weight = get_theme_mod('header_nav_font_weight', '500');
 $header_nav_letter_spacing = get_theme_mod('header_nav_letter_spacing', 0);
 $header_logo_size = get_theme_mod('header_logo_size', 'medium');
 $mobile_menu_bg_color = get_theme_mod('mobile_menu_bg_color', '#0f0f0f');
+$phone_button_style = get_theme_mod('header_phone_button_style', 'outline');
 
 // Build header style
 $header_style = 'background-color: ' . esc_attr($header_bg_color) . ';';
@@ -89,6 +90,21 @@ $nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
     $show_phone = get_theme_mod('show_phone_in_header', 1);
     $phone = get_theme_mod('business_phone', '07706 230867');
     $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+    
+    // Build phone button classes based on style
+    $phone_button_classes = 'hidden md:inline-block rounded-full px-4 py-2 text-sm font-semibold transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green';
+    switch ($phone_button_style) {
+        case 'solid':
+            $phone_button_classes .= ' bg-eco-green text-carbon-dark hover:bg-eco-green/90';
+            break;
+        case 'text':
+            $phone_button_classes .= ' text-eco-green hover:text-eco-green/80';
+            break;
+        case 'outline':
+        default:
+            $phone_button_classes .= ' border border-eco-green text-eco-green hover:bg-eco-green hover:text-carbon-dark';
+            break;
+    }
     
     // Render different layouts based on header_layout setting
     if ($header_layout === 'centered') : ?>
@@ -251,7 +267,7 @@ $nav_style .= ' color: ' . esc_attr($header_link_color) . ';';
             <div class="flex items-center gap-4">
                 <!-- Desktop Phone CTA -->
                 <?php if ($show_phone) : ?>
-                    <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="hidden md:inline-block border border-eco-green text-eco-green rounded-full px-4 py-2 text-sm font-semibold hover:bg-eco-green hover:text-carbon-dark transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
+                    <a href="tel:<?php echo esc_attr($phone_clean); ?>" aria-label="Call Clarke's DPF & Engine Specialists" class="header-phone-button <?php echo esc_attr($phone_button_classes); ?>" data-button-style="<?php echo esc_attr($phone_button_style); ?>">
                         Call <?php echo esc_html($phone); ?>
                     </a>
                 <?php endif; ?>
