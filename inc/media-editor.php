@@ -377,13 +377,17 @@ function clarkes_generate_ai_seo() {
     $current_alt = get_post_meta($media_id, '_wp_attachment_image_alt', true);
     
     // Generate SEO-friendly suggestions
-    // In a real implementation, this would call an AI API
-    // For now, we'll create intelligent suggestions based on filename and context
-    
     $filename = pathinfo($current_title, PATHINFO_FILENAME);
     $filename_clean = str_replace(array('-', '_'), ' ', $filename);
     $filename_clean = ucwords($filename_clean);
     
+    // Get image dimensions if available
+    $media_meta = wp_get_attachment_metadata($media_id);
+    $width = isset($media_meta['width']) ? $media_meta['width'] : 0;
+    $height = isset($media_meta['height']) ? $media_meta['height'] : 0;
+    $orientation = ($height > $width) ? 'portrait' : 'landscape';
+    
+    // Base suggestions
     $suggestions = array(
         'title' => $filename_clean . ' - Clarke\'s DPF & Engine Specialists',
         'alt' => $filename_clean . ' - Professional engine cleaning and decarbonisation service',
@@ -391,11 +395,45 @@ function clarkes_generate_ai_seo() {
         'keywords' => 'engine cleaning, DPF cleaning, EGR cleaning, decarbonisation, Kent, automotive service, ' . strtolower($filename_clean),
     );
     
-    // If AI API key is set, try to use it
+    // If AI API key is set, try to use OpenAI
     $ai_api_key = get_option('clarkes_ai_api_key', '');
     if (!empty($ai_api_key)) {
-        // Call AI API here (OpenAI, etc.)
-        // For now, return suggestions
+        // Analyze image/video and generate better SEO
+        $prompt = "Generate SEO-optimized metadata for a " . $media_type . " file named '" . $filename_clean . "' for a business called 'Clarke's DPF & Engine Specialists' that does engine decarbonisation, DPF cleaning, and EGR valve cleaning in Kent, UK. Return JSON with: title, alt_text, description, keywords (comma-separated).";
+        
+        $ai_response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $ai_api_key,
+                'Content-Type' => 'application/json',
+            ),
+            'body' => json_encode(array(
+                'model' => 'gpt-3.5-turbo',
+                'messages' => array(
+                    array('role' => 'user', 'content' => $prompt)
+                ),
+                'max_tokens' => 300,
+            )),
+            'timeout' => 30,
+        ));
+        
+        if (!is_wp_error($ai_response)) {
+            $body = json_decode(wp_remote_retrieve_body($ai_response), true);
+            if (isset($body['choices'][0]['message']['content'])) {
+                $ai_content = $body['choices'][0]['message']['content'];
+                // Try to parse JSON from AI response
+                if (preg_match('/\{.*\}/s', $ai_content, $matches)) {
+                    $ai_data = json_decode($matches[0], true);
+                    if ($ai_data) {
+                        $suggestions = array_merge($suggestions, array(
+                            'title' => isset($ai_data['title']) ? $ai_data['title'] : $suggestions['title'],
+                            'alt' => isset($ai_data['alt_text']) ? $ai_data['alt_text'] : $suggestions['alt'],
+                            'description' => isset($ai_data['description']) ? $ai_data['description'] : $suggestions['description'],
+                            'keywords' => isset($ai_data['keywords']) ? $ai_data['keywords'] : $suggestions['keywords'],
+                        ));
+                    }
+                }
+            }
+        }
     }
     
     wp_send_json_success($suggestions);
@@ -494,10 +532,11 @@ function clarkes_process_video() {
 add_action('wp_ajax_clarkes_process_video', 'clarkes_process_video');
 
 /**
- * Add AI API Key Setting
+ * Add AI API Key Setting to Advanced Section
  */
 if (!function_exists('clarkes_add_ai_api_key_setting')) {
 function clarkes_add_ai_api_key_setting($wp_customize) {
+    // Add to Advanced section if it exists, otherwise create it
     $wp_customize->add_setting('clarkes_ai_api_key', array(
         'default'           => '',
         'sanitize_callback' => 'sanitize_text_field',
@@ -506,11 +545,12 @@ function clarkes_add_ai_api_key_setting($wp_customize) {
     
     $wp_customize->add_control('clarkes_ai_api_key', array(
         'label'       => esc_html__('AI API Key (Optional)', 'clarkes-terraclean'),
-        'description' => esc_html__('Enter your OpenAI API key for enhanced AI features in the Media Editor', 'clarkes-terraclean'),
-        'section'     => 'clarkes_hero',
+        'description' => esc_html__('Enter your OpenAI API key for enhanced AI features in the Media Editor. Get one at platform.openai.com', 'clarkes-terraclean'),
+        'section'     => 'clarkes_advanced',
         'type'        => 'text',
+        'priority'    => 100,
     ));
 }
 }
-add_action('customize_register', 'clarkes_add_ai_api_key_setting');
+add_action('customize_register', 'clarkes_add_ai_api_key_setting', 20);
 
