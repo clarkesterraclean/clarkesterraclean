@@ -166,10 +166,15 @@ function clarkes_seo_module_page() {
         <!-- Quick Actions -->
         <div class="seo-actions" style="background: white; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin: 20px 0;">
             <h2><?php _e('Quick Actions', 'clarkes-terraclean'); ?></h2>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                 <button type="button" class="button button-primary button-large" id="btn-crawl-site">
-                    <?php _e('🕷️ Crawl Site & Analyze', 'clarkes-terraclean'); ?>
+                    <?php _e('🕷️ Crawl & Analyze Site', 'clarkes-terraclean'); ?>
                 </button>
+                <button type="button" class="button button-primary button-large" id="btn-crawl-and-fix" style="background: #4ade80; border-color: #4ade80; color: white;">
+                    <?php _e('⚡ Crawl & Auto-Fix All Issues', 'clarkes-terraclean'); ?>
+                </button>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button type="button" class="button button-large" id="btn-generate-sitemap">
                     <?php _e('🗺️ Generate Sitemap', 'clarkes-terraclean'); ?>
                 </button>
