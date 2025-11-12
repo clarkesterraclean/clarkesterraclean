@@ -66,7 +66,7 @@
         modal.style.cssText = 'display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10003; align-items: center; justify-content: center;';
         
         modal.innerHTML = `
-            <div style="background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+            <div id="clarkes-customer-info-content" style="background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto; position: relative;">
                 <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1f2937;">Quick Contact Form</h3>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">Please provide a few details to help us assist you better:</p>
                 <form id="clarkes-customer-info-form" style="display: flex; flex-direction: column; gap: 16px;">
@@ -103,6 +103,7 @@
         cancelBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('Cancel button clicked (CTA)');
             modal.style.display = 'none';
             const form = modal.querySelector('#clarkes-customer-info-form');
             if (form) form.reset();
@@ -110,11 +111,14 @@
             pendingAction = null;
         });
         
+        // Close modal on backdrop click
         modal.addEventListener('click', function(e) {
             // Close if clicking on the backdrop (the modal itself, not its children)
+            console.log('Modal clicked (CTA), target:', e.target, 'modal:', modal);
             if (e.target === modal) {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('Closing modal via backdrop click (CTA)');
                 modal.style.display = 'none';
                 const form = modal.querySelector('#clarkes-customer-info-form');
                 if (form) form.reset();
@@ -122,6 +126,14 @@
                 pendingAction = null;
             }
         });
+        
+        // Prevent clicks inside the content from closing the modal
+        const content = modal.querySelector('#clarkes-customer-info-content');
+        if (content) {
+            content.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent clicks inside from bubbling to modal
+            });
+        }
         
         modal.style.display = 'flex';
         const nameInput = modal.querySelector('#customer-name');

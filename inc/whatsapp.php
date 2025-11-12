@@ -353,7 +353,7 @@ function clarkes_render_whatsapp_fab() {
     
     <!-- Customer Info Form Modal -->
     <div id="clarkes-customer-info-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10003; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+        <div id="clarkes-customer-info-content" style="background: white; border-radius: 16px; padding: 24px; max-width: 450px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto; position: relative;">
             <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1f2937;">Quick Contact Form</h3>
             <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">Please provide a few details to help us assist you better:</p>
             <form id="clarkes-customer-info-form" style="display: flex; flex-direction: column; gap: 16px;">
@@ -643,23 +643,39 @@ function clarkes_render_whatsapp_fab() {
             });
         }
         
+        // Cancel button handler
         if (customerInfoCancel) {
             customerInfoCancel.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('Cancel button clicked');
                 closeCustomerInfoForm();
             });
+        } else {
+            console.warn('Cancel button not found');
         }
         
-        // Close customer info modal on outside click
+        // Close customer info modal on outside click (backdrop)
         if (customerInfoModal) {
             customerInfoModal.addEventListener('click', function(e) {
                 // Close if clicking on the backdrop (the modal itself, not its children)
+                console.log('Modal clicked, target:', e.target, 'modal:', customerInfoModal);
                 if (e.target === customerInfoModal) {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('Closing modal via backdrop click');
                     closeCustomerInfoForm();
                 }
+            });
+        } else {
+            console.warn('Customer info modal not found');
+        }
+        
+        // Prevent clicks inside the content from closing the modal
+        const customerInfoContent = document.getElementById('clarkes-customer-info-content');
+        if (customerInfoContent) {
+            customerInfoContent.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent clicks inside from bubbling to modal
             });
         }
         
