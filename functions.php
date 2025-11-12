@@ -537,6 +537,17 @@ if (!function_exists('clarkes_add_media_compression_menu')) {
 }
 
 /**
+ * Include AI Content Module
+ * Only include if not already loaded (prevents redeclaration)
+ */
+if (!function_exists('clarkes_add_ai_content_menu')) {
+    $ai_content_file = get_template_directory() . '/inc/ai-content-module.php';
+    if (file_exists($ai_content_file)) {
+        require_once $ai_content_file;
+    }
+}
+
+/**
  * Include Case Studies system
  * Only include if not already loaded (prevents redeclaration)
  */
