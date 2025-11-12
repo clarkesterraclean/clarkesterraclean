@@ -17,6 +17,10 @@
         modal.id = 'clarkes-cta-modal';
         modal.style.cssText = 'display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10002; align-items: center; justify-content: center;';
         
+        // Remove text parameter from WhatsApp URL for calls (we want to open chat without pre-filled message)
+        // This allows user to tap the call button in WhatsApp
+        const waCallUrl = waUrl.split('?')[0]; // Remove any query parameters
+        
         modal.innerHTML = `
             <div style="background: white; border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; margin: 20px;">
                 <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1f2937;">Call ${phone}</h3>
@@ -36,7 +40,7 @@
                         </svg>
                         <div>
                             <div style="font-weight: 600;">Call via WhatsApp</div>
-                            <div style="font-size: 12px; color: #6b7280;">Open WhatsApp to call</div>
+                            <div style="font-size: 12px; color: #6b7280;">Tap call button in WhatsApp</div>
                         </div>
                     </button>
                 </div>
@@ -60,15 +64,17 @@
             }
         });
         
-        // WhatsApp call button - opens WhatsApp (user can then tap call button in WhatsApp)
+        // WhatsApp call button - opens WhatsApp without pre-filled message
+        // User can then tap the call button in WhatsApp to make a voice/video call
         waCallBtn.addEventListener('click', function() {
-            // Open WhatsApp - user will need to tap the call button in WhatsApp
-            // WhatsApp doesn't support direct call links, so we open the chat and user can call from there
+            // Remove query parameters to avoid pre-filling a message
+            // This opens WhatsApp chat cleanly, allowing user to tap call button
             if (hasWhatsApp()) {
-                window.location.href = waUrl;
+                // On mobile, use location.href to open WhatsApp app
+                window.location.href = waCallUrl;
             } else {
                 // For desktop, open WhatsApp Web
-                window.open(waUrl, '_blank');
+                window.open(waCallUrl, '_blank');
             }
             modal.style.display = 'none';
         });
