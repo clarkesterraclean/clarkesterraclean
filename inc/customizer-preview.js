@@ -480,11 +480,20 @@
         });
     });
     
-    // Section Spacing
-    wp.customize('section_padding_vertical', function(value) {
+    // Global Section Spacing
+    wp.customize('section_padding_vertical_global', function(value) {
         value.bind(function(newval) {
-            $('section').css('padding-top', newval + 'px');
-            $('section').css('padding-bottom', newval + 'px');
+            // Apply to sections that don't have individual settings
+            $('section').each(function() {
+                var $section = $(this);
+                var sectionId = $section.attr('id');
+                if (!sectionId || (sectionId !== 'top' && sectionId !== 'about' && sectionId !== 'services' && sectionId !== 'case-studies' && sectionId !== 'testimonials' && sectionId !== 'contact')) {
+                    $section.css({
+                        'padding-top': newval + 'px',
+                        'padding-bottom': newval + 'px'
+                    });
+                }
+            });
         });
     });
     

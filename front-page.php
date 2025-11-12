@@ -42,9 +42,9 @@ switch ($hero_bg_type) {
 }
 ?>
 <?php
-$hero_padding_top = get_theme_mod('hero_section_padding_top', '');
-$hero_padding_bottom = get_theme_mod('hero_section_padding_bottom', '');
-$global_padding = get_theme_mod('section_padding_vertical', 64);
+    $hero_padding_top = get_theme_mod('hero_section_padding_top', '');
+    $hero_padding_bottom = get_theme_mod('hero_section_padding_bottom', '');
+    $global_padding = get_theme_mod('section_padding_vertical_global', 64);
 $hero_padding_style = '';
 if ($hero_padding_top !== '') {
     $hero_padding_style .= 'padding-top: ' . absint($hero_padding_top) . 'px; ';
@@ -117,7 +117,7 @@ if ($hero_padding_bottom !== '') {
 <?php if (get_theme_mod('show_about', 1)) : 
     $about_padding_top = get_theme_mod('about_section_padding_top', '');
     $about_padding_bottom = get_theme_mod('about_section_padding_bottom', '');
-    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $global_padding = get_theme_mod('section_padding_vertical_global', 64);
     $about_style = 'padding-top: ' . ($about_padding_top !== '' ? absint($about_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($about_padding_bottom !== '' ? absint($about_padding_bottom) : $global_padding) . 'px;';
 ?>
 <section id="about" class="bg-carbon-light text-text-dark" style="<?php echo esc_attr($about_style); ?>">
@@ -180,7 +180,7 @@ if ($hero_padding_bottom !== '') {
 <?php if (get_theme_mod('show_services', 1)) : 
     $services_padding_top = get_theme_mod('services_section_padding_top', '');
     $services_padding_bottom = get_theme_mod('services_section_padding_bottom', '');
-    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $global_padding = get_theme_mod('section_padding_vertical_global', 64);
     $services_style = 'padding-top: ' . ($services_padding_top !== '' ? absint($services_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($services_padding_bottom !== '' ? absint($services_padding_bottom) : $global_padding) . 'px;';
 ?>
 <section id="services" class="bg-white text-text-dark" style="<?php echo esc_attr($services_style); ?>">
@@ -350,7 +350,7 @@ if ($hero_padding_bottom !== '') {
     if ($case_studies_query->have_posts()) :
         $case_studies_padding_top = get_theme_mod('case_studies_section_padding_top', '');
         $case_studies_padding_bottom = get_theme_mod('case_studies_section_padding_bottom', '');
-        $global_padding = get_theme_mod('section_padding_vertical', 64);
+        $global_padding = get_theme_mod('section_padding_vertical_global', 64);
         $case_studies_style = 'padding-top: ' . ($case_studies_padding_top !== '' ? absint($case_studies_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($case_studies_padding_bottom !== '' ? absint($case_studies_padding_bottom) : $global_padding) . 'px;';
 ?>
 <section id="case-studies" class="bg-carbon-light text-text-dark" style="<?php echo esc_attr($case_studies_style); ?>">
@@ -405,7 +405,7 @@ endif; // show_case_studies
 <?php if (get_theme_mod('show_testimonials', 1)) : 
     $testimonials_padding_top = get_theme_mod('testimonials_section_padding_top', '');
     $testimonials_padding_bottom = get_theme_mod('testimonials_section_padding_bottom', '');
-    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $global_padding = get_theme_mod('section_padding_vertical_global', 64);
     $testimonials_style = 'padding-top: ' . ($testimonials_padding_top !== '' ? absint($testimonials_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($testimonials_padding_bottom !== '' ? absint($testimonials_padding_bottom) : $global_padding) . 'px;';
 ?>
 <section id="testimonials" class="bg-carbon-dark text-text-body" style="<?php echo esc_attr($testimonials_style); ?>">
@@ -449,7 +449,7 @@ endif; // show_case_studies
 <?php if (get_theme_mod('show_contact', 1)) : 
     $contact_padding_top = get_theme_mod('contact_section_padding_top', '');
     $contact_padding_bottom = get_theme_mod('contact_section_padding_bottom', '');
-    $global_padding = get_theme_mod('section_padding_vertical', 64);
+    $global_padding = get_theme_mod('section_padding_vertical_global', 64);
     $contact_style = 'padding-top: ' . ($contact_padding_top !== '' ? absint($contact_padding_top) : $global_padding) . 'px; padding-bottom: ' . ($contact_padding_bottom !== '' ? absint($contact_padding_bottom) : $global_padding) . 'px;';
 ?>
 <section id="contact" class="bg-carbon-dark text-text-body" style="<?php echo esc_attr($contact_style); ?>">
