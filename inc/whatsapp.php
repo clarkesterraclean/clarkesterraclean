@@ -534,56 +534,45 @@ function clarkes_render_whatsapp_fab() {
                 customerInfoModal.style.display = 'flex';
                 const nameInput = document.getElementById('customer-name');
                 if (nameInput) nameInput.focus();
-                
-                // Attach handlers when modal is shown (in case they weren't attached before)
-                attachCustomerInfoHandlers();
             }
         }
         
-        function attachCustomerInfoHandlers() {
+        // Use document-level event delegation for reliability
+        // This ensures handlers work even if modal is dynamically created
+        document.addEventListener('click', function(e) {
             const modal = document.getElementById('clarkes-customer-info-modal');
-            const cancelBtn = document.getElementById('clarkes-customer-info-cancel');
-            const content = document.getElementById('clarkes-customer-info-content');
-            
-            // Remove existing listeners by cloning (to avoid duplicates)
-            if (modal && modal._hasHandlers) {
-                return; // Already attached
+            if (!modal) {
+                return; // Modal doesn't exist
             }
             
-            // Cancel button - use event delegation
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    console.log('Cancel button clicked');
-                    closeCustomerInfoForm();
-                    return false;
-                }, true); // Use capture phase
+            // Check if modal is visible
+            const isVisible = modal.style.display !== 'none' && 
+                             window.getComputedStyle(modal).display !== 'none';
+            if (!isVisible) {
+                return; // Modal not visible
             }
             
-            // Backdrop click - close modal
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        console.log('Closing modal via backdrop click');
-                        closeCustomerInfoForm();
-                        return false;
-                    }
-                }, true); // Use capture phase
-                modal._hasHandlers = true;
+            // Check if cancel button was clicked
+            if (e.target && (e.target.id === 'clarkes-customer-info-cancel' || 
+                e.target.closest && e.target.closest('#clarkes-customer-info-cancel'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Cancel button clicked (document delegation)');
+                closeCustomerInfoForm();
+                return false;
             }
             
-            // Prevent clicks inside content from closing modal
-            if (content) {
-                content.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                }, true);
+            // Check if backdrop was clicked (modal itself, not its children)
+            if (e.target === modal) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Backdrop clicked (document delegation)');
+                closeCustomerInfoForm();
+                return false;
             }
-        }
+        }, true); // Capture phase
         
         function closeCustomerInfoForm() {
             if (customerInfoModal) {
@@ -691,8 +680,7 @@ function clarkes_render_whatsapp_fab() {
             });
         }
         
-        // Attach handlers initially (they'll be re-attached when modal is shown)
-        attachCustomerInfoHandlers();
+        // Handlers are attached via document-level delegation above
         
         // Call button - show options
         if (callBtn) {

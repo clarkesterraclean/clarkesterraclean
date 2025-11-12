@@ -100,45 +100,42 @@
             handleCustomerInfoSubmit(action, button);
         });
         
-        // Cancel button handler - use capture phase for reliability
-        cancelBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            console.log('Cancel button clicked (CTA)');
-            modal.style.display = 'none';
-            const form = modal.querySelector('#clarkes-customer-info-form');
-            if (form) form.reset();
-            customerInfo = null;
-            pendingAction = null;
-            return false;
-        }, true); // Capture phase
-        
-        // Close modal on backdrop click - use capture phase
-        modal.addEventListener('click', function(e) {
-            // Close if clicking on the backdrop (the modal itself, not its children)
-            console.log('Modal clicked (CTA), target:', e.target, 'modal:', modal);
-            if (e.target === modal) {
+        // Use document-level event delegation for reliability
+        // This ensures handlers work even if modal is dynamically created
+        const handleModalClick = function(e) {
+            // Check if cancel button was clicked
+            if (e.target && e.target.id === 'clarkes-customer-info-cancel') {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                console.log('Closing modal via backdrop click (CTA)');
+                console.log('Cancel button clicked (CTA - document delegation)');
                 modal.style.display = 'none';
                 const form = modal.querySelector('#clarkes-customer-info-form');
                 if (form) form.reset();
                 customerInfo = null;
                 pendingAction = null;
+                document.removeEventListener('click', handleModalClick, true);
                 return false;
             }
-        }, true); // Capture phase
+            
+            // Check if backdrop was clicked (modal itself, not its children)
+            if (e.target === modal) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Backdrop clicked (CTA - document delegation)');
+                modal.style.display = 'none';
+                const form = modal.querySelector('#clarkes-customer-info-form');
+                if (form) form.reset();
+                customerInfo = null;
+                pendingAction = null;
+                document.removeEventListener('click', handleModalClick, true);
+                return false;
+            }
+        };
         
-        // Prevent clicks inside the content from closing the modal
-        const content = modal.querySelector('#clarkes-customer-info-content');
-        if (content) {
-            content.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent clicks inside from bubbling to modal
-            }, true); // Capture phase
-        }
+        // Attach handler when modal is shown
+        document.addEventListener('click', handleModalClick, true);
         
         modal.style.display = 'flex';
         const nameInput = modal.querySelector('#customer-name');
