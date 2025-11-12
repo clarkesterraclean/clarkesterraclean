@@ -107,10 +107,10 @@ if ($hero_padding_bottom !== '') {
                 $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>
                 <button id="hero-call-cta" class="clarkes-cta-button border border-eco-green text-eco-green rounded-full px-6 py-3 text-base font-semibold hover:bg-eco-green hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
-                    📞 Call <?php echo esc_html($phone); ?>
+                    Call <?php echo esc_html($phone); ?>
                 </button>
                 <button id="hero-whatsapp-cta" class="clarkes-cta-button inline-block rounded-full border border-eco-green bg-eco-green text-white px-6 py-3 text-base font-semibold hover:bg-eco-green/80 transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green cursor-pointer" data-wa-url="<?php echo esc_attr($wa_url); ?>">
-                    💬 WhatsApp
+                    WhatsApp
                 </button>
                 <a href="#contact" class="inline-block rounded-full border border-text-body/40 px-4 py-2 text-sm font-semibold hover:bg-white hover:text-carbon-dark transition text-center whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-eco-green">
                     Book a Service
