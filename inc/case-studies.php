@@ -349,6 +349,19 @@ function clarkes_save_case_study_meta($post_id) {
             }
         }
     }
+    
+    // Save SEO fields
+    if (isset($_POST['case_study_seo_title'])) {
+        update_post_meta($post_id, '_clarkes_seo_title', sanitize_text_field($_POST['case_study_seo_title']));
+    }
+    
+    if (isset($_POST['case_study_seo_description'])) {
+        update_post_meta($post_id, '_clarkes_seo_description', sanitize_textarea_field($_POST['case_study_seo_description']));
+    }
+    
+    if (isset($_POST['case_study_seo_keywords'])) {
+        update_post_meta($post_id, '_clarkes_seo_keywords', sanitize_text_field($_POST['case_study_seo_keywords']));
+    }
 }
 }
 add_action('save_post', 'clarkes_save_case_study_meta');

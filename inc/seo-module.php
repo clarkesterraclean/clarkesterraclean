@@ -548,12 +548,22 @@ function clarkes_add_seo_meta_tags() {
         $meta_description = get_post_meta($post->ID, '_clarkes_seo_description', true);
         $meta_keywords = get_post_meta($post->ID, '_clarkes_seo_keywords', true);
         
+        // For case studies, use SEO title if available
+        if (get_post_type($post->ID) === 'case_study' && !$meta_title) {
+            $meta_title = $post->post_title;
+        }
+        
         if (!$meta_title) {
             $meta_title = $post->post_title . ' - ' . get_bloginfo('name');
         }
         
+        // For case studies, use SEO description if available
+        if (get_post_type($post->ID) === 'case_study' && !$meta_description) {
+            $meta_description = get_post_meta($post->ID, '_clarkes_seo_description', true);
+        }
+        
         if (!$meta_description) {
-            $meta_description = get_post_meta($post->ID, '_clarkes_seo_description', true) ?: wp_trim_words(strip_tags($post->post_content), 30);
+            $meta_description = wp_trim_words(strip_tags($post->post_content), 30);
         }
         
         // Meta tags
