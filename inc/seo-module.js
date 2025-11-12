@@ -107,6 +107,45 @@
     // Wait for DOM to be ready
     $(document).ready(function() {
         
+    // Poll for real-time progress updates
+    var progressInterval = null;
+    
+    function startProgressPolling() {
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
+        
+        progressInterval = setInterval(function() {
+            $.ajax({
+                url: clarkesSEO.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'clarkes_get_seo_progress',
+                    nonce: clarkesSEO.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data.status !== 'idle') {
+                        var progress = response.data;
+                        var percent = progress.percent || 0;
+                        var statusText = 'Analyzing: ' + (progress.current_page || '') + ' (' + progress.current + '/' + progress.total + ')';
+                        updateProgress(percent, statusText, progress.current + ' / ' + progress.total + ' pages');
+                        
+                        if (progress.status === 'fixed') {
+                            addLogEntry('Fixed: ' + progress.current_page, 'success');
+                        }
+                    }
+                }
+            });
+        }, 1000); // Poll every second
+    }
+    
+    function stopProgressPolling() {
+        if (progressInterval) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
+    }
+    
     // Crawl Site - Use delegated event
     $(document).on('click', '#btn-crawl-site', function() {
         var $btn = $(this);
@@ -117,6 +156,8 @@
         clearLog();
         addLogEntry('Starting site crawl and analysis...', 'processing');
         updateProgress(0, 'Starting site crawl...', '0 / 0 pages');
+        
+        startProgressPolling();
         
         $.ajax({
             url: clarkesSEO.ajax_url,
@@ -137,15 +178,24 @@
                 return xhr;
             },
             success: function(response) {
+                stopProgressPolling();
+                
                 if (response.success) {
                     addLogEntry('Crawl completed successfully', 'success');
                     addLogEntry('Analyzed ' + response.data.analyzed + ' pages', 'info');
                     addLogEntry('Average SEO score: ' + response.data.score + '/100', 'info');
                     addLogEntry('Found ' + response.data.issues + ' issues', response.data.issues > 0 ? 'warning' : 'success');
+                    
+                    // Display score breakdown if available
+                    if (response.data.breakdown) {
+                        addLogEntry('Score breakdown calculated', 'info');
+                        displayScoreBreakdown(response.data.breakdown, response.data.score);
+                    }
+                    
                     updateProgress(100, 'Crawl complete!', response.data.analyzed + ' pages analyzed');
                     setTimeout(function() {
                         location.reload();
-                    }, 3000);
+                    }, 4000);
                 } else {
                     addLogEntry('Error: ' + response.data.message, 'error');
                     alert('Error: ' + response.data.message);
@@ -153,6 +203,7 @@
                 }
             },
             error: function(xhr, status, error) {
+                stopProgressPolling();
                 addLogEntry('AJAX error occurred: ' + error, 'error');
                 alert('An error occurred during site crawl');
                 $btn.prop('disabled', false).text('🕷️ Crawl & Analyze Site');
@@ -175,6 +226,8 @@
         addLogEntry('Starting crawl and auto-fix process...', 'processing');
         updateProgress(0, 'Starting crawl and auto-fix...', '0 / 0 pages');
         
+        startProgressPolling();
+        
         $.ajax({
             url: clarkesSEO.ajax_url,
             type: 'POST',
@@ -194,6 +247,8 @@
                 return xhr;
             },
             success: function(response) {
+                stopProgressPolling();
+                
                 if (response.success) {
                     addLogEntry('Crawl and auto-fix completed', 'success');
                     addLogEntry('Analyzed ' + response.data.analyzed + ' pages', 'info');
@@ -201,17 +256,30 @@
                     if (response.data.fixed > 0) {
                         addLogEntry('Auto-fixed ' + response.data.fixed + ' pages', 'success');
                     }
+                    if (response.data.content_boosted > 0) {
+                        addLogEntry('Content boosted on ' + response.data.content_boosted + ' pages', 'success');
+                    }
                     if (response.data.issues > 0) {
                         addLogEntry('Remaining issues: ' + response.data.issues, 'warning');
                     }
+                    
+                    // Display score breakdown if available
+                    if (response.data.breakdown) {
+                        addLogEntry('Score breakdown calculated', 'info');
+                        displayScoreBreakdown(response.data.breakdown, response.data.score);
+                    }
+                    
                     var message = response.data.message;
                     if (response.data.fixed > 0) {
                         message += ' Fixed ' + response.data.fixed + ' pages automatically!';
                     }
+                    if (response.data.content_boosted > 0) {
+                        message += ' Content boosted on ' + response.data.content_boosted + ' pages!';
+                    }
                     updateProgress(100, message, response.data.analyzed + ' pages processed');
                     setTimeout(function() {
                         location.reload();
-                    }, 4000);
+                    }, 5000);
                 } else {
                     addLogEntry('Error: ' + response.data.message, 'error');
                     alert('Error: ' + response.data.message);
@@ -219,6 +287,7 @@
                 }
             },
             error: function(xhr, status, error) {
+                stopProgressPolling();
                 addLogEntry('AJAX error occurred: ' + error, 'error');
                 alert('An error occurred during crawl and fix');
                 $btn.prop('disabled', false).text('⚡ Crawl & Auto-Fix All Issues');
@@ -390,6 +459,52 @@
         } else {
             $('#seo-progress-bar').css('animation', 'none');
         }
+    }
+    
+    // Display Score Breakdown
+    function displayScoreBreakdown(breakdown, overallScore) {
+        var $recommendations = $('#seo-recommendations-list');
+        var html = '<div class="score-breakdown-detail" style="margin-top: 20px;">';
+        html += '<h3 style="margin-bottom: 15px;">Overall Score: ' + overallScore + '/100</h3>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">';
+        
+        var breakdownLabels = {
+            'meta_title': {label: 'Meta Title', icon: '📝', max: 15},
+            'title_keywords': {label: 'Title Keywords', icon: '🔑', max: 5},
+            'meta_description': {label: 'Meta Description', icon: '📄', max: 15},
+            'content_length': {label: 'Content Length', icon: '📊', max: 10},
+            'keyword_density': {label: 'Keyword Density', icon: '🎯', max: 10},
+            'image_alt_tags': {label: 'Image Alt Tags', icon: '🖼️', max: 10},
+            'headings': {label: 'Headings', icon: '📑', max: 10},
+            'internal_links': {label: 'Internal Links', icon: '🔗', max: 5},
+            'external_links': {label: 'External Links', icon: '🌐', max: 3},
+        };
+        
+        for (var key in breakdown) {
+            if (breakdownLabels[key] && breakdown[key].count > 0) {
+                var item = breakdown[key];
+                var label = breakdownLabels[key];
+                var percentage = item.percentage || 0;
+                var statusColor = percentage >= 80 ? '#10b981' : (percentage >= 60 ? '#f59e0b' : '#ef4444');
+                var score = Math.round(item.score || 0);
+                var max = label.max;
+                
+                html += '<div style="background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 3px solid ' + statusColor + ';">';
+                html += '<div style="display: flex; align-items: center; margin-bottom: 8px;">';
+                html += '<span style="font-size: 20px; margin-right: 8px;">' + label.icon + '</span>';
+                html += '<strong style="flex: 1;">' + label.label + '</strong>';
+                html += '<span style="font-weight: 600; color: ' + statusColor + ';">' + score + '/' + max + '</span>';
+                html += '</div>';
+                html += '<div style="background: #e5e7eb; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 8px;">';
+                html += '<div style="background: ' + statusColor + '; height: 100%; width: ' + percentage + '%;"></div>';
+                html += '</div>';
+                html += '<div style="font-size: 11px; color: #6b7280; margin-top: 6px;">' + percentage + '% of max score</div>';
+                html += '</div>';
+            }
+        }
+        
+        html += '</div></div>';
+        $recommendations.html(html);
     }
     
     // Start Analysis - Use delegated event

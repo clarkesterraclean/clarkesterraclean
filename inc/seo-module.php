@@ -230,6 +230,64 @@ function clarkes_seo_module_page() {
         </div>
         <?php endif; ?>
         
+        <!-- SEO Score Breakdown -->
+        <?php 
+        $score_breakdown = get_option('clarkes_seo_score_breakdown', array());
+        if (!empty($score_breakdown)) : 
+        ?>
+        <div class="seo-score-breakdown" style="background: white; padding: 30px; border: 1px solid #ddd; border-radius: 8px; margin: 20px 0;">
+            <h2 style="margin-top: 0;"><?php _e('SEO Score Breakdown', 'clarkes-terraclean'); ?></h2>
+            <p class="description" style="margin-bottom: 20px;"><?php _e('Detailed breakdown showing how your SEO score is calculated and where improvements can be made.', 'clarkes-terraclean'); ?></p>
+            
+            <div class="breakdown-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <?php 
+                $breakdown_labels = array(
+                    'meta_title' => array('label' => 'Meta Title', 'icon' => '📝', 'max' => 15),
+                    'title_keywords' => array('label' => 'Title Keywords', 'icon' => '🔑', 'max' => 5),
+                    'meta_description' => array('label' => 'Meta Description', 'icon' => '📄', 'max' => 15),
+                    'content_length' => array('label' => 'Content Length', 'icon' => '📊', 'max' => 10),
+                    'keyword_density' => array('label' => 'Keyword Density', 'icon' => '🎯', 'max' => 10),
+                    'image_alt_tags' => array('label' => 'Image Alt Tags', 'icon' => '🖼️', 'max' => 10),
+                    'headings' => array('label' => 'Headings Structure', 'icon' => '📑', 'max' => 10),
+                    'internal_links' => array('label' => 'Internal Links', 'icon' => '🔗', 'max' => 5),
+                    'external_links' => array('label' => 'External Links', 'icon' => '🌐', 'max' => 3),
+                );
+                
+                foreach ($breakdown_labels as $key => $label_info) :
+                    if (!isset($score_breakdown[$key])) continue;
+                    $breakdown = $score_breakdown[$key];
+                    $percentage = isset($breakdown['percentage']) ? $breakdown['percentage'] : 0;
+                    $status_color = $percentage >= 80 ? '#10b981' : ($percentage >= 60 ? '#f59e0b' : '#ef4444');
+                    $status_text = $percentage >= 80 ? 'Good' : ($percentage >= 60 ? 'Needs Work' : 'Critical');
+                ?>
+                <div class="breakdown-item" style="background: #f9fafb; padding: 20px; border-radius: 8px; border-left: 4px solid <?php echo $status_color; ?>;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 24px; margin-right: 10px;"><?php echo $label_info['icon']; ?></span>
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;"><?php echo esc_html($label_info['label']); ?></h3>
+                            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;"><?php echo esc_html($status_text); ?></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #6b7280;">Score</span>
+                            <span style="font-weight: 600; color: <?php echo $status_color; ?>;">
+                                <?php echo isset($breakdown['score']) ? round($breakdown['score']) : 0; ?>/<?php echo $label_info['max']; ?>
+                            </span>
+                        </div>
+                        <div style="background: #e5e7eb; border-radius: 4px; height: 8px; overflow: hidden;">
+                            <div style="background: <?php echo $status_color; ?>; height: 100%; width: <?php echo $percentage; ?>%; transition: width 0.3s;"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                            <?php echo $percentage; ?>% of maximum score
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
         <!-- SEO Recommendations -->
         <div class="seo-recommendations" style="background: white; padding: 20px; border: 1px solid #ddd; border-radius: 4px; margin: 20px 0;">
             <h2><?php _e('AI-Powered Recommendations', 'clarkes-terraclean'); ?></h2>
@@ -645,8 +703,28 @@ function clarkes_ajax_crawl_site() {
     $total_score = 0;
     $analyzed = 0;
     $fixed_count = 0;
+    $content_boosted_count = 0;
+    
+    // Real-time progress updates via transients (for AJAX polling)
+    $progress_key = 'seo_crawl_progress_' . get_current_user_id();
+    delete_transient($progress_key);
+    
+    $total_items = count($all_items);
+    $current_item = 0;
     
     foreach ($all_items as $item) {
+        $current_item++;
+        $progress_percent = round(($current_item / $total_items) * 100);
+        
+        // Update progress for real-time display
+        set_transient($progress_key, array(
+            'current' => $current_item,
+            'total' => $total_items,
+            'percent' => $progress_percent,
+            'current_page' => $item->post_title,
+            'status' => 'analyzing'
+        ), 300);
+        
         $analysis = clarkes_analyze_page_seo($item->ID, true); // Return detailed analysis
         $score = $analysis['score'];
         $total_score += $score;
@@ -665,13 +743,30 @@ function clarkes_ajax_crawl_site() {
         
         // Auto-fix if enabled
         if ($auto_fix && $score < 80) {
-            $fixed = clarkes_auto_optimize_page($item->ID, $analysis);
+            $fix_result = clarkes_auto_optimize_page($item->ID, $analysis);
+            $fixed = is_array($fix_result) ? $fix_result['fixed'] : $fix_result;
+            $content_boosted = is_array($fix_result) && isset($fix_result['content_boosted']) ? $fix_result['content_boosted'] : false;
+            
             if ($fixed) {
                 $fixed_count++;
+                $content_boosted = is_array($fix_result) && isset($fix_result['content_boosted']) ? $fix_result['content_boosted'] : false;
+                if ($content_boosted) {
+                    $content_boosted_count++;
+                }
                 // Re-analyze after fix
                 $new_analysis = clarkes_analyze_page_seo($item->ID, true);
                 $total_score -= $score;
                 $total_score += $new_analysis['score'];
+                
+                // Update progress
+                set_transient($progress_key, array(
+                    'current' => $current_item,
+                    'total' => $total_items,
+                    'percent' => $progress_percent,
+                    'current_page' => $item->post_title,
+                    'status' => 'fixed',
+                    'fixed_count' => $fixed_count
+                ), 300);
             }
         } else {
             // Just collect issues
@@ -696,13 +791,59 @@ function clarkes_ajax_crawl_site() {
     }
     
     $average_score = $analyzed > 0 ? round($total_score / $analyzed) : 0;
+    
+    // Calculate overall score breakdown
+    $overall_breakdown = array(
+        'meta_title' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'meta_description' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'content_length' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'keyword_density' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'image_alt_tags' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'headings' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'internal_links' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'external_links' => array('score' => 0, 'max' => 0, 'count' => 0),
+        'title_keywords' => array('score' => 0, 'max' => 0, 'count' => 0),
+    );
+    
+    // Aggregate breakdowns from all pages
+    foreach ($all_items as $item) {
+        $item_analysis = clarkes_analyze_page_seo($item->ID, true);
+        if (isset($item_analysis['score_breakdown'])) {
+            foreach ($item_analysis['score_breakdown'] as $key => $breakdown) {
+                if (isset($overall_breakdown[$key])) {
+                    $overall_breakdown[$key]['score'] += $breakdown['final_score'];
+                    $overall_breakdown[$key]['max'] += $breakdown['score'];
+                    $overall_breakdown[$key]['count']++;
+                }
+            }
+        }
+    }
+    
+    // Calculate averages
+    foreach ($overall_breakdown as $key => &$breakdown) {
+        if ($breakdown['count'] > 0) {
+            $breakdown['average'] = round(($breakdown['score'] / $breakdown['max']) * 100);
+            $breakdown['percentage'] = round(($breakdown['score'] / $breakdown['max']) * 100);
+        } else {
+            $breakdown['average'] = 0;
+            $breakdown['percentage'] = 0;
+        }
+    }
+    
     update_option('clarkes_seo_score', $average_score);
     update_option('clarkes_seo_issues', $issues);
+    update_option('clarkes_seo_score_breakdown', $overall_breakdown);
     update_option('clarkes_seo_last_crawl', current_time('mysql'));
+    
+    // Clear progress transient
+    delete_transient($progress_key);
     
     $message = sprintf(__('Analyzed %d pages. Average SEO score: %d/100', 'clarkes-terraclean'), $analyzed, $average_score);
     if ($auto_fix && $fixed_count > 0) {
         $message .= sprintf(__('. Auto-fixed %d pages.', 'clarkes-terraclean'), $fixed_count);
+        if ($content_boosted_count > 0) {
+            $message .= sprintf(__(' Content boosted on %d pages.', 'clarkes-terraclean'), $content_boosted_count);
+        }
     }
     
     wp_send_json_success(array(
@@ -710,11 +851,37 @@ function clarkes_ajax_crawl_site() {
         'analyzed' => $analyzed,
         'issues' => count($issues),
         'fixed' => $fixed_count,
+        'content_boosted' => $content_boosted_count,
+        'breakdown' => $overall_breakdown,
         'message' => $message,
     ));
 }
 }
 add_action('wp_ajax_clarkes_crawl_site', 'clarkes_ajax_crawl_site');
+
+/**
+ * AJAX: Get Real-time Progress
+ */
+if (!function_exists('clarkes_ajax_get_seo_progress')) {
+function clarkes_ajax_get_seo_progress() {
+    check_ajax_referer('clarkes_seo_module', 'nonce');
+    
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Insufficient permissions'));
+        return;
+    }
+    
+    $progress_key = 'seo_crawl_progress_' . get_current_user_id();
+    $progress = get_transient($progress_key);
+    
+    if ($progress) {
+        wp_send_json_success($progress);
+    } else {
+        wp_send_json_success(array('status' => 'idle'));
+    }
+}
+}
+add_action('wp_ajax_clarkes_get_seo_progress', 'clarkes_ajax_get_seo_progress');
 
 /**
  * Analyze Page SEO - Enhanced with detailed issue detection
@@ -873,19 +1040,264 @@ function clarkes_analyze_page_seo($post_id, $detailed = false) {
     $final_score = max(0, $score);
     update_post_meta($post_id, '_clarkes_seo_score', $final_score);
     
+    // Calculate score breakdown
+    $score_breakdown = array(
+        'meta_title' => array(
+            'score' => 15,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'meta_description' => array(
+            'score' => 15,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'content_length' => array(
+            'score' => 10,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'keyword_density' => array(
+            'score' => 10,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'image_alt_tags' => array(
+            'score' => 10,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'headings' => array(
+            'score' => 10,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'internal_links' => array(
+            'score' => 5,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'external_links' => array(
+            'score' => 3,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+        'title_keywords' => array(
+            'score' => 5,
+            'deducted' => 0,
+            'status' => 'good',
+            'details' => ''
+        ),
+    );
+    
+    // Calculate deductions for each category
+    if (!$meta_title) {
+        $score_breakdown['meta_title']['deducted'] = 15;
+        $score_breakdown['meta_title']['status'] = 'critical';
+        $score_breakdown['meta_title']['details'] = 'Missing meta title';
+    } elseif ($title_length < 30 || $title_length > 60) {
+        $score_breakdown['meta_title']['deducted'] = 10;
+        $score_breakdown['meta_title']['status'] = 'warning';
+        $score_breakdown['meta_title']['details'] = sprintf('Title length: %d characters (recommended: 30-60)', $title_length);
+    }
+    
+    if (!$has_keyword && !empty($focus_keywords[0])) {
+        $score_breakdown['title_keywords']['deducted'] = 5;
+        $score_breakdown['title_keywords']['status'] = 'warning';
+        $score_breakdown['title_keywords']['details'] = 'Title missing focus keywords';
+    }
+    
+    if (!$meta_description) {
+        $score_breakdown['meta_description']['deducted'] = 15;
+        $score_breakdown['meta_description']['status'] = 'critical';
+        $score_breakdown['meta_description']['details'] = 'Missing meta description';
+    } elseif ($desc_length < 120 || $desc_length > 160) {
+        $score_breakdown['meta_description']['deducted'] = 10;
+        $score_breakdown['meta_description']['status'] = 'warning';
+        $score_breakdown['meta_description']['details'] = sprintf('Description length: %d characters (recommended: 120-160)', $desc_length);
+    }
+    
+    if ($content_length < 300) {
+        $score_breakdown['content_length']['deducted'] = 10;
+        $score_breakdown['content_length']['status'] = 'warning';
+        $score_breakdown['content_length']['details'] = sprintf('Content too short: %d characters (recommended: 300+)', $content_length);
+    }
+    
+    if (!empty($focus_keywords[0])) {
+        $primary_keyword = strtolower(trim($focus_keywords[0]));
+        $content_lower = strtolower($content);
+        $word_count = str_word_count($content_lower);
+        $keyword_count = substr_count($content_lower, $primary_keyword);
+        $density = $word_count > 0 ? ($keyword_count / $word_count) * 100 : 0;
+        
+        if ($density < 0.5) {
+            $score_breakdown['keyword_density']['deducted'] = 5;
+            $score_breakdown['keyword_density']['status'] = 'warning';
+            $score_breakdown['keyword_density']['details'] = sprintf('Low keyword density: %.2f%% (recommended: 0.5-2.5%%)', $density);
+        } elseif ($density > 3) {
+            $score_breakdown['keyword_density']['deducted'] = 10;
+            $score_breakdown['keyword_density']['status'] = 'critical';
+            $score_breakdown['keyword_density']['details'] = sprintf('Keyword stuffing: %.2f%% (recommended: 0.5-2.5%%)', $density);
+        } else {
+            $score_breakdown['keyword_density']['details'] = sprintf('Keyword density: %.2f%% (optimal)', $density);
+        }
+    }
+    
+    if (count($images) > 0) {
+        $alt_percentage = ($images_with_alt / count($images)) * 100;
+        if ($alt_percentage < 80) {
+            $score_breakdown['image_alt_tags']['deducted'] = 10;
+            $score_breakdown['image_alt_tags']['status'] = 'warning';
+            $score_breakdown['image_alt_tags']['details'] = sprintf('Only %d%% of images have alt tags (%d/%d)', round($alt_percentage), $images_with_alt, count($images));
+        } else {
+            $score_breakdown['image_alt_tags']['details'] = sprintf('All images have alt tags (%d/%d)', $images_with_alt, count($images));
+        }
+    } else {
+        $score_breakdown['image_alt_tags']['details'] = 'No images found';
+    }
+    
+    if (!$has_h1 && !$has_h2) {
+        $score_breakdown['headings']['deducted'] = 10;
+        $score_breakdown['headings']['status'] = 'warning';
+        $score_breakdown['headings']['details'] = 'Missing H1 or H2 headings';
+    } else {
+        $score_breakdown['headings']['details'] = 'Headings structure present';
+    }
+    
+    if ($internal_links < 2) {
+        $score_breakdown['internal_links']['deducted'] = 5;
+        $score_breakdown['internal_links']['status'] = 'warning';
+        $score_breakdown['internal_links']['details'] = sprintf('Only %d internal link(s) (recommended: 2+)', $internal_links);
+    } else {
+        $score_breakdown['internal_links']['details'] = sprintf('%d internal links (good)', $internal_links);
+    }
+    
+    if ($external_links > 0) {
+        $nofollow_count = preg_match_all('/<a[^>]+rel=["\'][^"\']*nofollow[^"\']*["\']/', $post->post_content);
+        if ($nofollow_count < $external_links * 0.8) {
+            $score_breakdown['external_links']['deducted'] = 3;
+            $score_breakdown['external_links']['status'] = 'info';
+            $score_breakdown['external_links']['details'] = sprintf('External links missing nofollow (%d/%d)', $nofollow_count, $external_links);
+        } else {
+            $score_breakdown['external_links']['details'] = 'External links properly configured';
+        }
+    }
+    
+    // Calculate final scores for each category
+    foreach ($score_breakdown as $key => &$breakdown) {
+        $breakdown['final_score'] = $breakdown['score'] - $breakdown['deducted'];
+        if ($breakdown['final_score'] < $breakdown['score']) {
+            $breakdown['status'] = $breakdown['status'] === 'good' ? 'warning' : $breakdown['status'];
+        }
+    }
+    
     if ($detailed) {
         return array(
             'score' => $final_score,
+            'score_breakdown' => $score_breakdown,
             'issues' => $issues,
             'meta_title' => $meta_title,
             'meta_description' => $meta_description,
             'content_length' => $content_length,
             'images_count' => count($images),
             'images_with_alt' => $images_with_alt,
+            'word_count' => isset($word_count) ? $word_count : str_word_count(strtolower($content)),
+            'keyword_density' => isset($density) ? $density : 0,
+            'internal_links' => $internal_links,
+            'external_links' => $external_links,
         );
     }
     
     return $final_score;
+}
+}
+
+/**
+ * Boost Content with AI - Enhances content quality and quantity
+ */
+if (!function_exists('clarkes_boost_content_with_ai')) {
+function clarkes_boost_content_with_ai($post_id, $post, $ai_api_key, $focus_keywords) {
+    if (empty($ai_api_key)) {
+        return false;
+    }
+    
+    $current_content = wp_strip_all_tags($post->post_content);
+    $current_length = strlen($current_content);
+    
+    // Only boost if content is too short
+    if ($current_length >= 500) {
+        return false;
+    }
+    
+    $primary_keyword = !empty($focus_keywords[0]) ? trim($focus_keywords[0]) : '';
+    $keywords_str = implode(', ', $focus_keywords);
+    
+    // Build prompt for content enhancement
+    $prompt = "Enhance and expand the following content to be at least 500 words while maintaining natural, human-sounding language. ";
+    $prompt .= "The content should be professional, engaging, and SEO-friendly. ";
+    if ($primary_keyword) {
+        $prompt .= "Naturally incorporate the keyword '{$primary_keyword}' and related terms: {$keywords_str}. ";
+    }
+    $prompt .= "Keep the original meaning and tone. Add relevant details, examples, and value to the reader.\n\n";
+    $prompt .= "Original Content:\n{$current_content}\n\n";
+    $prompt .= "Enhanced Content:";
+    
+    $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+        'headers' => array(
+            'Authorization' => 'Bearer ' . $ai_api_key,
+            'Content-Type' => 'application/json',
+        ),
+        'body' => json_encode(array(
+            'model' => 'gpt-4',
+            'messages' => array(
+                array(
+                    'role' => 'system',
+                    'content' => 'You are a professional content writer specializing in automotive services. Enhance content to be comprehensive, engaging, and SEO-optimized while maintaining natural, human-sounding language.'
+                ),
+                array(
+                    'role' => 'user',
+                    'content' => $prompt
+                )
+            ),
+            'max_tokens' => 2000,
+            'temperature' => 0.7,
+        )),
+        'timeout' => 60,
+    ));
+    
+    if (is_wp_error($response)) {
+        return false;
+    }
+    
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+    
+    if (isset($body['choices'][0]['message']['content'])) {
+        $enhanced_content = trim($body['choices'][0]['message']['content']);
+        
+        // Preserve HTML structure if original had it
+        if (strpos($post->post_content, '<') !== false) {
+            // Try to maintain some HTML structure
+            $enhanced_content = wpautop($enhanced_content);
+        }
+        
+        // Update post content
+        wp_update_post(array(
+            'ID' => $post_id,
+            'post_content' => $enhanced_content
+        ));
+        
+        return true;
+    }
+    
+    return false;
 }
 }
 
@@ -1009,42 +1421,58 @@ function clarkes_auto_optimize_page($post_id, $analysis) {
         }
     }
     
-    // Fix keyword density (if too low)
+    // Content Booster - Enhance content quality and quantity
+    $content_boosted = false;
     foreach ($analysis['issues'] as $issue) {
-        if ($issue['type'] === 'low_keyword_density' && $primary_keyword) {
+        if ($issue['type'] === 'content_too_short' || $issue['type'] === 'low_keyword_density') {
             $content = $post->post_content;
-            $content_lower = strtolower($content);
-            $word_count = str_word_count($content_lower);
-            $keyword_count = substr_count($content_lower, strtolower($primary_keyword));
-            $current_density = $word_count > 0 ? ($keyword_count / $word_count) * 100 : 0;
+            $content_stripped = wp_strip_all_tags($content);
+            $current_length = strlen($content_stripped);
             
-            // Target density: 1-2%
-            $target_density = 1.5;
-            $target_count = ceil(($word_count * $target_density) / 100);
-            $needed = max(0, $target_count - $keyword_count);
-            
-            if ($needed > 0 && $needed <= 3) {
-                // Add keyword naturally in content (only if reasonable)
-                $content_updated = $content;
-                // Add keyword in first paragraph if not present
-                if (stripos($content, $primary_keyword) === false) {
-                    $first_para = strpos($content, '</p>');
-                    if ($first_para !== false) {
-                        $insert_pos = $first_para;
-                        $insert_text = ' ' . $primary_keyword;
-                        $content_updated = substr_replace($content_updated, $insert_text, $insert_pos, 0);
-                    }
-                }
-                
-                // Only update if we made a reasonable change
-                if ($content_updated !== $content) {
-                    wp_update_post(array(
-                        'ID' => $post_id,
-                        'post_content' => $content_updated
-                    ));
+            // Use AI to boost content if API key is available
+            if ($ai_api_key && $current_length < 500) {
+                $content_boosted = clarkes_boost_content_with_ai($post_id, $post, $ai_api_key, $focus_keywords);
+                if ($content_boosted) {
                     $fixed = true;
                 }
             }
+            
+            // Fix keyword density (if too low)
+            if ($issue['type'] === 'low_keyword_density' && $primary_keyword) {
+                $content_lower = strtolower($content);
+                $word_count = str_word_count($content_lower);
+                $keyword_count = substr_count($content_lower, strtolower($primary_keyword));
+                $current_density = $word_count > 0 ? ($keyword_count / $word_count) * 100 : 0;
+                
+                // Target density: 1-2%
+                $target_density = 1.5;
+                $target_count = ceil(($word_count * $target_density) / 100);
+                $needed = max(0, $target_count - $keyword_count);
+                
+                if ($needed > 0 && $needed <= 3) {
+                    // Add keyword naturally in content (only if reasonable)
+                    $content_updated = $content;
+                    // Add keyword in first paragraph if not present
+                    if (stripos($content, $primary_keyword) === false) {
+                        $first_para = strpos($content, '</p>');
+                        if ($first_para !== false) {
+                            $insert_pos = $first_para;
+                            $insert_text = ' ' . $primary_keyword;
+                            $content_updated = substr_replace($content_updated, $insert_text, $insert_pos, 0);
+                        }
+                    }
+                    
+                    // Only update if we made a reasonable change
+                    if ($content_updated !== $content) {
+                        wp_update_post(array(
+                            'ID' => $post_id,
+                            'post_content' => $content_updated
+                        ));
+                        $fixed = true;
+                    }
+                }
+            }
+            break; // Only boost once per page
         }
     }
     
@@ -1068,7 +1496,7 @@ function clarkes_auto_optimize_page($post_id, $analysis) {
         }
     }
     
-    return $fixed;
+    return array('fixed' => $fixed, 'content_boosted' => isset($content_boosted) ? $content_boosted : false);
 }
 }
 
