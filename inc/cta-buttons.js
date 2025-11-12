@@ -59,35 +59,21 @@
         if (!modal) return;
         
         // Remove old handlers by removing and re-adding listeners
-        // Cancel button - remove old, add new
+        // Cancel button - use onclick attribute for maximum reliability
         if (cancelBtn) {
             // Clone to remove all listeners
             const newCancelBtn = cancelBtn.cloneNode(true);
             cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
             
-            // Attach with capture phase for highest priority
-            newCancelBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                console.log('Cancel clicked (CTA handler - capture)');
-                const modalEl = document.getElementById('clarkes-customer-info-modal');
-                const formEl = document.getElementById('clarkes-customer-info-form');
-                if (modalEl) {
-                    modalEl.style.display = 'none';
-                    if (formEl) formEl.reset();
-                }
-                customerInfo = null;
-                pendingAction = null;
-                return false;
-            }, true); // Capture phase - fires first
+            // Use onclick attribute as most reliable method (fires before form validation)
+            newCancelBtn.setAttribute('onclick', 'event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); const m = document.getElementById("clarkes-customer-info-modal"); const f = document.getElementById("clarkes-customer-info-form"); if(m) m.style.display="none"; if(f) f.reset(); return false;');
             
-            // Also attach in bubble phase as backup
+            // Also attach event listener as backup
             newCancelBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                console.log('Cancel clicked (CTA handler - bubble)');
+                console.log('Cancel clicked (CTA - listener)');
                 const modalEl = document.getElementById('clarkes-customer-info-modal');
                 const formEl = document.getElementById('clarkes-customer-info-form');
                 if (modalEl) {
@@ -97,7 +83,23 @@
                 customerInfo = null;
                 pendingAction = null;
                 return false;
-            }, false); // Bubble phase - backup
+            }, true); // Capture phase
+            
+            newCancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Cancel clicked (CTA - bubble)');
+                const modalEl = document.getElementById('clarkes-customer-info-modal');
+                const formEl = document.getElementById('clarkes-customer-info-form');
+                if (modalEl) {
+                    modalEl.style.display = 'none';
+                    if (formEl) formEl.reset();
+                }
+                customerInfo = null;
+                pendingAction = null;
+                return false;
+            }, false); // Bubble phase
         }
         
         // Backdrop click - remove old, add new

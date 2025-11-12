@@ -552,34 +552,22 @@ function clarkes_render_whatsapp_fab() {
                 return; // Modal doesn't exist yet
             }
             
-            // Clone elements to remove old listeners and attach fresh ones
-            // Cancel button - must be attached BEFORE form handlers
+            // Cancel button - use document-level delegation to ensure it always works
+            // Don't clone, just attach handler directly
             if (cancelBtn) {
+                // Remove any existing handlers by cloning
                 const newCancelBtn = cancelBtn.cloneNode(true);
                 cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
                 
-                // Attach with capture phase and highest priority
-                newCancelBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    console.log('Cancel button clicked (WhatsApp handler)');
-                    const modal = document.getElementById('clarkes-customer-info-modal');
-                    const form = document.getElementById('clarkes-customer-info-form');
-                    if (modal) {
-                        modal.style.display = 'none';
-                        if (form) form.reset();
-                    }
-                    pendingAction = null;
-                    return false;
-                }, true); // Capture phase - fires first
+                // Use onclick attribute as most reliable method
+                newCancelBtn.setAttribute('onclick', 'event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); const m = document.getElementById("clarkes-customer-info-modal"); const f = document.getElementById("clarkes-customer-info-form"); if(m) m.style.display="none"; if(f) f.reset(); return false;');
                 
-                // Also attach in bubble phase as backup
+                // Also attach event listener as backup
                 newCancelBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
-                    console.log('Cancel button clicked (WhatsApp handler - bubble)');
+                    console.log('Cancel button clicked (WhatsApp - listener)');
                     const modal = document.getElementById('clarkes-customer-info-modal');
                     const form = document.getElementById('clarkes-customer-info-form');
                     if (modal) {
@@ -588,7 +576,22 @@ function clarkes_render_whatsapp_fab() {
                     }
                     pendingAction = null;
                     return false;
-                }, false); // Bubble phase - backup
+                }, true); // Capture phase
+                
+                newCancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Cancel button clicked (WhatsApp - bubble)');
+                    const modal = document.getElementById('clarkes-customer-info-modal');
+                    const form = document.getElementById('clarkes-customer-info-form');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        if (form) form.reset();
+                    }
+                    pendingAction = null;
+                    return false;
+                }, false); // Bubble phase
             }
             
             // Backdrop - clone modal to remove old listeners
