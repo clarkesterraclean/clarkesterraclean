@@ -126,6 +126,15 @@ function clarkes_terraclean_scripts() {
         true
     );
     
+    // Enqueue CTA buttons script globally
+    wp_enqueue_script(
+        'clarkes-cta-buttons',
+        get_template_directory_uri() . '/inc/cta-buttons.js',
+        array(),
+        file_exists(get_template_directory() . '/inc/cta-buttons.js') ? filemtime(get_template_directory() . '/inc/cta-buttons.js') : '1.0.0',
+        true
+    );
+    
     // Localize script with AJAX URL and nonce for contact form
     wp_localize_script('clarkes-terraclean-script', 'CLARKES_CONTACT', array(
         'ajax_url' => admin_url('admin-ajax.php'),
