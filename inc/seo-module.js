@@ -21,7 +21,8 @@
             type: 'POST',
             data: {
                 action: 'clarkes_crawl_site',
-                nonce: clarkesSEO.nonce
+                nonce: clarkesSEO.nonce,
+                auto_fix: 'false'
             },
             success: function(response) {
                 if (response.success) {
@@ -31,12 +32,54 @@
                     }, 2000);
                 } else {
                     alert('Error: ' + response.data.message);
-                    $btn.prop('disabled', false).text('🕷️ Crawl Site & Analyze');
+                    $btn.prop('disabled', false).text('🕷️ Crawl & Analyze Site');
                 }
             },
             error: function() {
                 alert('An error occurred during site crawl');
-                $btn.prop('disabled', false).text('🕷️ Crawl Site & Analyze');
+                $btn.prop('disabled', false).text('🕷️ Crawl & Analyze Site');
+            }
+        });
+    });
+    
+    // Crawl and Auto-Fix - Use delegated event
+    $(document).on('click', '#btn-crawl-and-fix', function() {
+        if (!confirm('This will automatically fix SEO issues across all pages. This may take a while. Continue?')) {
+            return;
+        }
+        
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Crawling & Fixing...');
+        
+        $('#seo-progress').show();
+        updateProgress(0, 'Starting crawl and auto-fix...');
+        
+        $.ajax({
+            url: clarkesSEO.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'clarkes_crawl_site',
+                nonce: clarkesSEO.nonce,
+                auto_fix: 'true'
+            },
+            success: function(response) {
+                if (response.success) {
+                    var message = response.data.message;
+                    if (response.data.fixed > 0) {
+                        message += '\n\nFixed ' + response.data.fixed + ' pages automatically!';
+                    }
+                    updateProgress(100, message);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 3000);
+                } else {
+                    alert('Error: ' + response.data.message);
+                    $btn.prop('disabled', false).text('⚡ Crawl & Auto-Fix All Issues');
+                }
+            },
+            error: function() {
+                alert('An error occurred during crawl and fix');
+                $btn.prop('disabled', false).text('⚡ Crawl & Auto-Fix All Issues');
             }
         });
     });
