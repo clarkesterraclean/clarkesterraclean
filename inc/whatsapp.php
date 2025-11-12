@@ -207,8 +207,8 @@ function clarkes_render_whatsapp_fab() {
         return;
     }
 
-    // Check scope
-    $scope = get_theme_mod('whatsapp_show_scope', 'all');
+    // Check scope - Default to front page only for this feature
+    $scope = get_theme_mod('whatsapp_show_scope', 'front_only');
     if ($scope === 'front_only' && !is_front_page()) {
         return;
     }
