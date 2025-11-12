@@ -484,7 +484,7 @@ endif; // show_case_studies
                 $wa_url = 'https://wa.me/' . $wa_clean . '?text=' . $wa_prefill;
                 ?>
                 <button id="contact-call-cta" class="clarkes-cta-button inline-block border border-eco-green text-eco-green rounded-full px-8 py-4 text-lg font-semibold hover:bg-eco-green hover:text-carbon-dark transition cursor-pointer" data-phone="<?php echo esc_attr($phone); ?>" data-phone-clean="<?php echo esc_attr($phone_clean); ?>" data-wa-url="<?php echo esc_attr($wa_url); ?>">
-                    📞 Call <?php echo esc_html($phone); ?>
+                    Call <?php echo esc_html($phone); ?>
                 </button>
             </div>
             
