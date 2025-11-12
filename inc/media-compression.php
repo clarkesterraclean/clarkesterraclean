@@ -261,7 +261,11 @@ add_action('wp_ajax_clarkes_get_media_list', 'clarkes_ajax_get_media_list');
  */
 if (!function_exists('clarkes_ajax_compress_media')) {
 function clarkes_ajax_compress_media() {
-    check_ajax_referer('clarkes_compression', 'nonce');
+    // Check nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'clarkes_compression')) {
+        wp_send_json_error(array('message' => 'Security check failed'));
+        return;
+    }
     
     if (!current_user_can('manage_options')) {
         wp_send_json_error(array('message' => 'Insufficient permissions'));
@@ -269,19 +273,30 @@ function clarkes_ajax_compress_media() {
     }
     
     $media_id = isset($_POST['media_id']) ? absint($_POST['media_id']) : 0;
-    $settings = isset($_POST['settings']) ? $_POST['settings'] : array();
+    $settings = isset($_POST['settings']) ? (array)$_POST['settings'] : array();
     
     if (!$media_id) {
         wp_send_json_error(array('message' => 'Invalid media ID'));
         return;
     }
     
-    $result = clarkes_compress_single_media($media_id, $settings);
-    
-    if ($result['success']) {
-        wp_send_json_success($result);
-    } else {
-        wp_send_json_error($result);
+    try {
+        $result = clarkes_compress_single_media($media_id, $settings);
+        
+        if (isset($result['success']) && $result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    } catch (Exception $e) {
+        wp_send_json_error(array(
+            'success' => false,
+            'message' => 'Compression error: ' . $e->getMessage(),
+            'original_size' => 0,
+            'new_size' => 0,
+            'savings' => 0,
+            'savings_percent' => 0
+        ));
     }
 }
 }
@@ -294,24 +309,49 @@ if (!function_exists('clarkes_compress_single_media')) {
 function clarkes_compress_single_media($media_id, $settings = array()) {
     $file_path = get_attached_file($media_id);
     
-    if (!file_exists($file_path)) {
-        return array('success' => false, 'message' => 'File not found');
+    if (!$file_path || !file_exists($file_path)) {
+        return array(
+            'success' => false,
+            'message' => 'File not found',
+            'original_size' => 0,
+            'new_size' => 0,
+            'savings' => 0,
+            'savings_percent' => 0
+        );
     }
     
     $mime_type = get_post_mime_type($media_id);
     $original_size = filesize($file_path);
     
+    if ($original_size === false || $original_size === 0) {
+        return array(
+            'success' => false,
+            'message' => 'Unable to read file size',
+            'original_size' => 0,
+            'new_size' => 0,
+            'savings' => 0,
+            'savings_percent' => 0
+        );
+    }
+    
     // Image compression
     if (strpos($mime_type, 'image') !== false) {
-        return clarkes_compress_image($file_path, $media_id, $settings);
+        return clarkes_compress_image($file_path, $media_id, $settings, $original_size);
     }
     
     // Video compression
     if (strpos($mime_type, 'video') !== false) {
-        return clarkes_compress_video($file_path, $media_id, $settings);
+        return clarkes_compress_video($file_path, $media_id, $settings, $original_size);
     }
     
-    return array('success' => false, 'message' => 'Unsupported file type');
+    return array(
+        'success' => false,
+        'message' => 'Unsupported file type: ' . $mime_type,
+        'original_size' => $original_size,
+        'new_size' => $original_size,
+        'savings' => 0,
+        'savings_percent' => 0
+    );
 }
 }
 
@@ -319,18 +359,32 @@ function clarkes_compress_single_media($media_id, $settings = array()) {
  * Compress Image
  */
 if (!function_exists('clarkes_compress_image')) {
-function clarkes_compress_image($file_path, $media_id, $settings = array()) {
+function clarkes_compress_image($file_path, $media_id, $settings = array(), $original_size = null) {
+    if ($original_size === null) {
+        $original_size = file_exists($file_path) ? filesize($file_path) : 0;
+    }
     $jpeg_quality = isset($settings['jpeg_quality']) ? intval($settings['jpeg_quality']) : 85;
     $png_compression = isset($settings['png_compression']) ? intval($settings['png_compression']) : 6;
-    $convert_to_webp = isset($settings['convert_to_webp']) ? $settings['convert_to_webp'] : false;
-    $max_width = isset($settings['max_width']) ? intval($settings['max_width']) : 1920;
-    $backup = isset($settings['backup']) ? $settings['backup'] : true;
+    $convert_to_webp = isset($settings['convert_to_webp']) && $settings['convert_to_webp'] ? true : false;
+    $resize_large = isset($settings['resize_large_images']) && $settings['resize_large_images'] ? true : false;
+    $max_width = isset($settings['max_image_width']) ? intval($settings['max_image_width']) : (isset($settings['max_width']) ? intval($settings['max_width']) : 1920);
+    $backup = isset($settings['backup']) && $settings['backup'] ? true : false;
     
-    $original_size = filesize($file_path);
-    $image_info = getimagesize($file_path);
+    if ($original_size === null || $original_size === 0) {
+        $original_size = file_exists($file_path) ? filesize($file_path) : 0;
+    }
+    
+    $image_info = @getimagesize($file_path);
     
     if (!$image_info) {
-        return array('success' => false, 'message' => 'Invalid image file');
+        return array(
+            'success' => false,
+            'message' => 'Invalid image file or unsupported format',
+            'original_size' => $original_size,
+            'new_size' => $original_size,
+            'savings' => 0,
+            'savings_percent' => 0
+        );
     }
     
     $width = $image_info[0];
@@ -368,7 +422,7 @@ function clarkes_compress_image($file_path, $media_id, $settings = array()) {
     // Resize if needed
     $new_width = $width;
     $new_height = $height;
-    if ($width > $max_width) {
+    if ($resize_large && $max_width > 0 && $width > $max_width) {
         $new_width = $max_width;
         $new_height = intval(($height * $max_width) / $width);
         
@@ -406,8 +460,15 @@ function clarkes_compress_image($file_path, $media_id, $settings = array()) {
     
     imagedestroy($image);
     
-    if (!$saved) {
-        return array('success' => false, 'message' => 'Failed to save compressed image');
+    if (!$saved || !file_exists($output_path)) {
+        return array(
+            'success' => false,
+            'message' => 'Failed to save compressed image',
+            'original_size' => $original_size,
+            'new_size' => $original_size,
+            'savings' => 0,
+            'savings_percent' => 0
+        );
     }
     
     $new_size = filesize($output_path);
@@ -440,7 +501,10 @@ function clarkes_compress_image($file_path, $media_id, $settings = array()) {
  * Compress Video
  */
 if (!function_exists('clarkes_compress_video')) {
-function clarkes_compress_video($file_path, $media_id, $settings = array()) {
+function clarkes_compress_video($file_path, $media_id, $settings = array(), $original_size = null) {
+    if ($original_size === null) {
+        $original_size = file_exists($file_path) ? filesize($file_path) : 0;
+    }
     // Check if FFmpeg is available
     $ffmpeg_path = clarkes_get_ffmpeg_path();
     if (!$ffmpeg_path) {

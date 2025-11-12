@@ -193,31 +193,58 @@
                     media_id: media.id,
                     settings: compressionSettings
                 },
-                success: function(response) {
-                    if (response.success) {
-                        results.push({
-                            media: media,
-                            result: response.data
-                        });
-                        totalSavings += response.data.savings || 0;
-                    } else {
-                        results.push({
-                            media: media,
-                            error: response.data.message || 'Compression failed'
-                        });
+            success: function(response) {
+                if (response && response.success && response.data) {
+                    var result = response.data;
+                    // Ensure all required fields exist
+                    if (typeof result.savings === 'undefined') {
+                        result.savings = 0;
+                    }
+                    if (typeof result.savings_percent === 'undefined') {
+                        result.savings_percent = 0;
+                    }
+                    if (typeof result.original_size === 'undefined') {
+                        result.original_size = media.size || 0;
+                    }
+                    if (typeof result.new_size === 'undefined') {
+                        result.new_size = result.original_size;
                     }
                     
-                    processed++;
-                    compressNext();
-                },
-                error: function() {
                     results.push({
                         media: media,
-                        error: 'AJAX error'
+                        result: result
                     });
-                    processed++;
-                    compressNext();
+                    totalSavings += parseInt(result.savings) || 0;
+                } else {
+                    var errorMsg = 'Compression failed';
+                    if (response && response.data && response.data.message) {
+                        errorMsg = response.data.message;
+                    } else if (response && response.data && typeof response.data === 'string') {
+                        errorMsg = response.data;
+                    }
+                    results.push({
+                        media: media,
+                        error: errorMsg
+                    });
                 }
+                
+                processed++;
+                compressNext();
+            },
+            error: function(xhr, status, error) {
+                var errorMsg = 'AJAX error';
+                if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                    errorMsg = xhr.responseJSON.data.message;
+                } else if (error) {
+                    errorMsg = 'AJAX error: ' + error;
+                }
+                results.push({
+                    media: media,
+                    error: errorMsg
+                });
+                processed++;
+                compressNext();
+            }
             });
         }
         
@@ -244,9 +271,11 @@
             } else {
                 successCount++;
                 $result.addClass('result-success');
+                var savings = parseInt(item.result.savings) || 0;
+                var savingsPercent = parseFloat(item.result.savings_percent) || 0;
                 $result.html(
                     '<strong>' + item.media.title + '</strong><br>' +
-                    '<span class="savings">Saved: ' + formatBytes(item.result.savings) + ' (' + item.result.savings_percent + '%)</span>'
+                    '<span class="savings">Saved: ' + formatBytes(savings) + ' (' + savingsPercent.toFixed(2) + '%)</span>'
                 );
             }
             
