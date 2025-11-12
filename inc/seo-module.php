@@ -882,3 +882,155 @@ function clarkes_ajax_generate_sitemap() {
 }
 add_action('wp_ajax_clarkes_generate_sitemap', 'clarkes_ajax_generate_sitemap');
 
+/**
+ * AJAX: Get All Pages
+ */
+if (!function_exists('clarkes_ajax_get_all_pages')) {
+function clarkes_ajax_get_all_pages() {
+    check_ajax_referer('clarkes_seo_module', 'nonce');
+    
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Insufficient permissions'));
+        return;
+    }
+    
+    $posts = get_posts(array('numberposts' => -1, 'post_status' => 'publish', 'fields' => 'ids'));
+    $pages = get_pages(array('post_status' => 'publish', 'fields' => 'ids'));
+    
+    wp_send_json_success(array(
+        'ids' => array_merge($posts, $pages),
+    ));
+}
+}
+add_action('wp_ajax_clarkes_get_all_pages', 'clarkes_ajax_get_all_pages');
+
+/**
+ * Generate Robots.txt
+ */
+if (!function_exists('clarkes_generate_robots_txt')) {
+function clarkes_generate_robots_txt() {
+    $sitemap_url = home_url('/sitemap.xml');
+    
+    $robots = "User-agent: *\n";
+    $robots .= "Allow: /\n";
+    $robots .= "Disallow: /wp-admin/\n";
+    $robots .= "Disallow: /wp-includes/\n";
+    $robots .= "Disallow: /wp-content/plugins/\n";
+    $robots .= "Disallow: /?s=\n";
+    $robots .= "Disallow: /search/\n\n";
+    $robots .= "Sitemap: " . $sitemap_url . "\n";
+    
+    return $robots;
+}
+}
+
+/**
+ * Add Robots Meta to Head
+ */
+if (!function_exists('clarkes_add_robots_meta')) {
+function clarkes_add_robots_meta() {
+    echo '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />' . "\n";
+}
+}
+add_action('wp_head', 'clarkes_add_robots_meta', 1);
+
+/**
+ * Add Breadcrumbs Schema
+ */
+if (!function_exists('clarkes_add_breadcrumbs_schema')) {
+function clarkes_add_breadcrumbs_schema() {
+    if (!is_singular()) {
+        return;
+    }
+    
+    global $post;
+    $breadcrumbs = array(
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => array(
+            array(
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => 'Home',
+                'item' => home_url(),
+            ),
+        ),
+    );
+    
+    if (is_page() && $post->post_parent) {
+        $ancestors = get_post_ancestors($post->ID);
+        $ancestors = array_reverse($ancestors);
+        
+        $position = 2;
+        foreach ($ancestors as $ancestor_id) {
+            $breadcrumbs['itemListElement'][] = array(
+                '@type' => 'ListItem',
+                'position' => $position++,
+                'name' => get_the_title($ancestor_id),
+                'item' => get_permalink($ancestor_id),
+            );
+        }
+    }
+    
+    $breadcrumbs['itemListElement'][] = array(
+        '@type' => 'ListItem',
+        'position' => count($breadcrumbs['itemListElement']) + 1,
+        'name' => get_the_title(),
+        'item' => get_permalink(),
+    );
+    
+    echo '<script type="application/ld+json">' . wp_json_encode($breadcrumbs, JSON_UNESCAPED_SLASHES) . '</script>' . "\n";
+}
+}
+add_action('wp_head', 'clarkes_add_breadcrumbs_schema', 6);
+
+/**
+ * Optimize Images for SEO
+ */
+if (!function_exists('clarkes_optimize_image_seo')) {
+function clarkes_optimize_image_seo($post_id) {
+    $images = get_attached_media('image', $post_id);
+    
+    foreach ($images as $image) {
+        $alt_text = get_post_meta($image->ID, '_wp_attachment_image_alt', true);
+        
+        if (empty($alt_text)) {
+            // Generate alt text from image filename or post title
+            $filename = basename(get_attached_file($image->ID));
+            $filename_clean = str_replace(array('-', '_', '.'), ' ', $filename);
+            $filename_clean = ucwords($filename_clean);
+            
+            update_post_meta($image->ID, '_wp_attachment_image_alt', $filename_clean);
+        }
+    }
+}
+}
+
+/**
+ * Add Performance Optimizations
+ */
+if (!function_exists('clarkes_add_performance_meta')) {
+function clarkes_add_performance_meta() {
+    // Preconnect to important domains
+    echo '<link rel="preconnect" href="https://fonts.googleapis.com" />' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />' . "\n";
+    
+    // DNS Prefetch
+    echo '<link rel="dns-prefetch" href="//fonts.googleapis.com" />' . "\n";
+    echo '<link rel="dns-prefetch" href="//fonts.gstatic.com" />' . "\n";
+}
+}
+add_action('wp_head', 'clarkes_add_performance_meta', 0);
+
+/**
+ * Add Viewport Meta for Mobile
+ */
+if (!function_exists('clarkes_add_viewport_meta')) {
+function clarkes_add_viewport_meta() {
+    if (!has_action('wp_head', 'wp_head')) {
+        echo '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />' . "\n";
+    }
+}
+}
+add_action('wp_head', 'clarkes_add_viewport_meta', 0);
+
